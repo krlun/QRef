@@ -1,0 +1,664 @@
+# electronic Ligand Builder and Optimisation Workbench (eLBOW)
+#   - a module of PHENIX version 1.20.1-4487-
+#   - file written: Mon Feb 13 14:35:24 2023
+#
+#   Ligand name: (4R,7R)-7-(dodecanoyloxy)-4-hydroxy-N,N,N-trimethyl-10-oxo-3,5,9-trioxa-4-phosphahenicosan-1-aminium 4-oxide
+#   Random seed: 03056941001
+#   Residue: PLC
+#   SMILES string: CCCCCCCCCCCC(=O)OC[C@H](CO[P@@](O)(=O)OCC[N+](C)(C)C)OC(=O)CCCCCCCCCCC
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+PLC        PLC 'Unknown                  ' ligand 106 42 .
+#
+data_comp_PLC
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.charge
+_chem_comp_atom.partial_charge
+_chem_comp_atom.x
+_chem_comp_atom.y
+_chem_comp_atom.z
+PLC         C1     C   CH2    0    .      -3.9280   -1.8165   -1.2649
+PLC         C2     C   CH1    0    .      -2.4419   -1.6458   -0.9551
+PLC         C3     C   CH2    0    .      -2.2530   -1.4629    0.5506
+PLC         C4     C   CH2    0    .      -7.6572    1.0736   -3.3991
+PLC         C5     C   CH2    0    .      -7.8330    1.6220   -4.8113
+PLC         C6     C   CH3    0    .      -9.0373    3.5183   -4.0631
+PLC         C7     C   CH3    0    .      -9.3308    2.7241   -6.2757
+PLC         C8     C   CH3    0    .     -10.1680    1.4714   -4.4473
+PLC        C'      C   C      0    .      -1.1601   -2.6490   -2.6414
+PLC        C1'     C   CH2    0    .      -0.5406   -3.8649   -3.3271
+PLC        C2'     C   CH2    0    .       0.5310   -3.4029   -4.3118
+PLC        C3'     C   CH2    0    .       1.4031   -4.5917   -4.7097
+PLC        C4'     C   CH2    0    .       2.5486   -4.1085   -5.5965
+PLC        C5'     C   CH2    0    .       3.7129   -5.0924   -5.5053
+PLC        C6'     C   CH2    0    .       5.0077   -4.3877   -5.9058
+PLC        C7'     C   CH2    0    .       6.2009   -5.1506   -5.3327
+PLC        C8'     C   CH2    0    .       7.4328   -4.2481   -5.3391
+PLC        C9'     C   CH2    0    .       8.4566   -4.7768   -4.3364
+PLC        CA'     C   CH2    0    .       9.5724   -3.7502   -4.1595
+PLC        CB'     C   CH3    0    .      10.3432   -4.0520   -2.8765
+PLC         CB     C   C      0    .      -0.8175   -0.5146    2.1456
+PLC         C1B    C   CH2    0    .       0.3180    0.4187    2.5650
+PLC         C2B    C   CH2    0    .       0.3495    0.5304    4.0909
+PLC         C3B    C   CH2    0    .       1.4067    1.5535    4.5047
+PLC         C4B    C   CH2    0    .       1.3575    1.7533    6.0195
+PLC         C5B    C   CH2    0    .       2.1253    3.0225    6.3912
+PLC         C6B    C   CH2    0    .       2.0808    3.2198    7.9046
+PLC         C7B    C   CH2    0    .       2.3862    4.6798    8.2369
+PLC         C8B    C   CH2    0    .       2.3895    4.8670    9.7504
+PLC         C9B    C   CH2    0    .       2.2164    6.3468   10.0801
+PLC         CAA    C   CH2    0    .       2.2576    6.5388   11.5920
+PLC         CBA    C   CH3    0    .       1.6339    7.8844   11.9510
+PLC        O'      O   O      0    .      -1.1583   -1.5969   -3.1861
+PLC         OB     O   O      0    .      -1.4868   -1.0407    2.9700
+PLC         O2     O   O2     0    .      -1.7443   -2.7811   -1.3779
+PLC         O3     O   O2     0    .      -1.1089   -0.6958    0.7868
+PLC         O1P    O   O      0    .      -6.6262   -1.8285   -2.4682
+PLC         O2P    O   OP    -1    .      -6.6797   -0.0446   -0.7682
+PLC         O3P    O   O2     0    .      -4.4191   -0.6465   -1.8531
+PLC         O4P    O   O2     0    .      -6.3476    0.6148   -3.2373
+PLC         N      N   NT     1    .      -9.0918    2.3338   -4.8995
+PLC         P      P   P      0    .      -6.0459   -0.4961   -2.0619
+PLC         H11    H   HCH2   0    .      -4.4687   -2.0135   -0.3454
+PLC         H12    H   HCH2   0    .      -4.0617   -2.6485   -1.9484
+PLC         H2     H   HCH1   0    .      -2.0626   -0.7745   -1.4751
+PLC         H31    H   HCH2   0    .      -2.1409   -2.4340    1.0216
+PLC         H32    H   HCH2   0    .      -3.1187   -0.9579    0.9649
+PLC         H41    H   HCH2   0    .      -7.8565    1.8595   -2.6787
+PLC         H42    H   HCH2   0    .      -8.3499    0.2536   -3.2407
+PLC         H51    H   HCH2   0    .      -7.8312    0.8016   -5.5204
+PLC         H52    H   HCH2   0    .      -7.0176    2.2996   -5.0402
+PLC         H61    H   HCH3   0    .      -9.2543    3.2452   -3.0338
+PLC         H62    H   HCH3   0    .      -8.0443    3.9568   -4.1200
+PLC         H63    H   HCH3   0    .      -9.7724    4.2400   -4.4089
+PLC         H71    H   HCH3   0    .      -8.4903    3.3094   -6.6373
+PLC         H72    H   HCH3   0    .     -10.2374    3.3200   -6.3309
+PLC         H73    H   HCH3   0    .      -9.4439    1.8355   -6.8895
+PLC         H81    H   HCH3   0    .     -11.1232    1.9471   -4.6511
+PLC         H82    H   HCH3   0    .     -10.1167    0.5225   -4.9730
+PLC         H83    H   HCH3   0    .     -10.0696    1.2994   -3.3793
+PLC        H1'1    H   HCH2   0    .      -1.3109   -4.4102   -3.8608
+PLC        H1'2    H   HCH2   0    .      -0.0913   -4.5112   -2.5805
+PLC        H2'1    H   HCH2   0    .       0.0564   -2.9910   -5.1955
+PLC        H2'2    H   HCH2   0    .       1.1478   -2.6422   -3.8446
+PLC        H3'1    H   HCH2   0    .       0.8041   -5.3133   -5.2543
+PLC        H3'2    H   HCH2   0    .       1.8082   -5.0578   -3.8176
+PLC        H4'1    H   HCH2   0    .       2.8757   -3.1293   -5.2631
+PLC        H4'2    H   HCH2   0    .       2.2083   -4.0455   -6.6241
+PLC        H5'1    H   HCH2   0    .       3.5340   -5.9274   -6.1742
+PLC        H5'2    H   HCH2   0    .       3.7996   -5.4568   -4.4872
+PLC        H6'1    H   HCH2   0    .       5.0834   -4.3578   -6.9873
+PLC        H6'2    H   HCH2   0    .       5.0042   -3.3754   -5.5153
+PLC        H7'1    H   HCH2   0    .       6.3933   -6.0296   -5.9392
+PLC        H7'2    H   HCH2   0    .       5.9807   -5.4546   -4.3152
+PLC        H8'1    H   HCH2   0    .       7.1437   -3.2398   -5.0630
+PLC        H8'2    H   HCH2   0    .       7.8699   -4.2399   -6.3320
+PLC        H9'1    H   HCH2   0    .       7.9714   -4.9514   -3.3824
+PLC        H9'2    H   HCH2   0    .       8.8763   -5.7075   -4.7046
+PLC        HT'1    H   HCH2   0    .       9.1427   -2.7565   -4.0977
+PLC        HT'2    H   HCH2   0    .      10.2476   -3.8002   -5.0074
+PLC        HE'1    H   HCH3   0    .      11.0984   -3.2873   -2.7195
+PLC        HE'2    H   HCH3   0    .      10.8233   -5.0230   -2.9623
+PLC        HE'3    H   HCH3   0    .       9.6566   -4.0608   -2.0352
+PLC        H1A1    H   HCH2   0    .       0.1565    1.4009    2.1339
+PLC        H1A2    H   HCH2   0    .       1.2631    0.0197    2.2120
+PLC        H2A1    H   HCH2   0    .      -0.6231    0.8496    4.4503
+PLC        H2A2    H   HCH2   0    .       0.5941   -0.4356    4.5192
+PLC        H3A1    H   HCH2   0    .       1.2094    2.4978    4.0090
+PLC        H3A2    H   HCH2   0    .       2.3888    1.1938    4.2194
+PLC        H4A1    H   HCH2   0    .       0.3250    1.8488    6.3383
+PLC        H4A2    H   HCH2   0    .       1.8106    0.8991    6.5120
+PLC        H5A1    H   HCH2   0    .       1.6701    3.8766    5.9019
+PLC        H5A2    H   HCH2   0    .       3.1569    2.9286    6.0690
+PLC        H6A1    H   HCH2   0    .       2.8200    2.5796    8.3747
+PLC        H6A2    H   HCH2   0    .       1.0937    2.9639    8.2738
+PLC        H7A1    H   HCH2   0    .       3.3595    4.9457    7.8374
+PLC        H7A2    H   HCH2   0    .       1.6275    5.3175    7.7953
+PLC        H8A1    H   HCH2   0    .       1.5730    4.3013   10.1865
+PLC        H8A2    H   HCH2   0    .       3.3315    4.5138   10.1564
+PLC        H9A1    H   HCH2   0    .       3.0181    6.9156    9.6214
+PLC        H9A2    H   HCH2   0    .       1.2621    6.6933    9.6974
+PLC        HTA1    H   HCH2   0    .       1.7003    5.7421   12.0730
+PLC        HTA2    H   HCH2   0    .       3.2873    6.5155   11.9313
+PLC        HEA1    H   HCH3   0    .       0.6052    7.9115   11.6019
+PLC        HEA2    H   HCH3   0    .       2.1982    8.6828   11.4776
+PLC        HEA3    H   HCH3   0    .       1.6541    8.0166   13.0287
+#
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+PLC   C1      C2    single        1.528 0.020
+PLC   C1      O3P   single        1.399 0.020
+PLC   C1      H11   single        1.085 0.020
+PLC   C1      H12   single        1.085 0.020
+PLC   C2      C3    single        1.529 0.020
+PLC   C2      O2    single        1.398 0.020
+PLC   C2      H2    single        1.083 0.020
+PLC   C3      O3    single        1.398 0.020
+PLC   C3      H31   single        1.085 0.020
+PLC   C3      H32   single        1.084 0.020
+PLC   C4      C5    single        1.525 0.020
+PLC   C4      O4P   single        1.397 0.020
+PLC   C4      H41   single        1.085 0.020
+PLC   C4      H42   single        1.085 0.020
+PLC   C5      N     single        1.449 0.020
+PLC   C5      H51   single        1.084 0.020
+PLC   C5      H52   single        1.085 0.020
+PLC   C6      N     single        1.451 0.020
+PLC   C6      H61   single        1.087 0.020
+PLC   C6      H62   single        1.087 0.020
+PLC   C6      H63   single        1.087 0.020
+PLC   C7      N     single        1.450 0.020
+PLC   C7      H71   single        1.086 0.020
+PLC   C7      H72   single        1.086 0.020
+PLC   C7      H73   single        1.086 0.020
+PLC   C8      N     single        1.451 0.020
+PLC   C8      H81   single        1.086 0.020
+PLC   C8      H82   single        1.086 0.020
+PLC   C8      H83   single        1.086 0.020
+PLC  C'      C1'    single        1.527 0.020
+PLC  C'      O'     double        1.185 0.020
+PLC  C'       O2    single        1.398 0.020
+PLC  C1'     C2'    single        1.527 0.020
+PLC  C1'     H1'1   single        1.084 0.020
+PLC  C1'     H1'2   single        1.085 0.020
+PLC  C2'     C3'    single        1.527 0.020
+PLC  C2'     H2'1   single        1.084 0.020
+PLC  C2'     H2'2   single        1.085 0.020
+PLC  C3'     C4'    single        1.527 0.020
+PLC  C3'     H3'1   single        1.084 0.020
+PLC  C3'     H3'2   single        1.085 0.020
+PLC  C4'     C5'    single        1.527 0.020
+PLC  C4'     H4'1   single        1.085 0.020
+PLC  C4'     H4'2   single        1.084 0.020
+PLC  C5'     C6'    single        1.528 0.020
+PLC  C5'     H5'1   single        1.085 0.020
+PLC  C5'     H5'2   single        1.085 0.020
+PLC  C6'     C7'    single        1.528 0.020
+PLC  C6'     H6'1   single        1.085 0.020
+PLC  C6'     H6'2   single        1.085 0.020
+PLC  C7'     C8'    single        1.527 0.020
+PLC  C7'     H7'1   single        1.085 0.020
+PLC  C7'     H7'2   single        1.085 0.020
+PLC  C8'     C9'    single        1.527 0.020
+PLC  C8'     H8'1   single        1.085 0.020
+PLC  C8'     H8'2   single        1.085 0.020
+PLC  C9'     CA'    single        1.527 0.020
+PLC  C9'     H9'1   single        1.084 0.020
+PLC  C9'     H9'2   single        1.085 0.020
+PLC  CA'     CB'    single        1.527 0.020
+PLC  CA'     HT'1   single        1.084 0.020
+PLC  CA'     HT'2   single        1.085 0.020
+PLC  CB'     HE'1   single        1.086 0.020
+PLC  CB'     HE'2   single        1.087 0.020
+PLC  CB'     HE'3   single        1.086 0.020
+PLC   CB      C1B   single        1.528 0.020
+PLC   CB      OB    double        1.185 0.020
+PLC   CB      O3    single        1.401 0.020
+PLC   C1B     C2B   single        1.530 0.020
+PLC   C1B    H1A1   single        1.085 0.020
+PLC   C1B    H1A2   single        1.085 0.020
+PLC   C2B     C3B   single        1.528 0.020
+PLC   C2B    H2A1   single        1.085 0.020
+PLC   C2B    H2A2   single        1.085 0.020
+PLC   C3B     C4B   single        1.529 0.020
+PLC   C3B    H3A1   single        1.085 0.020
+PLC   C3B    H3A2   single        1.084 0.020
+PLC   C4B     C5B   single        1.529 0.020
+PLC   C4B    H4A1   single        1.085 0.020
+PLC   C4B    H4A2   single        1.085 0.020
+PLC   C5B     C6B   single        1.527 0.020
+PLC   C5B    H5A1   single        1.084 0.020
+PLC   C5B    H5A2   single        1.085 0.020
+PLC   C6B     C7B   single        1.528 0.020
+PLC   C6B    H6A1   single        1.085 0.020
+PLC   C6B    H6A2   single        1.084 0.020
+PLC   C7B     C8B   single        1.525 0.020
+PLC   C7B    H7A1   single        1.085 0.020
+PLC   C7B    H7A2   single        1.085 0.020
+PLC   C8B     C9B   single        1.526 0.020
+PLC   C8B    H8A1   single        1.085 0.020
+PLC   C8B    H8A2   single        1.085 0.020
+PLC   C9B     CAA   single        1.525 0.020
+PLC   C9B    H9A1   single        1.085 0.020
+PLC   C9B    H9A2   single        1.085 0.020
+PLC   CAA     CBA   single        1.526 0.020
+PLC   CAA    HTA1   single        1.085 0.020
+PLC   CAA    HTA2   single        1.084 0.020
+PLC   CBA    HEA1   single        1.087 0.020
+PLC   CBA    HEA2   single        1.086 0.020
+PLC   CBA    HEA3   single        1.086 0.020
+PLC   O1P     P     deloc         1.509 0.020
+PLC   O2P     P     deloc         1.510 0.020
+PLC   O3P     P     single        1.647 0.020
+PLC   O4P     P     single        1.645 0.020
+#
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+PLC   H12     C1      H11         109.47 3.000
+PLC   H12     C1      O3P         109.47 3.000
+PLC   H11     C1      O3P         109.47 3.000
+PLC   H12     C1      C2          109.47 3.000
+PLC   H11     C1      C2          109.47 3.000
+PLC   O3P     C1      C2          109.47 3.000
+PLC   H2      C2      O2          109.47 3.000
+PLC   H2      C2      C3          109.47 3.000
+PLC   O2      C2      C3          109.47 3.000
+PLC   H2      C2      C1          109.47 3.000
+PLC   O2      C2      C1          109.47 3.000
+PLC   C3      C2      C1          109.47 3.000
+PLC   H32     C3      H31         109.47 3.000
+PLC   H32     C3      O3          109.47 3.000
+PLC   H31     C3      O3          109.47 3.000
+PLC   H32     C3      C2          109.47 3.000
+PLC   H31     C3      C2          109.47 3.000
+PLC   O3      C3      C2          109.47 3.000
+PLC   H42     C4      H41         109.47 3.000
+PLC   H42     C4      O4P         109.47 3.000
+PLC   H41     C4      O4P         109.47 3.000
+PLC   H42     C4      C5          109.47 3.000
+PLC   H41     C4      C5          109.47 3.000
+PLC   O4P     C4      C5          109.47 3.000
+PLC   H52     C5      H51         109.47 3.000
+PLC   H52     C5      N           109.47 3.000
+PLC   H51     C5      N           109.47 3.000
+PLC   H52     C5      C4          109.47 3.000
+PLC   H51     C5      C4          109.47 3.000
+PLC   N       C5      C4          109.47 3.000
+PLC   H63     C6      H62         109.47 3.000
+PLC   H63     C6      H61         109.47 3.000
+PLC   H62     C6      H61         109.47 3.000
+PLC   H63     C6      N           109.47 3.000
+PLC   H62     C6      N           109.47 3.000
+PLC   H61     C6      N           109.47 3.000
+PLC   H73     C7      H72         109.47 3.000
+PLC   H73     C7      H71         109.47 3.000
+PLC   H72     C7      H71         109.47 3.000
+PLC   H73     C7      N           109.47 3.000
+PLC   H72     C7      N           109.47 3.000
+PLC   H71     C7      N           109.47 3.000
+PLC   H83     C8      H82         109.47 3.000
+PLC   H83     C8      H81         109.47 3.000
+PLC   H82     C8      H81         109.47 3.000
+PLC   H83     C8      N           109.47 3.000
+PLC   H82     C8      N           109.47 3.000
+PLC   H81     C8      N           109.47 3.000
+PLC  H1'2    C1'     H1'1         109.47 3.000
+PLC  H1'2    C1'     C2'          109.47 3.000
+PLC  H1'1    C1'     C2'          109.47 3.000
+PLC  H1'2    C1'     C'           109.47 3.000
+PLC  H1'1    C1'     C'           109.47 3.000
+PLC  C2'     C1'     C'           109.47 3.000
+PLC  H2'2    C2'     H2'1         109.47 3.000
+PLC  H2'2    C2'     C3'          109.47 3.000
+PLC  H2'1    C2'     C3'          109.47 3.000
+PLC  H2'2    C2'     C1'          109.47 3.000
+PLC  H2'1    C2'     C1'          109.47 3.000
+PLC  C3'     C2'     C1'          109.47 3.000
+PLC  H3'2    C3'     H3'1         109.47 3.000
+PLC  H3'2    C3'     C4'          109.47 3.000
+PLC  H3'1    C3'     C4'          109.47 3.000
+PLC  H3'2    C3'     C2'          109.47 3.000
+PLC  H3'1    C3'     C2'          109.47 3.000
+PLC  C4'     C3'     C2'          109.47 3.000
+PLC  H4'2    C4'     H4'1         109.47 3.000
+PLC  H4'2    C4'     C5'          109.47 3.000
+PLC  H4'1    C4'     C5'          109.47 3.000
+PLC  H4'2    C4'     C3'          109.47 3.000
+PLC  H4'1    C4'     C3'          109.47 3.000
+PLC  C5'     C4'     C3'          109.47 3.000
+PLC  H5'2    C5'     H5'1         109.47 3.000
+PLC  H5'2    C5'     C6'          109.47 3.000
+PLC  H5'1    C5'     C6'          109.47 3.000
+PLC  H5'2    C5'     C4'          109.47 3.000
+PLC  H5'1    C5'     C4'          109.47 3.000
+PLC  C6'     C5'     C4'          109.47 3.000
+PLC  H6'2    C6'     H6'1         109.47 3.000
+PLC  H6'2    C6'     C7'          109.47 3.000
+PLC  H6'1    C6'     C7'          109.47 3.000
+PLC  H6'2    C6'     C5'          109.47 3.000
+PLC  H6'1    C6'     C5'          109.47 3.000
+PLC  C7'     C6'     C5'          109.47 3.000
+PLC  H7'2    C7'     H7'1         109.47 3.000
+PLC  H7'2    C7'     C8'          109.47 3.000
+PLC  H7'1    C7'     C8'          109.47 3.000
+PLC  H7'2    C7'     C6'          109.47 3.000
+PLC  H7'1    C7'     C6'          109.47 3.000
+PLC  C8'     C7'     C6'          109.47 3.000
+PLC  H8'2    C8'     H8'1         109.47 3.000
+PLC  H8'2    C8'     C9'          109.47 3.000
+PLC  H8'1    C8'     C9'          109.47 3.000
+PLC  H8'2    C8'     C7'          109.47 3.000
+PLC  H8'1    C8'     C7'          109.47 3.000
+PLC  C9'     C8'     C7'          109.47 3.000
+PLC  H9'2    C9'     H9'1         109.47 3.000
+PLC  H9'2    C9'     CA'          109.47 3.000
+PLC  H9'1    C9'     CA'          109.47 3.000
+PLC  H9'2    C9'     C8'          109.47 3.000
+PLC  H9'1    C9'     C8'          109.47 3.000
+PLC  CA'     C9'     C8'          109.46 3.000
+PLC  HT'2    CA'     HT'1         109.47 3.000
+PLC  HT'2    CA'     CB'          109.47 3.000
+PLC  HT'1    CA'     CB'          109.47 3.000
+PLC  HT'2    CA'     C9'          109.47 3.000
+PLC  HT'1    CA'     C9'          109.47 3.000
+PLC  CB'     CA'     C9'          109.48 3.000
+PLC  HE'3    CB'     HE'2         109.47 3.000
+PLC  HE'3    CB'     HE'1         109.47 3.000
+PLC  HE'2    CB'     HE'1         109.47 3.000
+PLC  HE'3    CB'     CA'          109.47 3.000
+PLC  HE'2    CB'     CA'          109.47 3.000
+PLC  HE'1    CB'     CA'          109.47 3.000
+PLC   O3      CB      OB          119.98 3.000
+PLC   O3      CB      C1B         119.96 3.000
+PLC   OB      CB      C1B         119.98 3.000
+PLC  H1A2     C1B    H1A1         109.47 3.000
+PLC  H1A2     C1B     C2B         109.47 3.000
+PLC  H1A1     C1B     C2B         109.47 3.000
+PLC  H1A2     C1B     CB          109.47 3.000
+PLC  H1A1     C1B     CB          109.47 3.000
+PLC   C2B     C1B     CB          109.48 3.000
+PLC  H2A2     C2B    H2A1         109.48 3.000
+PLC  H2A2     C2B     C3B         109.47 3.000
+PLC  H2A1     C2B     C3B         109.47 3.000
+PLC  H2A2     C2B     C1B         109.47 3.000
+PLC  H2A1     C2B     C1B         109.47 3.000
+PLC   C3B     C2B     C1B         109.46 3.000
+PLC  H3A2     C3B    H3A1         109.47 3.000
+PLC  H3A2     C3B     C4B         109.47 3.000
+PLC  H3A1     C3B     C4B         109.47 3.000
+PLC  H3A2     C3B     C2B         109.47 3.000
+PLC  H3A1     C3B     C2B         109.47 3.000
+PLC   C4B     C3B     C2B         109.48 3.000
+PLC  H4A2     C4B    H4A1         109.47 3.000
+PLC  H4A2     C4B     C5B         109.47 3.000
+PLC  H4A1     C4B     C5B         109.47 3.000
+PLC  H4A2     C4B     C3B         109.47 3.000
+PLC  H4A1     C4B     C3B         109.47 3.000
+PLC   C5B     C4B     C3B         109.46 3.000
+PLC  H5A2     C5B    H5A1         109.47 3.000
+PLC  H5A2     C5B     C6B         109.47 3.000
+PLC  H5A1     C5B     C6B         109.47 3.000
+PLC  H5A2     C5B     C4B         109.47 3.000
+PLC  H5A1     C5B     C4B         109.47 3.000
+PLC   C6B     C5B     C4B         109.48 3.000
+PLC  H6A2     C6B    H6A1         109.47 3.000
+PLC  H6A2     C6B     C7B         109.47 3.000
+PLC  H6A1     C6B     C7B         109.47 3.000
+PLC  H6A2     C6B     C5B         109.47 3.000
+PLC  H6A1     C6B     C5B         109.47 3.000
+PLC   C7B     C6B     C5B         109.46 3.000
+PLC  H7A2     C7B    H7A1         109.47 3.000
+PLC  H7A2     C7B     C8B         109.47 3.000
+PLC  H7A1     C7B     C8B         109.47 3.000
+PLC  H7A2     C7B     C6B         109.47 3.000
+PLC  H7A1     C7B     C6B         109.47 3.000
+PLC   C8B     C7B     C6B         109.48 3.000
+PLC  H8A2     C8B    H8A1         109.47 3.000
+PLC  H8A2     C8B     C9B         109.47 3.000
+PLC  H8A1     C8B     C9B         109.47 3.000
+PLC  H8A2     C8B     C7B         109.47 3.000
+PLC  H8A1     C8B     C7B         109.47 3.000
+PLC   C9B     C8B     C7B         109.47 3.000
+PLC  H9A2     C9B    H9A1         109.47 3.000
+PLC  H9A2     C9B     CAA         109.47 3.000
+PLC  H9A1     C9B     CAA         109.47 3.000
+PLC  H9A2     C9B     C8B         109.47 3.000
+PLC  H9A1     C9B     C8B         109.47 3.000
+PLC   CAA     C9B     C8B         109.47 3.000
+PLC  HTA2     CAA    HTA1         109.47 3.000
+PLC  HTA2     CAA     CBA         109.47 3.000
+PLC  HTA1     CAA     CBA         109.47 3.000
+PLC  HTA2     CAA     C9B         109.47 3.000
+PLC  HTA1     CAA     C9B         109.47 3.000
+PLC   CBA     CAA     C9B         109.47 3.000
+PLC  HEA3     CBA    HEA2         109.47 3.000
+PLC  HEA3     CBA    HEA1         109.47 3.000
+PLC  HEA2     CBA    HEA1         109.47 3.000
+PLC  HEA3     CBA     CAA         109.47 3.000
+PLC  HEA2     CBA     CAA         109.47 3.000
+PLC  HEA1     CBA     CAA         109.47 3.000
+PLC  C'       O2      C2          113.89 3.000
+PLC   CB      O3      C3          113.89 3.000
+PLC   P       O3P     C1          118.46 3.000
+PLC   P       O4P     C4          118.45 3.000
+PLC   C8      N       C7          109.47 3.000
+PLC   C8      N       C6          109.47 3.000
+PLC   C7      N       C6          109.48 3.000
+PLC   C8      N       C5          109.47 3.000
+PLC   C7      N       C5          109.47 3.000
+PLC   C6      N       C5          109.47 3.000
+PLC   O4P     P       O3P         109.47 3.000
+PLC   O4P     P       O2P         109.47 3.000
+PLC   O3P     P       O2P         109.47 3.000
+PLC   O4P     P       O1P         109.47 3.000
+PLC   O3P     P       O1P         109.47 3.000
+PLC   O2P     P       O1P         109.47 3.000
+PLC   O2     C'      O'           120.00 3.000
+PLC   O2     C'      C1'          120.00 3.000
+PLC  O'      C'      C1'          120.00 3.000
+#
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+PLC Var_01         O1P     P       O3P     C1          -38.44  30.0 3
+PLC Var_02         O2P     P       O3P     C1           81.56  30.0 3
+PLC Var_03         O4P     P       O3P     C1         -158.44  30.0 3
+PLC Var_04         P       O3P     C1      C2         -170.51  30.0 3
+PLC Var_05         CB      O3      C3      C2         -177.62  30.0 3
+PLC Var_06         C1'     C'      O2      C2         -171.09  30.0 3
+PLC Var_07         O'      C'      O2      C2            8.11  30.0 3
+PLC Var_08         C1B     CB      O3      C3         -173.74  30.0 1
+PLC Var_09         OB      CB      O3      C3            3.09  30.0 1
+PLC Var_10         C6      N       C5      C4           66.41  30.0 3
+PLC Var_11         C7      N       C5      C4         -173.58  30.0 3
+PLC Var_12         C8      N       C5      C4          -53.58  30.0 3
+PLC Var_13         O1P     P       O4P     C4           71.69  30.0 3
+PLC Var_14         O2P     P       O4P     C4          -48.31  30.0 3
+PLC Var_15         O3P     P       O4P     C4         -168.31  30.0 3
+PLC Var_16         P       O4P     C4      C5         -157.65  30.0 3
+PLC Var_17        C3'     C2'      C1'     C'          164.68  30.0 3
+PLC Var_18        C4'     C3'     C2'      C1'        -175.05  30.0 3
+PLC Var_19         O'      C'      C1'    C2'           26.15  30.0 3
+PLC Var_20         O2      C'      C1'    C2'         -154.65  30.0 3
+PLC Var_21        C5'     C4'     C3'     C2'          155.72  30.0 3
+PLC Var_22        C6'     C5'     C4'     C3'         -157.78  30.0 3
+PLC Var_23        C7'     C6'     C5'     C4'          158.75  30.0 3
+PLC Var_24        C8'     C7'     C6'     C5'         -162.21  30.0 3
+PLC Var_25        C9'     C8'     C7'     C6'          159.29  30.0 3
+PLC Var_26        CA'     C9'     C8'     C7'         -170.04  30.0 3
+PLC Var_27        CB'     CA'     C9'     C8'          162.40  30.0 3
+PLC Var_28         C3B     C2B     C1B     CB         -175.25  30.0 3
+PLC Var_29         C4B     C3B     C2B     C1B         175.23  30.0 3
+PLC Var_30         OB      CB      C1B     C2B          -1.60  30.0 1
+PLC Var_31         O3      CB      C1B     C2B         175.24  30.0 1
+PLC Var_32         C5B     C4B     C3B     C2B        -164.76  30.0 3
+PLC Var_33         C6B     C5B     C4B     C3B        -179.79  30.0 3
+PLC Var_34         C7B     C6B     C5B     C4B        -159.95  30.0 3
+PLC Var_35         C8B     C7B     C6B     C5B        -178.06  30.0 3
+PLC Var_36         C9B     C8B     C7B     C6B        -160.85  30.0 3
+PLC Var_37         CAA     C9B     C8B     C7B        -178.48  30.0 3
+PLC Var_38         CBA     CAA     C9B     C8B        -161.16  30.0 3
+PLC Var_39         N       C5      C4      O4P        -168.74  30.0 3
+PLC Var_40         H61     C6      N       C5          -82.32  30.0 3
+PLC Var_41         H62     C6      N       C5           37.68  30.0 3
+PLC Var_42         H63     C6      N       C5          157.69  30.0 3
+PLC Var_43         H71     C7      N       C5          -55.89  30.0 3
+PLC Var_44         H72     C7      N       C5         -175.90  30.0 3
+PLC Var_45         H73     C7      N       C5           64.10  30.0 3
+PLC Var_46         H81     C8      N       C5         -171.62  30.0 3
+PLC Var_47         H82     C8      N       C5          -51.62  30.0 3
+PLC Var_48         H83     C8      N       C5           68.38  30.0 3
+PLC Var_49         H51     C5      N       C6         -173.59  30.0 3
+PLC Var_50         H52     C5      N       C6          -53.59  30.0 3
+PLC Var_51         H71     C7      N       C6           64.11  30.0 3
+PLC Var_52         H72     C7      N       C6          -55.89  30.0 3
+PLC Var_53         H73     C7      N       C6         -175.90  30.0 3
+PLC Var_54         H81     C8      N       C6           68.39  30.0 3
+PLC Var_55         H82     C8      N       C6         -171.61  30.0 3
+PLC Var_56         H83     C8      N       C6          -51.61  30.0 3
+PLC Var_57         H51     C5      N       C7          -53.58  30.0 3
+PLC Var_58         H52     C5      N       C7           66.42  30.0 3
+PLC Var_59         H61     C6      N       C7          157.68  30.0 3
+PLC Var_60         H62     C6      N       C7          -82.32  30.0 3
+PLC Var_61         H63     C6      N       C7           37.69  30.0 3
+PLC Var_62         H81     C8      N       C7          -51.62  30.0 3
+PLC Var_63         H82     C8      N       C7           68.38  30.0 3
+PLC Var_64         H83     C8      N       C7         -171.62  30.0 3
+PLC Var_65         H51     C5      N       C8           66.42  30.0 3
+PLC Var_66         H52     C5      N       C8         -173.58  30.0 3
+PLC Var_67         H61     C6      N       C8           37.68  30.0 3
+PLC Var_68         H62     C6      N       C8          157.68  30.0 3
+PLC Var_69         H63     C6      N       C8          -82.32  30.0 3
+PLC Var_70         H71     C7      N       C8         -175.89  30.0 3
+PLC Var_71         H72     C7      N       C8           64.11  30.0 3
+PLC Var_72         H73     C7      N       C8          -55.89  30.0 3
+PLC Var_73        H2'1    C2'      C1'     C'          -75.32  30.0 3
+PLC Var_74        H2'2    C2'      C1'     C'           44.68  30.0 3
+PLC Var_75        H3'1    C3'     C2'      C1'          64.96  30.0 3
+PLC Var_76        H3'2    C3'     C2'      C1'         -55.04  30.0 3
+PLC Var_77        H4'1    C4'     C3'     C2'           35.72  30.0 3
+PLC Var_78        H4'2    C4'     C3'     C2'          -84.28  30.0 3
+PLC Var_79        H1'1     C1'    C2'     C3'          -75.32  30.0 1
+PLC Var_80        H1'2     C1'    C2'     C3'           44.68  30.0 1
+PLC Var_81        H5'1    C5'     C4'     C3'           82.22  30.0 3
+PLC Var_82        H5'2    C5'     C4'     C3'          -37.78  30.0 3
+PLC Var_83        H2'1    C2'     C3'     C4'           64.96  30.0 1
+PLC Var_84        H2'2    C2'     C3'     C4'          -55.05  30.0 1
+PLC Var_85        H6'1    C6'     C5'     C4'          -81.25  30.0 3
+PLC Var_86        H6'2    C6'     C5'     C4'           38.75  30.0 3
+PLC Var_87        H3'1    C3'     C4'     C5'          -84.28  30.0 2
+PLC Var_88        H3'2    C3'     C4'     C5'           35.72  30.0 2
+PLC Var_89        H7'1    C7'     C6'     C5'           77.79  30.0 3
+PLC Var_90        H7'2    C7'     C6'     C5'          -42.21  30.0 3
+PLC Var_91        H4'1    C4'     C5'     C6'          -37.78  30.0 1
+PLC Var_92        H4'2    C4'     C5'     C6'           82.22  30.0 1
+PLC Var_93        H8'1    C8'     C7'     C6'           39.29  30.0 3
+PLC Var_94        H8'2    C8'     C7'     C6'          -80.71  30.0 3
+PLC Var_95        H5'1    C5'     C6'     C7'          -81.25  30.0 2
+PLC Var_96        H5'2    C5'     C6'     C7'           38.75  30.0 2
+PLC Var_97        H9'1    C9'     C8'     C7'          -50.04  30.0 3
+PLC Var_98        H9'2    C9'     C8'     C7'           69.96  30.0 3
+PLC Var_99        H6'1    C6'     C7'     C8'           77.79  30.0 1
+PLC Var_100       H6'2    C6'     C7'     C8'          -42.21  30.0 1
+PLC Var_101       HT'1    CA'     C9'     C8'           42.41  30.0 3
+PLC Var_102       HT'2    CA'     C9'     C8'          -77.59  30.0 3
+PLC Var_103       H7'1    C7'     C8'     C9'          -80.71  30.0 2
+PLC Var_104       H7'2    C7'     C8'     C9'           39.29  30.0 2
+PLC Var_105       HE'1    CB'     CA'     C9'         -176.62  30.0 3
+PLC Var_106       HE'2    CB'     CA'     C9'           63.38  30.0 3
+PLC Var_107       HE'3    CB'     CA'     C9'          -56.63  30.0 3
+PLC Var_108       H8'1    C8'     C9'     CA'          -50.04  30.0 1
+PLC Var_109       H8'2    C8'     C9'     CA'           69.96  30.0 1
+PLC Var_110       H9'1    C9'     CA'     CB'           42.41  30.0 2
+PLC Var_111       H9'2    C9'     CA'     CB'          -77.60  30.0 2
+PLC Var_112       H2A1     C2B     C1B     CB          -55.26  30.0 3
+PLC Var_113       H2A2     C2B     C1B     CB           64.75  30.0 3
+PLC Var_114        H31     C3      O3      CB          -57.62  30.0 1
+PLC Var_115        H32     C3      O3      CB           62.38  30.0 1
+PLC Var_116       H3A1     C3B     C2B     C1B          55.23  30.0 3
+PLC Var_117       H3A2     C3B     C2B     C1B         -64.77  30.0 3
+PLC Var_118       H4A1     C4B     C3B     C2B         -44.77  30.0 3
+PLC Var_119       H4A2     C4B     C3B     C2B          75.24  30.0 3
+PLC Var_120       H1A1     C1B     C2B     C3B         -55.26  30.0 1
+PLC Var_121       H1A2     C1B     C2B     C3B          64.74  30.0 1
+PLC Var_122       H5A1     C5B     C4B     C3B          60.21  30.0 3
+PLC Var_123       H5A2     C5B     C4B     C3B         -59.79  30.0 3
+PLC Var_124       H2A1     C2B     C3B     C4B          55.23  30.0 2
+PLC Var_125       H2A2     C2B     C3B     C4B         -64.77  30.0 2
+PLC Var_126       H6A1     C6B     C5B     C4B          80.05  30.0 3
+PLC Var_127       H6A2     C6B     C5B     C4B         -39.95  30.0 3
+PLC Var_128       H3A1     C3B     C4B     C5B         -44.76  30.0 1
+PLC Var_129       H3A2     C3B     C4B     C5B          75.24  30.0 1
+PLC Var_130       H7A1     C7B     C6B     C5B         -58.05  30.0 3
+PLC Var_131       H7A2     C7B     C6B     C5B          61.94  30.0 3
+PLC Var_132       H4A1     C4B     C5B     C6B          60.21  30.0 2
+PLC Var_133       H4A2     C4B     C5B     C6B         -59.80  30.0 2
+PLC Var_134       H8A1     C8B     C7B     C6B         -40.85  30.0 3
+PLC Var_135       H8A2     C8B     C7B     C6B          79.15  30.0 3
+PLC Var_136       H5A1     C5B     C6B     C7B         -39.95  30.0 1
+PLC Var_137       H5A2     C5B     C6B     C7B          80.04  30.0 1
+PLC Var_138       H9A1     C9B     C8B     C7B         -58.48  30.0 3
+PLC Var_139       H9A2     C9B     C8B     C7B          61.52  30.0 3
+PLC Var_140       H6A1     C6B     C7B     C8B         -58.06  30.0 2
+PLC Var_141       H6A2     C6B     C7B     C8B          61.95  30.0 2
+PLC Var_142       HTA1     CAA     C9B     C8B         -41.16  30.0 3
+PLC Var_143       HTA2     CAA     C9B     C8B          78.84  30.0 3
+PLC Var_144       H7A1     C7B     C8B     C9B          79.15  30.0 1
+PLC Var_145       H7A2     C7B     C8B     C9B         -40.85  30.0 1
+PLC Var_146       HEA1     CBA     CAA     C9B          59.42  30.0 3
+PLC Var_147       HEA2     CBA     CAA     C9B         -60.58  30.0 3
+PLC Var_148       HEA3     CBA     CAA     C9B         179.42  30.0 3
+PLC Var_149       H8A1     C8B     C9B     CAA          61.53  30.0 2
+PLC Var_150       H8A2     C8B     C9B     CAA         -58.48  30.0 2
+PLC Var_151       H9A1     C9B     CAA     CBA          78.85  30.0 1
+PLC Var_152       H9A2     C9B     CAA     CBA         -41.15  30.0 1
+PLC Var_153       H1'1     C1'     C'      O'          -93.85  30.0 3
+PLC Var_154       H1'2     C1'     C'      O'          146.15  30.0 3
+PLC Var_155       H1A1     C1B     CB      OB         -121.60  30.0 3
+PLC Var_156       H1A2     C1B     CB      OB          118.41  30.0 3
+PLC Var_157       H1'1     C1'     C'      O2           85.35  30.0 3
+PLC Var_158       H1'2     C1'     C'      O2          -34.65  30.0 3
+PLC Var_159       H1A1     C1B     CB      O3           55.24  30.0 3
+PLC Var_160       H1A2     C1B     CB      O3          -64.75  30.0 3
+PLC Var_161        H51     C5      C4      O4P          71.27  30.0 3
+PLC Var_162        H52     C5      C4      O4P         -48.74  30.0 3
+PLC Var_163        H41     C4      C5      N           -48.74  30.0 1
+PLC Var_164        H42     C4      C5      N            71.26  30.0 1
+PLC Var_165        H11     C1      O3P     P           -50.51  30.0 2
+PLC Var_166        H12     C1      O3P     P            69.49  30.0 2
+PLC Var_167        H41     C4      O4P     P            82.35  30.0 1
+PLC Var_168        H42     C4      O4P     P           -37.65  30.0 1
+#
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+PLC chir_01   C2      C1      C3      O2    negativ
+#
+loop_
+_chem_comp_plane_atom.comp_id
+_chem_comp_plane_atom.plane_id
+_chem_comp_plane_atom.atom_id
+_chem_comp_plane_atom.dist_esd
+PLC plan-1    C1' 0.020
+PLC plan-1     O' 0.020
+PLC plan-1     O2 0.020
+PLC plan-1     C' 0.020
+PLC plan-2     CB 0.020
+PLC plan-2    C1B 0.020
+PLC plan-2     OB 0.020
+PLC plan-2     O3 0.020

@@ -1,0 +1,531 @@
+# File: juncfactor
+# Created by UR 28/1-00
+# Data from JncFacOld but only types 5 and 6 are included
+# 
+# The jtypes are:
+# 5: experimental (Amber)
+# 6: B3LYP/6-31G*
+# 7: BP(RI)/6-31G*
+# 8: BP(RI)/SVP
+# 9: BP(RI)/def2-SV(P)
+#10: PBE(RI)/def2-SVP 
+#11: B3LYP(RI)/def2-SV(P) 
+#12: TPSS(RI)/def2-SV(P) 
+#13: B97-D(RI)/def2-SV(P) 
+
+$version 
+ 2006
+
+ALA CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+ALA CA   CB   H1  # ALA OXT CA-N junction
+ 9   1.1177d0     # HAc, BPRi/def2-SV(P), Cs, C-H out of plane, UR 24/6-09
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+ALA CA   N    HC  # ALA CA-N junction
+ 9   1.1177d0     # HAc, BPRi/def2-SV(P), Cs, C-H out of plane, UR 24/6-09
+12   1.1065d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+ALA CB   CA   HC  # ALA CB junction
+12   1.1060d0     # CH4, TPSS/def2-SVP, MI 10/04-20
+
+ASH CB   CA   HC  # ASH CB junction
+ 7   1.0978d0     # HAc BP/Ri 6-31G*; H in plane
+ 9   1.1068d0     # BP/Ri def2-SV(P); H in plane
+10   1.1031d0     # HAc, PBE-Ri/def2-SVP, Cs, C-H in plane, UR 23/4-13
+12   1.1016d0     # HAc, TPSS-Ri/def2-SVP, Cs, C-H in plane, UR 7/11-14
+
+ASN CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+ASN CA   CB   H1  # Asn CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+ASN CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+ASN CB   CA   HC  # ASN CB junction
+ 9   1.1072d0     # AcAmid, BPRi/def2-SV(P), Cs, C-H in plane, UR 24/6-09
+12   1.1019d0     # AcAmid, TPSS/def2-SV(P), Cs, C-H in plane, UR 2/6-10
+
+ASP CA   C    H1  # Asp CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+ASP CA   CB   H1  # Asp CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+ASP CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+ASP CB   CA   HC  # Asp OOC-CH3 junction
+ 5   1.090d0
+ 6   1.0980d0
+ 7   1.1065d0     # Acetate, BPRi/6-31G*, Cs, C-H in plane
+ 9   1.1157d0     # Ac, BPRi/def2-SV(P), Cs, C-H in plane, UR 24/6-09
+10   1.1117d0     # Ac, PBE-Ri/def2-SVP, Cs, C-H in plane, UR 23/4-13
+12   1.1109d0     # Ac, TPSS/def2-SV(P), Cs, C-H in plane, UR 2/6-10
+
+ARG CA   C    H1  # ARG CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+ARG CA   CB   H1  # RGp CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+ARG CA   N    HC  # ARG CA-N junction
+ 9   1.1177d0     # HAc, BPRi/def2-SV(P), Cs, C-H out of plane, UR 24/6-09
+12   1.1065d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+ARG CB CA     HC  # Arg CB-CA junction
+12   1.1049d0     # Arg, C1, TPSS/def2-SV(P), in plane, UR 26/9-19
+
+ARG CD   CG   H1  # Arg CH3-NH-C(NH2)2 junction
+ 9   1.1070d0     # CH3-NH-C-(NH2)2 (+), BPri/def2-SV(P), UR 24/6-08
+12   1.1050d0     # CH3-NH-C-(NH2)2 (+), TPSS/def2-SV(P), UR 20/1-10
+
+ARN CD   CG   H1  # Arg CH3-NH-C(NH2)(NH) junction
+ 9   1.1107d0     # CH3-NH-C-(NH2)(NH) (0), BPri/def2-SV(P), UR 8/12-08
+
+CYB CA   C    H1  # CYB CA-C junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+CYF CB   CA   H1  # Cym CB junction
+12   1.1238d0     # MeS-, Cs, TPSS/RI, def2-SV(P), UR 29/12-09
+
+CYM CB   CA   H1  # Cym CB junction
+ 7   1.1137d0     # MeS-, Cs, BP/RI, 6-31G*, 29/10-02
+ 9   1.1307d0     # MeS-, Cs, BP/RI, def2-SV(P), UR 24/6-08
+10   1.1306d0     # MeS-, Cs, PBE/RI, def2-SV(P), H in plane, UR 22/6-11
+11   1.1201d0     # MeS-, Cs, B3LYP/RI, def2-SV(P), UR 18/11-09
+12   1.1238d0     # MeS-, Cs, TPSS/RI, def2-SV(P), UR 29/12-09
+13   1.1304d0     # MeS-, Cs, B97-D/RI, def2-SV(P), UR 16/1-13
+
+CYM CA   C    H1  # CYM CA-C junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+CYM CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+CYM CA   N    HC  # CYM CA-N junction
+ 9   1.1177d0     # HAc, BPRi/def2-SV(P), Cs, C-H out of plane, UR 24/6-09
+12   1.1065d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+CYM SG   CB   H1  # SG-CB junction
+12   1.3776d0     # TPSS/def2-SV(P), SH-, for FeS clusters, Mehdi 2022-03-03
+
+CYS CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+CYS CA   CB   H1  # Cys CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+CYS CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+CYS CB   CA   H1  # Cys CB junction
+ 9   1.1010d0     # MeSH, Cs, BP/RI, def2-SV(P), UR 31/1-18
+12   1.1045d0     # MeSH, Cs, TPSS/RI, def2-SV(P), UR 13/1-16
+
+CYX CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+CYX CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+CYX CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+EOH C2   C1   h1  # EtOH C1-C2 junction
+12   1.1051d0     # MeOH, Cs, TPSS/RI, def2-SV(P), UR 23/2-18
+
+FEG C5*  C4*  HC  # FEG C4* junction
+13   1.1124d0     # FEG model, B97-D&def2-SV(P), UR 16/1-13
+
+GLH CG   CB   HC  # Glh CG junction
+ 7   1.0978d0     # HAc BP/Ri 6-31G*; H in plane
+ 9   1.1068d0     # BP/Ri def2-SV(P); H in plane
+10   1.1031d0     # HAc, PBE-Ri/def2-SVP, Cs, C-H in plane, UR 23/4-13
+12   1.1016d0     # HAc, TPSS-Ri/def2-SVP, Cs, C-H in plane, UR 7/11-14
+
+GLH CB   CA   HC
+12   1.1064d0     # TPSS/def2-SV(P), average, Mehdi Irani, 26/12-17
+
+GLH CA   C    H1
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+GLN CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+GLN CA   CB   H1  # Gln CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+GLN CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+GLN CG   CB   HC  # GLN CG junction
+ 9   1.1072d0     # AcAmid, BPRi/def2-SV(P), Cs, C-H in plane, UR 24/6-09
+12   1.1019d0     # AcAmid, TPSS/def2-SV(P), Cs, C-H in plane, UR 2/6-10
+
+GLN CB CA     HC
+ 6   1.0945d0     # propionamide, B3LYP(RI)/6-31G*, Mehdi 2022-05-30
+11   1.1043d0     # propionamide, B3LYP(RI)/def2-SV(P), Mehdi 2022-05-30
+12   1.1066d0     # propionamide, TPSS/def2-SV(P), UR, 23/7-17
+
+GLU CA   C    H1  # Glu CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+GLU CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+GLU CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+GLU CG   CB   HC  # Glu CG junction
+ 5   1.090d0
+ 6   1.0980d0
+ 7   1.1065d0     # Acetate, BPRi/6-31G*, Cs, C-H in plane
+ 9   1.1157d0     # Ac, BPRi/def2-SV(P), Cs, C-H in plane, UR 24/6-09
+10   1.1117d0     # Ac, PBE-Ri/def2-SVP, Cs, C-H in plane, UR 23/4-13
+12   1.1109d0     # Ac, TPSS/def2-SV(P), Cs, C-H in plane, UR 2/6-10
+
+GLU CB CA     HC
+12   1.1155d0     # propionate, TPSS/def2-SV(P), UR, 23/7-17
+
+GLY CA   C    H1  # Gly CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+GLY CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+GLY CA   N    HC  # GLY CA-N iback-bone junction
+12   1.1065d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+HID CA   C    HC
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+HID CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+HID CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+HID CB CA     HC
+ 6   1.0978d0     # CH3Im, Hid, Cs, B3LYP(RI)/6-31G*, in plane, Mehdi 2022-05-30
+ 9   1.1100d0     # CH3Im, Hid, Cs, BP/def2-SV(P), in plane, UR 31/3-16
+11   1.1054d0     # CH3Im, Hid, Cs, B3LYP(RI)/def2-SV(P), in plane, Mehdi 2022-05-30
+12   1.1048d0     # CH3Im, Hid, Cs, TPSS/def2-SV(P), in plane, UR 1/3-16
+
+HID CG CB     H4 
+ 5   1.090d0
+ 6   1.0798d0     # Im: B3LYP/6-31G*
+ 7   1.0877d0     # Im: BP-RI/6-31G*
+ 9   1.1157d0     # Im, BPRi/def2-SV(P), Cs, C4, UR 24/6-09
+10   1.0966d0     # Im, RI-PBE/def2-SV(P), Cs, C4, UR 22/6-11
+11   1.0886d0     # Im, B3LYP(Ri)/def2-SV(P), Cs, C4, UR 11/11-09
+12   1.0911d0     # Im, TPSS/def2-SV(P), Cs, C4, UR 2/6-10
+
+HIE CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+HIE CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+HIE CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+HIE CB CA     HC
+12   1.1059d0     # CH3Im, Hie, Cs, TPSS/def2-SV(P), in plane, UR 1/3-16
+
+HIE CG CB     H4
+ 5   1.090d0
+ 6   1.0820d0     # Im: B3LYP/6-31G*
+ 7   1.0898d0     # Im: BP-RI/6-31G*
+ 9   1.1157d0     # Im, BPRi/def2-SV(P), Cs, C6, UR 24/6-09
+10   1.0994d0     # Im, RI-PBE/def2-SV(P), Cs, C6, UR 22/6-11
+11   1.0913d0     # Im, B3LYP(Ri)/def2-SV(P), Cs, C6, UR 11/11-09
+12   1.0933d0     # Im, TPSS/def2-SV(P), Cs, C6, UR 2/6-10
+
+HIP CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+HIP CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+HIP CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+HIP CB CA     HC
+12   1.1059d0     # CH3ImH+, TPSS/def2-SV(P), average of 3, UR 17/3-11
+
+HIP CG CB     H4
+ 9   1.0961d0     # ImH+, BPRi/def2-SV(P), C1 and C2, UR 5/2-10
+12   1.0904d0     # ImH+, TPSS/def2-SV(P), C1 and C2, UR 17/3-11
+
+HIS CA   C    HC
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+HIS CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+HIS CG CB     H4  # Took data from HIE
+ 5   1.090d0
+ 6   1.0820d0     # Im: B3LYP/6-31G*
+ 7   1.0898d0     # Im: BP-RI/6-31G*
+ 9   1.1157d0     # Im, BPRi/def2-SV(P), Cs, C6, UR 24/6-09
+10   1.0994d0     # Im, RI-PBE/def2-SV(P), Cs, C6, UR 22/6-11
+11   1.0913d0     # Im, B3LYP(Ri)/def2-SV(P), Cs, C6, UR 11/11-09
+12   1.0933d0     # Im, TPSS/def2-SV(P), Cs, C6, UR 2/6-10
+
+HOC C4 C5     H1  # Glutathiohydroxyacetone
+12   1.1048d0     # Glutathiohydroxyacetone, TPSS/def2-SV(P), UR, 23/7-17
+
+HTA CB2 CA2   H1  # Glutathione
+12   1.1053d0     # Glutathione model, TPSS/def2-SV(P), UR 2/6-10
+
+ILE CA   C    H1  # CA-C back-bone junction
+ 6   1.1024d0     # BackBone, B3LYP(RI)/6-31G*, Cs, average, Mehdi 2022-05-30
+11   1.1105d0     # BackBone, B3LYP(RI)/def2-SV(P), Cs, average,Mehdi 2022-05-30
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+ILE CA   CB   H1  # Ile CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+ILE CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+#ILE CA   C    H1  # Leu CA-C back-bone  junction
+#12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+ILE CB   CA   HC  # Ile CA-CB side-chain junction
+12   1.1062d0     # CH3-CH2-CH2-CH3, TPSS/def2-SV(P), UR 4/2-16
+
+LEU CA   CB   H1  # Leu CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+LEU CA   C    H1  # Leu CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+LEU CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+LEU CB CA     HC
+12   1.1088d0     # Isobutane, TPSS/def2-SV(P), average of 9, Mehdi, 2022-07-09
+
+LIG C1   N    HC  # Lig C1-N  junction
+12   1.1072d0     # Lig, TPSS/def2-SV(P), average, UR 20/9-18
+
+LYN CE   CD   H1  # Lyn CE-CD junction
+12   1.1184d0     # CH3-NH2, TPSS/def2-SV(P), non-symmetric H, UR 17/3-11
+
+LYS CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+LYS CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+LYS CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+LYS CB   CA   H1  # Lys CB-CA junction
+12   1.0930d0     # CH3CH2CH2CH2NH3, TPSS/def2-SV(P), C1, average of 3, UR 25/1-21
+
+LYS CE   CD   H1  # Lys CE-CD junction
+12   1.1015d0     # CH3-NH3, TPSS/def2-SV(P), non-symmetric H, UR 21/4-19
+
+MCN C9'  C10  H1  # MCN C9'-C10 junction
+ 9   1.1135d0     # MPT, BP86/def2-SV(P), UR 5/12-17
+
+MGD C11  C10  H1  # MGD C11-C10 junction
+12   1.1072d0     # MPT, TPSS/def2-SV(P), the cut H, GG 17/3-15
+
+MGP C11  C10  H1  # MGP C11-C10 junction
+12   1.1072d0     # MPT, TPSS/def2-SV(P), the cut H, GG 17/3-15
+
+MET CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+MET CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+MET CA   N    H1  # CA-N back-bone  junction
+ 6   1.1015d0     # CH3-NH-CO-CH3, B3LYP(RI)/6-31G*, Mehdi 2022-05-30
+11   1.1094d0     # CH3-NH-CO-CH3, B3LYP(RI)/def2-SV(P), Mehdi 2022-05-30
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+MET CB   CA   H1  # Met CB-CA junction
+12   1.1075d0     # CH3CH2SCH3, TPSS/def2-SV(P), average of 3, Mehdi, 2022-07-06
+
+MET CG   CB   H1  
+ 7   1.1029d0     # CH3SCH3 RI-BP86/6-31G* Lubos R
+10   1.1107d0     # CH3SCH3 RI-PBE/def2-SV(P), H in plane, UR 22/06-11
+11   1.1030d0     # CH3SCH3 RI-B3LYP/def2-SV(P), UR 18/11-09
+
+MPH C6   N5   HC  # MPT C6-N5 junction
+12   1.1185d0     # DMDT, TPSS-D3/def2-SV(P), Average of 6H, UR 15/8-17
+
+MPH C6   C7   HC  # MPT C6-C7 junction
+12   1.1185d0     # DMDT, TPSS-D3/def2-SV(P), Average of 6H, UR 15/8-17
+
+MPH C3'  O3'  HC  # MPT C3'-O3' junction
+12   1.1185d0     # DMDT, TPSS-D3/def2-SV(P), Average of 6H, UR 15/8-17
+
+MPH C3'  C4'  HC  # MPT C3'-C4' junction
+12   1.1185d0     # DMDT, TPSS-D3/def2-SV(P), Average of 6H, UR 15/8-17
+
+OXF C2A  CAA  HA  # Oxophlorin
+12   1.0929d0     # Oxophlorin, TPSS-D3/def2-SV(P), Average of 6H, UR 16/8-17
+
+OXF C3A  CMA  HA  # Oxophlorin
+12   1.0929d0     # Oxophlorin, TPSS-D3/def2-SV(P), Average of 6H, UR 16/8-17
+
+OXF C2B  CMB  HA  # Oxophlorin
+12   1.0929d0     # Oxophlorin, TPSS-D3/def2-SV(P), Average of 6H, UR 16/8-17
+
+OXF C3B  CAB  HA  # Oxophlorin
+12   1.0907d0     # Oxophlorin, TPSS-D3/def2-SV(P), Average of 2H, UR 16/8-17
+
+OXF C2C  CMC  HA  # Oxophlorin
+12   1.0907d0     # Oxophlorin, TPSS-D3/def2-SV(P), Average of 2H, UR 16/8-17
+
+OXF C3C  CAC  HA  # Oxophlorin
+12   1.0929d0     # Oxophlorin, TPSS-D3/def2-SV(P), Average of 6H, UR 16/8-17
+
+OXF C2D  CMD  HA  # Oxophlorin
+12   1.0929d0     # Oxophlorin, TPSS-D3/def2-SV(P), Average of 6H, UR 16/8-17
+
+OXF C3D  CAD  HA  # Oxophlorin
+12   1.0929d0     # Oxophlorin, TPSS-D3/def2-SV(P), Average of 6H, UR 16/8-17
+
+PHE CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+PHE CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+PHE CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+PHE CG   CB   HA  # PHE CG-CB junction
+12   1.0975d0     # TPSS-D3(BJ)/def2-SV(P), same for all H, UR 12/4-18
+
+PHE CB   CA   HC  # PHE CB-CA junction
+12   1.1079d0     # TPSS-D3(BJ)/def2-SV(P), average, Mehdi, 2021-10-25
+
+PRO CA   CB   H1  # PRO CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+PRO CA   N    HC  # PRO CA-N junction
+ 9   1.1177d0     # HAc, BPRi/def2-SV(P), Cs, C-H out of plane, UR 24/6-09
+12   1.1065d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+SEM CA   C    HC  # Sem CA-C EtO junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+SEM CA   N    HC  # Sem CA-N EtO junction
+12   1.1140d0     # EtO-, TPSS-D3/def2-SV(P), Cs, average of 2, UR 23/8-17
+
+SER CA   C    HC  # Ser CA-C EtOH junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+SER CA   CB   H1  # Ser CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+SER CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+SER CB   CA   H1  # Ser CB-CA side-chain junction
+12   1.1051d0     # MeOH, TPSS/def2-SV(P), Cs, symmetric H, UR 2/11-15
+
+SRM C3A  CAA  hc  # SRM C3A-CAA junction 
+12   1.1068d0     # Fe(II)SRMCys (ls), TPSS/def2 SV(P), atoms 16-17, UR & AB 8/12-15
+
+SRM C2A  CMA  hc  # SRM C2A-CMA junction 
+12   1.1135d0     # Fe(II)SRMCys (ls), TPSS/def2 SV(P), atoms 13-14, UR & AB 8/12-15
+
+SRM C2A  CDA  hc  # SRM C2A-CDA junction 
+12   1.1060d0     # Fe(II)SRMCys (ls), TPSS/def2 SV(P), atoms 13-15, UR & AB 8/12-15
+
+SRM C2D  CAD  hc  # SRM C2D-CAD junction 
+12   1.0946d0     # Fe(II)SRMCys (ls), TPSS/def2 SV(P), atoms 38-39, UR & AB 8/12-15
+
+SRM C3D  CDD  hc  # SRM C3D-CDD junction 
+12   1.0951d0     # Fe(II)SRMCys (ls), TPSS/def2 SV(P), atoms 40-41, UR & AB 8/12-15
+
+SRM C2C  CDC  hc  # SRM C2C-CDC junction 
+12   1.0951d0     # Fe(II)SRMCys (ls), TPSS/def2 SV(P), atoms 31-32, UR & AB 8/12-15
+
+SRM C3C  CAC  hc  # SRM C3C-CAC junction 
+12   1.0947d0     # Fe(II)SRMCys (ls), TPSS/def2 SV(P), atoms 33-34, UR & AB 8/12-15
+
+SRM C2B  CMB  hc  # SRM C2B-CMB junction 
+12   1.1066d0     # Fe(II)SRMCys (ls), TPSS/def2 SV(P), atoms 22-23, UR & AB 8/12-15
+
+SRM C2B  CDB  hc  # SRM C2B-CDB junction 
+12   1.1131d0     # Fe(II)SRMCys (ls), TPSS/def2 SV(P), atoms 22-24, UR & AB 8/12-15
+
+SRM C3B  CAB  hc  # SRM C3B-CAB junction 
+12   1.1136d0     # Fe(II)SRMCys (ls), TPSS/def2 SV(P), atoms 25-27, UR & AB 8/12-15
+
+THR CA   C    H1  # THR CA-C back-bone junction
+ 6   1.1043d0     # BackBone, B3LYP(RI)/6-31G*, Cs, average, Mehdi 2022-05-30
+11   1.1131d0     # BackBone, B3LYP(RI)/def2-SV(P), Cs, average, Mehdi 2022-05-30
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+THR CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+THR CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+THR CB   CA   H1  # THR CB-CA side-chain junction
+12   1.1050d0     # EtOH, TPSS/def2-SV(P), Cs, CH2, UR 4/2-15
+
+TRP CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+TRP CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+TRP CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+TRP CB   CA   H1  # TYR CB-CA junction
+12   1.10820d0     # TPSS/def2-SV(P), average of 3 H, Mehdi 2022-06-17
+
+TRP CG   CB   HA  # CG-CB junction
+12   1.10917d0    # Indole, TPSS/def2-SV(P), 18/8-21
+
+TYR CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+TYR CA   CB   H1  # CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+TYR CA   N    H1  # CA-N back-bone  junction
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+TYR CB   CA   H1  # TYR CB-CA junction
+12   1.0932d0     # TPSS/def2-SV(P), average of 3 H, UR 9/11-16
+
+TYR CG   CB   HA  
+ 7   1.0939d0     # BP86/RI  6-31G* 2004-08-11 Sheny
+12   1.0963d0     # Phenol, TPSS(RI)-D3/SV(P), UR 18/8-21 
+
+VAL CA   C    H1  # CA-C back-bone junction
+12   1.1070d0     # BackBone, TPSS/def2-SV(P), Cs, average, UR 17/3-11
+
+VAL CA   CB   H1  # Val CA-CB back-bone junction
+12   1.1068d0     # BackBone, TPSS/def2-SV(P), Cs, average of 6, UR 17/3-11
+
+VAL CA   N    H1  # CA-N back-bone  junction
+ 6   1.1022d0     # CH3-NH-CO-CH3, B3LYP(RI)/6-31G*, Mehdi 2022-05-30
+11   1.1103d0     # CH3-NH-CO-CH3, B3LYP(RI)/def2-SV(P), Mehdi 2022-05-30
+12   1.1065d0     # CH3-NH-CO-CH3, TPSS/def2-SV(P), UR 20/1-10
+
+VAL CB CA     HC  # Val CB-CA junction
+12   1.1096d0     # CH2(CH3)2, C2v, TPSS/def2-SV(P), UR 26/9-19
+
+4GB O4   C4   HO  # Glucose O4-C4 junction
+12   0.9819d0     # TPSS/def2-SV(P), Erik H, 9/11-16
+
+

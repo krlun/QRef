@@ -1,0 +1,252 @@
+# electronic Ligand Builder and Optimisation Workbench (eLBOW)
+#   - a module of PHENIX version 1.20.1-4487-
+#   - file written: Wed Mar 22 13:48:34 2023
+#
+#   Final geometry file: 8P8.pdb
+#   Random seed: 3628800
+#   SMILES string: S1[Fe@]23[S-]4[V]5[S-]6[Fe]4[C++]2789[Fe]%10[S-]%11[Fe]%12[S-]%10[Fe@]7(S[Fe@@]68[S-]35)[S-]%12[Fe@@]19%11
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+8P8        8P8 'None                     ' ligand 17 17 .
+#
+data_comp_8P8
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.charge
+_chem_comp_atom.partial_charge
+_chem_comp_atom.x
+_chem_comp_atom.y
+_chem_comp_atom.z
+8P8         S4A    S   S3    -1    .     104.5750   58.2520    4.5590
+8P8        FE1     FE  FE     0    .     104.4900   59.1580    2.4210
+8P8        FE3     FE  FE     0    .     104.2660   60.5000    4.7100
+8P8         S5A    S   S2     0    .     104.8410   61.5810    6.5790
+8P8         S2A    S   S3    -1    .     104.9540   61.3390    2.7250
+8P8        FE4     FE  FE     0    .     102.4070   58.8250    3.9000
+8P8         C1     C   C      2    .     102.2410   60.7190    4.5680
+8P8        FE5     FE  FE     0    .     100.6320   60.0260    5.6360
+8P8         S4B    S   S3    -1    .     101.3050   60.5200    7.7450
+8P8         S1A    S   S3    -1    .     102.3190   59.2130    1.6460
+8P8        FE2     FE  FE     0    .     102.6820   61.1490    2.7130
+8P8        FE6     FE  FE     0    .     101.0210   62.2700    4.3790
+8P8        FE7     FE  FE     0    .     102.5870   61.6510    6.3200
+8P8         S2B    S   S2     0    .     101.4170   62.9170    2.3420
+8P8         S3B    S   S3    -1    .     101.6520   63.6590    5.9840
+8P8         S1B    S   S3    -1    .      99.0150   61.4880    5.0020
+8P8         V1     V   V      0    .     100.0180   62.2990    6.9650
+#
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+8P8   S4A    FE1    aromatic      2.324 0.020
+8P8   S4A    FE3    single        2.274 0.020
+8P8   S4A    FE4    aromatic      2.337 0.020
+8P8  FE1      S2A   aromatic      2.250 0.020
+8P8  FE1      S1A   single        2.306 0.020
+8P8  FE3      S5A   single        2.234 0.020
+8P8  FE3      S2A   single        2.262 0.020
+8P8  FE3      C1    single        2.042 0.020
+8P8   S5A    FE7    single        2.270 0.020
+8P8   S2A    FE2    single        2.280 0.020
+8P8  FE4      C1    single        2.015 0.020
+8P8  FE4      S1A   aromatic      2.289 0.020
+8P8   C1     FE5    single        2.052 0.020
+8P8   C1     FE2    single        1.955 0.020
+8P8   C1     FE6    single        1.982 0.020
+8P8   C1     FE7    single        2.014 0.020
+8P8  FE5      S4B   aromatic      2.268 0.020
+8P8  FE5      S1B   aromatic      2.270 0.020
+8P8   S4B    FE7    single        2.226 0.020
+8P8   S4B     V1    single        2.330 0.020
+8P8   S1A    FE2    single        2.240 0.020
+8P8  FE2      S2B   single        2.205 0.020
+8P8  FE6      S2B   single        2.174 0.020
+8P8  FE6      S3B   single        2.214 0.020
+8P8  FE6      S1B   single        2.241 0.020
+8P8  FE7      S3B   single        2.240 0.020
+8P8   S3B     V1    single        2.341 0.020
+8P8   S1B     V1    single        2.349 0.020
+#
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+8P8  FE4      S4A    FE3           69.53 3.000
+8P8  FE4      S4A    FE1           67.11 3.000
+8P8  FE3      S4A    FE1           70.77 3.000
+8P8   S1A    FE1      S2A         102.50 3.000
+8P8   S1A    FE1      S4A         110.67 3.000
+8P8   S2A    FE1      S4A         104.24 3.000
+8P8   C1     FE3      S2A         101.59 3.000
+8P8   C1     FE3      S5A         105.16 3.000
+8P8   S2A    FE3      S5A         118.44 3.000
+8P8   C1     FE3      S4A         103.66 3.000
+8P8   S2A    FE3      S4A         105.49 3.000
+8P8   S5A    FE3      S4A         119.92 3.000
+8P8  FE7      S5A    FE3           70.36 3.000
+8P8  FE2      S2A    FE3           70.77 3.000
+8P8  FE2      S2A    FE1           73.33 3.000
+8P8  FE3      S2A    FE1           72.33 3.000
+8P8   S1A    FE4      C1           99.44 3.000
+8P8   S1A    FE4      S4A         110.79 3.000
+8P8   C1     FE4      S4A         102.32 3.000
+8P8  FE7      C1     FE6           80.02 3.000
+8P8  FE7      C1     FE2          133.23 3.000
+8P8  FE6      C1     FE2           82.89 3.000
+8P8  FE7      C1     FE5           80.69 3.000
+8P8  FE6      C1     FE5           80.29 3.000
+8P8  FE2      C1     FE5          138.18 3.000
+8P8  FE7      C1     FE4          135.15 3.000
+8P8  FE6      C1     FE4          138.98 3.000
+8P8  FE2      C1     FE4           82.74 3.000
+8P8  FE5      C1     FE4           85.39 3.000
+8P8  FE7      C1     FE3           79.56 3.000
+8P8  FE6      C1     FE3          134.50 3.000
+8P8  FE2      C1     FE3           82.29 3.000
+8P8  FE5      C1     FE3          134.86 3.000
+8P8  FE4      C1     FE3           80.82 3.000
+8P8   S1B    FE5      S4B         109.31 3.000
+8P8   S1B    FE5      C1          101.28 3.000
+8P8   S4B    FE5      C1          100.24 3.000
+8P8   V1      S4B    FE7           73.49 3.000
+8P8   V1      S4B    FE5           72.01 3.000
+8P8  FE7      S4B    FE5           71.72 3.000
+8P8  FE2      S1A    FE4           70.81 3.000
+8P8  FE2      S1A    FE1           73.02 3.000
+8P8  FE4      S1A    FE1           68.21 3.000
+8P8   S2B    FE2      S1A         121.32 3.000
+8P8   S2B    FE2      C1          101.92 3.000
+8P8   S1A    FE2      C1          103.02 3.000
+8P8   S2B    FE2      S2A         120.38 3.000
+8P8   S1A    FE2      S2A         103.65 3.000
+8P8   C1     FE2      S2A         103.78 3.000
+8P8   S1B    FE6      S3B         105.81 3.000
+8P8   S1B    FE6      S2B         121.83 3.000
+8P8   S3B    FE6      S2B         116.14 3.000
+8P8   S1B    FE6      C1          104.56 3.000
+8P8   S3B    FE6      C1          104.26 3.000
+8P8   S2B    FE6      C1          102.13 3.000
+8P8   S3B    FE7      S4B         108.13 3.000
+8P8   S3B    FE7      C1          102.27 3.000
+8P8   S4B    FE7      C1          102.87 3.000
+8P8   S3B    FE7      S5A         117.33 3.000
+8P8   S4B    FE7      S5A         118.90 3.000
+8P8   C1     FE7      S5A         104.80 3.000
+8P8  FE6      S2B    FE2           73.04 3.000
+8P8   V1      S3B    FE7           73.01 3.000
+8P8   V1      S3B    FE6           74.96 3.000
+8P8  FE7      S3B    FE6           70.45 3.000
+8P8   V1      S1B    FE6           74.32 3.000
+8P8   V1      S1B    FE5           71.63 3.000
+8P8  FE6      S1B    FE5           70.42 3.000
+8P8   S1B     V1      S3B          98.53 3.000
+8P8   S1B     V1      S4B         104.60 3.000
+8P8   S3B     V1      S4B         101.44 3.000
+#
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+8P8 Var_01        FE7      S5A    FE3      S4A        -113.50  30.0 1
+8P8 Var_02        FE5      C1     FE3      S4A          58.56  30.0 1
+8P8 Var_03        FE6      C1     FE3      S4A        -171.34  30.0 1
+8P8 Var_04        FE7      C1     FE3      S4A         124.01  30.0 1
+8P8 Var_05        FE5      C1     FE4      S4A        -121.93  30.0 1
+8P8 Var_06        FE6      C1     FE4      S4A         168.59  30.0 1
+8P8 Var_07        FE7      C1     FE4      S4A         -50.05  30.0 1
+8P8 Var_08         S5A    FE3      S4A    FE1         -157.25  30.0 1
+8P8 Var_09         S5A    FE3      S2A    FE1          158.51  30.0 1
+8P8 Var_10         S2B    FE2      S2A    FE1         -160.92  30.0 1
+8P8 Var_11         S2B    FE2      S1A    FE1          159.94  30.0 1
+8P8 Var_12         C1     FE7      S5A    FE3           -2.52  30.0 1
+8P8 Var_13         S4B    FE7      S5A    FE3          111.63  30.0 1
+8P8 Var_14         S3B    FE7      S5A    FE3         -115.11  30.0 1
+8P8 Var_15         S2B    FE2      S2A    FE3          122.45  30.0 1
+8P8 Var_16         S4B    FE5      C1     FE3           48.64  30.0 1
+8P8 Var_17         S1B    FE5      C1     FE3          160.90  30.0 1
+8P8 Var_18         S2B    FE2      C1     FE3         -135.73  30.0 1
+8P8 Var_19         S2B    FE6      C1     FE3           70.67  30.0 1
+8P8 Var_20         S3B    FE6      C1     FE3          -50.64  30.0 1
+8P8 Var_21         S1B    FE6      C1     FE3         -161.52  30.0 1
+8P8 Var_22         S4B    FE7      C1     FE3         -122.32  30.0 1
+8P8 Var_23         S3B    FE7      C1     FE3          125.57  30.0 1
+8P8 Var_24        FE4      S4A    FE3      S5A         130.78  30.0 1
+8P8 Var_25        FE2      S2A    FE3      S5A        -123.48  30.0 1
+8P8 Var_26        FE4      C1     FE3      S5A        -142.16  30.0 1
+8P8 Var_27        FE5      C1     FE3      S5A         -68.15  30.0 1
+8P8 Var_28        FE2      C1     FE3      S5A         134.00  30.0 1
+8P8 Var_29        FE6      C1     FE3      S5A          61.95  30.0 1
+8P8 Var_30        FE4      C1     FE7      S5A          68.12  30.0 1
+8P8 Var_31        FE5      C1     FE7      S5A         141.85  30.0 1
+8P8 Var_32        FE2      C1     FE7      S5A         -66.23  30.0 1
+8P8 Var_33        FE6      C1     FE7      S5A        -136.48  30.0 1
+8P8 Var_34        FE5      S4B    FE7      S5A        -131.02  30.0 1
+8P8 Var_35         V1      S4B    FE7      S5A         152.94  30.0 1
+8P8 Var_36        FE6      S3B    FE7      S5A         126.67  30.0 1
+8P8 Var_37         V1      S3B    FE7      S5A        -153.67  30.0 1
+8P8 Var_38        FE7      S5A    FE3      S2A         115.04  30.0 1
+8P8 Var_39        FE5      C1     FE3      S2A         167.85  30.0 1
+8P8 Var_40        FE6      C1     FE3      S2A         -62.05  30.0 1
+8P8 Var_41        FE7      C1     FE3      S2A        -126.70  30.0 1
+8P8 Var_42        FE5      C1     FE2      S2A        -166.37  30.0 1
+8P8 Var_43        FE6      C1     FE2      S2A         126.86  30.0 1
+8P8 Var_44        FE7      C1     FE2      S2A          57.77  30.0 1
+8P8 Var_45        FE6      S2B    FE2      S2A        -115.02  30.0 1
+8P8 Var_46         S4B    FE5      C1     FE4          120.83  30.0 1
+8P8 Var_47         S1B    FE5      C1     FE4         -126.91  30.0 1
+8P8 Var_48         S2B    FE2      C1     FE4          142.60  30.0 1
+8P8 Var_49         S2B    FE6      C1     FE4          -71.43  30.0 1
+8P8 Var_50         S3B    FE6      C1     FE4          167.27  30.0 1
+8P8 Var_51         S1B    FE6      C1     FE4           56.39  30.0 1
+8P8 Var_52         S4B    FE7      C1     FE4          -56.85  30.0 1
+8P8 Var_53         S3B    FE7      C1     FE4         -168.96  30.0 1
+8P8 Var_54         S2B    FE2      S1A    FE4         -127.80  30.0 1
+8P8 Var_55        FE6      S2B    FE2      C1           -1.07  30.0 1
+8P8 Var_56         S1A    FE4      C1     FE5          124.21  30.0 1
+8P8 Var_57         S1A    FE2      C1     FE5          -58.55  30.0 1
+8P8 Var_58         S2B    FE2      C1     FE5           67.90  30.0 1
+8P8 Var_59         S2B    FE6      C1     FE5         -142.71  30.0 1
+8P8 Var_60         S2B    FE6      S1B    FE5          128.69  30.0 1
+8P8 Var_61        FE2      C1     FE5      S4B        -165.44  30.0 1
+8P8 Var_62        FE2      C1     FE7      S4B         168.80  30.0 1
+8P8 Var_63        FE6      C1     FE4      S1A          54.73  30.0 1
+8P8 Var_64        FE7      C1     FE4      S1A        -163.91  30.0 1
+8P8 Var_65        FE6      C1     FE2      S1A        -125.32  30.0 1
+8P8 Var_66        FE7      C1     FE2      S1A         165.60  30.0 1
+8P8 Var_67        FE6      S2B    FE2      S1A         112.39  30.0 1
+8P8 Var_68         S1B    FE5      C1     FE2          -53.19  30.0 1
+8P8 Var_69         S3B    FE6      C1     FE2         -122.45  30.0 1
+8P8 Var_70         S1B    FE6      C1     FE2          126.67  30.0 1
+8P8 Var_71         S3B    FE7      C1     FE2           56.70  30.0 1
+8P8 Var_72         S3B    FE6      S2B    FE2          113.77  30.0 1
+8P8 Var_73         S1B    FE6      S2B    FE2         -114.79  30.0 1
+8P8 Var_74         S2B    FE2      C1     FE7          -67.96  30.0 1
+8P8 Var_75         S2B    FE6      C1     FE7          135.14  30.0 1
+8P8 Var_76         S2B    FE6      S3B    FE7         -124.46  30.0 1
+8P8 Var_77         V1      S3B    FE6      S2B         158.58  30.0 1
+8P8 Var_78         V1      S1B    FE6      S2B        -155.64  30.0 1

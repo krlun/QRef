@@ -1,0 +1,250 @@
+# electronic Ligand Builder and Optimisation Workbench (eLBOW)
+#   - a module of PHENIX version 1.20.1-4487-
+#   - file written: Wed Mar 22 13:48:17 2023
+#
+#   Final geometry file: CLF.pdb
+#   Random seed: 3628800
+#   SMILES string: S1|2[Fe]|3S4|[Fe]1[S]567([Fe]|8S|9[Fe]|%10S|8[Fe]5S|%10[Fe]6|9)[Fe]|2S|3[Fe]47
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+CLF        CLF 'None                     ' ligand 15 15 .
+#
+data_comp_CLF
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.charge
+_chem_comp_atom.partial_charge
+_chem_comp_atom.x
+_chem_comp_atom.y
+_chem_comp_atom.z
+CLF        FE1     FE  FE     0    .      94.9160   77.0580   -1.5990
+CLF        FE2     FE  FE     0    .      93.8290   76.5910    0.6310
+CLF        FE3     FE  FE     0    .      95.9510   74.9340   -0.1200
+CLF        FE4     FE  FE     0    .      96.2890   77.5370    0.5240
+CLF         S1     S   S      0    .      94.3870   78.9040   -0.0880
+CLF         S2A    S   S3     0    .      93.8410   75.0950   -1.0730
+CLF         S4A    S   S3     0    .      95.5850   75.8830    1.9150
+CLF         S3A    S   S3     0    .      97.1160   76.5420   -1.3180
+CLF        FE5     FE  FE     0    .      95.2570   79.8080    2.0340
+CLF        FE6     FE  FE     0    .      93.5730   81.1750    0.6630
+CLF        FE7     FE  FE     0    .      93.2170   81.0160    3.4690
+CLF        FE8     FE  FE     0    .      92.7930   79.0340    1.6970
+CLF         S2B    S   S3     0    .      94.9710   82.0200    2.3440
+CLF         S3B    S   S3     0    .      91.6040   80.9380    1.8350
+CLF         S4B    S   S3     0    .      93.9690   78.8660    3.6370
+#
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+CLF  FE1      S1    single        2.443 0.020
+CLF  FE1      S2A   aromatic      2.299 0.020
+CLF  FE1      S3A   aromatic      2.277 0.020
+CLF  FE2      S1    single        2.486 0.020
+CLF  FE2      S2A   aromatic      2.268 0.020
+CLF  FE2      S4A   aromatic      2.288 0.020
+CLF  FE3      S2A   single        2.321 0.020
+CLF  FE3      S4A   aromatic      2.275 0.020
+CLF  FE3      S3A   aromatic      2.319 0.020
+CLF  FE4      S1    single        2.421 0.020
+CLF  FE4      S4A   single        2.273 0.020
+CLF  FE4      S3A   single        2.251 0.020
+CLF   S1     FE5    single        2.465 0.020
+CLF   S1     FE6    single        2.527 0.020
+CLF   S1     FE8    single        2.397 0.020
+CLF  FE5      S2B   aromatic      2.252 0.020
+CLF  FE5      S4B   aromatic      2.262 0.020
+CLF  FE6      S2B   aromatic      2.344 0.020
+CLF  FE6      S3B   aromatic      2.304 0.020
+CLF  FE7      S2B   single        2.313 0.020
+CLF  FE7      S3B   aromatic      2.297 0.020
+CLF  FE7      S4B   aromatic      2.284 0.020
+CLF  FE8      S3B   single        2.249 0.020
+CLF  FE8      S4B   single        2.275 0.020
+#
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+CLF   S3A    FE1      S2A         103.30 3.000
+CLF   S3A    FE1      S1          107.70 3.000
+CLF   S2A    FE1      S1          113.72 3.000
+CLF   S4A    FE2      S2A         102.33 3.000
+CLF   S4A    FE2      S1          106.14 3.000
+CLF   S2A    FE2      S1          113.29 3.000
+CLF   S3A    FE3      S4A         104.69 3.000
+CLF   S3A    FE3      S2A         101.33 3.000
+CLF   S4A    FE3      S2A         101.08 3.000
+CLF   S3A    FE4      S4A         107.03 3.000
+CLF   S3A    FE4      S1          109.35 3.000
+CLF   S4A    FE4      S1          108.80 3.000
+CLF  FE8      S1     FE6           61.03 3.000
+CLF  FE8      S1     FE5           64.77 3.000
+CLF  FE6      S1     FE5           61.85 3.000
+CLF  FE8      S1     FE4          111.40 3.000
+CLF  FE6      S1     FE4          133.27 3.000
+CLF  FE5      S1     FE4           73.27 3.000
+CLF  FE8      S1     FE2           71.68 3.000
+CLF  FE6      S1     FE2          132.69 3.000
+CLF  FE5      S1     FE2           99.87 3.000
+CLF  FE4      S1     FE2           65.03 3.000
+CLF  FE8      S1     FE1          130.21 3.000
+CLF  FE6      S1     FE1          158.84 3.000
+CLF  FE5      S1     FE1          137.13 3.000
+CLF  FE4      S1     FE1           63.87 3.000
+CLF  FE2      S1     FE1           61.61 3.000
+CLF  FE3      S2A    FE2           75.05 3.000
+CLF  FE3      S2A    FE1           74.22 3.000
+CLF  FE2      S2A    FE1           67.11 3.000
+CLF  FE4      S4A    FE3           72.92 3.000
+CLF  FE4      S4A    FE2           70.67 3.000
+CLF  FE3      S4A    FE2           75.55 3.000
+CLF  FE4      S3A    FE3           72.49 3.000
+CLF  FE4      S3A    FE1           69.26 3.000
+CLF  FE3      S3A    FE1           74.66 3.000
+CLF   S4B    FE5      S2B         103.84 3.000
+CLF   S4B    FE5      S1          104.85 3.000
+CLF   S2B    FE5      S1          115.72 3.000
+CLF   S3B    FE6      S2B         100.49 3.000
+CLF   S3B    FE6      S1          109.52 3.000
+CLF   S2B    FE6      S1          110.18 3.000
+CLF   S4B    FE7      S3B         104.57 3.000
+CLF   S4B    FE7      S2B         101.23 3.000
+CLF   S3B    FE7      S2B         101.61 3.000
+CLF   S4B    FE8      S3B         106.47 3.000
+CLF   S4B    FE8      S1          106.70 3.000
+CLF   S3B    FE8      S1          116.31 3.000
+CLF  FE7      S2B    FE6           74.93 3.000
+CLF  FE7      S2B    FE5           74.75 3.000
+CLF  FE6      S2B    FE5           67.85 3.000
+CLF  FE8      S3B    FE7           72.61 3.000
+CLF  FE8      S3B    FE6           66.67 3.000
+CLF  FE7      S3B    FE6           76.01 3.000
+CLF  FE8      S4B    FE7           72.39 3.000
+CLF  FE8      S4B    FE5           70.08 3.000
+CLF  FE7      S4B    FE5           75.13 3.000
+#
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+CLF Var_01         S2A    FE2      S1     FE1          -16.12  30.0 3
+CLF Var_02         S4A    FE2      S1     FE1           95.38  30.0 3
+CLF Var_03         S4A    FE4      S1     FE1          -92.54  30.0 3
+CLF Var_04         S3A    FE4      S1     FE1           24.05  30.0 3
+CLF Var_05         S2B    FE5      S1     FE1          151.12  30.0 1
+CLF Var_06         S4B    FE5      S1     FE1          -95.15  30.0 1
+CLF Var_07         S2B    FE6      S1     FE1         -141.44  30.0 1
+CLF Var_08         S3B    FE6      S1     FE1          108.92  30.0 1
+CLF Var_09         S3B    FE8      S1     FE1         -137.64  30.0 1
+CLF Var_10         S4B    FE8      S1     FE1          103.77  30.0 1
+CLF Var_11         S4A    FE2      S2A    FE1          -97.46  30.0 1
+CLF Var_12         S4A    FE3      S2A    FE1           88.54  30.0 1
+CLF Var_13         S3A    FE3      S2A    FE1          -19.09  30.0 1
+CLF Var_14         S4A    FE3      S3A    FE1          -85.54  30.0 1
+CLF Var_15         S4A    FE4      S3A    FE1           92.88  30.0 1
+CLF Var_16         S3A    FE1      S1     FE2          -97.88  30.0 3
+CLF Var_17         S4A    FE4      S1     FE2          -23.38  30.0 3
+CLF Var_18         S3A    FE4      S1     FE2           93.20  30.0 3
+CLF Var_19         S2B    FE5      S1     FE2         -150.34  30.0 1
+CLF Var_20         S4B    FE5      S1     FE2          -36.61  30.0 1
+CLF Var_21         S2B    FE6      S1     FE2           92.32  30.0 1
+CLF Var_22         S3B    FE6      S1     FE2          -17.32  30.0 1
+CLF Var_23         S3B    FE8      S1     FE2         -158.30  30.0 1
+CLF Var_24         S4B    FE8      S1     FE2           83.11  30.0 1
+CLF Var_25         S3A    FE1      S2A    FE2           99.72  30.0 1
+CLF Var_26         S4A    FE3      S2A    FE2           18.59  30.0 1
+CLF Var_27         S3A    FE3      S2A    FE2          -89.04  30.0 1
+CLF Var_28         S3A    FE3      S4A    FE2           86.59  30.0 1
+CLF Var_29         S3A    FE4      S4A    FE2          -93.59  30.0 1
+CLF Var_30         S1     FE1      S2A    FE3          -96.83  30.0 1
+CLF Var_31         S1     FE2      S2A    FE3           95.25  30.0 1
+CLF Var_32         S1     FE2      S4A    FE3         -100.07  30.0 1
+CLF Var_33         S1     FE4      S4A    FE3          104.75  30.0 1
+CLF Var_34         S3A    FE4      S4A    FE3          -13.31  30.0 1
+CLF Var_35         S1     FE1      S3A    FE3          101.05  30.0 1
+CLF Var_36         S1     FE4      S3A    FE3         -104.62  30.0 1
+CLF Var_37         S2A    FE1      S1     FE4           90.32  30.0 3
+CLF Var_38         S2A    FE2      S1     FE4          -88.64  30.0 3
+CLF Var_39         S2B    FE5      S1     FE4          149.64  30.0 1
+CLF Var_40         S4B    FE5      S1     FE4          -96.63  30.0 1
+CLF Var_41         S2B    FE6      S1     FE4           -2.25  30.0 1
+CLF Var_42         S3B    FE6      S1     FE4         -111.88  30.0 1
+CLF Var_43         S3B    FE8      S1     FE4          149.10  30.0 1
+CLF Var_44         S4B    FE8      S1     FE4           30.51  30.0 1
+CLF Var_45         S2A    FE2      S4A    FE4           95.55  30.0 1
+CLF Var_46         S2A    FE3      S4A    FE4          -92.21  30.0 1
+CLF Var_47         S2A    FE1      S3A    FE4          -96.30  30.0 1
+CLF Var_48         S2A    FE3      S3A    FE4           91.87  30.0 1
+CLF Var_49        FE6      S2B    FE5      S1           17.37  30.0 1
+CLF Var_50        FE7      S2B    FE5      S1           97.01  30.0 1
+CLF Var_51        FE7      S4B    FE5      S1         -104.35  30.0 1
+CLF Var_52        FE8      S4B    FE5      S1          -28.03  30.0 1
+CLF Var_53        FE7      S2B    FE6      S1          -95.60  30.0 1
+CLF Var_54        FE7      S3B    FE6      S1           96.06  30.0 1
+CLF Var_55        FE8      S3B    FE6      S1           19.23  30.0 1
+CLF Var_56        FE7      S3B    FE8      S1         -103.32  30.0 1
+CLF Var_57        FE7      S4B    FE8      S1          109.33  30.0 1
+CLF Var_58        FE5      S1     FE1      S2A          88.74  30.0 3
+CLF Var_59        FE6      S1     FE1      S2A        -121.69  30.0 3
+CLF Var_60        FE8      S1     FE1      S2A          -6.43  30.0 3
+CLF Var_61        FE5      S1     FE2      S2A        -154.85  30.0 3
+CLF Var_62        FE6      S1     FE2      S2A         144.55  30.0 3
+CLF Var_63        FE8      S1     FE2      S2A         146.04  30.0 3
+CLF Var_64        FE5      S1     FE2      S4A         -43.34  30.0 3
+CLF Var_65        FE6      S1     FE2      S4A        -103.94  30.0 3
+CLF Var_66        FE8      S1     FE2      S4A        -102.45  30.0 3
+CLF Var_67        FE5      S1     FE4      S4A          86.34  30.0 3
+CLF Var_68        FE6      S1     FE4      S4A         102.69  30.0 3
+CLF Var_69        FE8      S1     FE4      S4A          32.91  30.0 3
+CLF Var_70        FE5      S1     FE1      S3A         -25.09  30.0 3
+CLF Var_71        FE6      S1     FE1      S3A         124.49  30.0 3
+CLF Var_72        FE8      S1     FE1      S3A        -120.26  30.0 3
+CLF Var_73        FE5      S1     FE4      S3A        -157.08  30.0 3
+CLF Var_74        FE6      S1     FE4      S3A        -140.72  30.0 3
+CLF Var_75        FE8      S1     FE4      S3A         149.50  30.0 3
+CLF Var_76         S3B    FE6      S1     FE5          -94.08  30.0 1
+CLF Var_77         S3B    FE8      S1     FE5           90.87  30.0 1
+CLF Var_78         S3B    FE6      S2B    FE5           99.24  30.0 1
+CLF Var_79         S3B    FE7      S2B    FE5          -90.66  30.0 1
+CLF Var_80         S4B    FE7      S2B    FE5           16.95  30.0 1
+CLF Var_81         S3B    FE7      S4B    FE5           88.43  30.0 1
+CLF Var_82         S3B    FE8      S4B    FE5          -95.64  30.0 1
+CLF Var_83         S4B    FE5      S1     FE6           96.82  30.0 1
+CLF Var_84         S4B    FE8      S1     FE6          -98.14  30.0 1
+CLF Var_85         S4B    FE5      S2B    FE6          -96.94  30.0 1
+CLF Var_86         S3B    FE7      S2B    FE6          -20.01  30.0 1
+CLF Var_87         S4B    FE7      S2B    FE6           87.60  30.0 1
+CLF Var_88         S4B    FE7      S3B    FE6          -84.72  30.0 1
+CLF Var_89         S4B    FE8      S3B    FE6           97.30  30.0 1
+CLF Var_90         S4B    FE8      S3B    FE7           15.40  30.0 1
+CLF Var_91         S2B    FE5      S1     FE8          -86.11  30.0 1
+CLF Var_92         S2B    FE6      S1     FE8           90.71  30.0 1
+CLF Var_93         S2B    FE6      S3B    FE8          -96.74  30.0 1
+CLF Var_94         S2B    FE7      S3B    FE8           89.81  30.0 1
+CLF Var_95         S2B    FE5      S4B    FE8           93.81  30.0 1
+CLF Var_96         S2B    FE7      S4B    FE8          -90.25  30.0 1

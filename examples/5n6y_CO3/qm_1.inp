@@ -1,0 +1,12 @@
+! TPSS D4 DEF2-SV(P) UKS
+! ENGRAD
+! NOTRAH
+! SlowConv
+! TightSCF
+%scf
+  MaxIter 100000
+  DIISMaxEq 40
+  DirectResetFreq 1
+end
+%PAL NPROCS 48 END
+*pdbfile -2 1 qm_1_h.pdb

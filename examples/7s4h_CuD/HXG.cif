@@ -1,0 +1,458 @@
+# electronic Ligand Builder and Optimisation Workbench (eLBOW)
+#   - a module of PHENIX version 1.20.1-4487-
+#   - file written: Mon Feb 13 14:34:45 2023
+#
+#   Input file: HXG.cif
+#   Random seed: 3628800
+#
+data_comp_list
+loop_
+_chem_comp.id
+_chem_comp.three_letter_code
+_chem_comp.name
+_chem_comp.group
+_chem_comp.number_atoms_all
+_chem_comp.number_atoms_nh
+_chem_comp.desc_level
+HXG        HXG 'Unknown                  ' ligand 70 30 .
+#
+data_comp_HXG
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.type_energy
+_chem_comp_atom.charge
+_chem_comp_atom.partial_charge
+_chem_comp_atom.x
+_chem_comp_atom.y
+_chem_comp_atom.z
+HXG         CAA    C   CH3    0    .      -6.1339    3.1988   -7.0143
+HXG         CAJ    C   CH2    0    .      -5.1487    2.0744   -6.7018
+HXG         CAL    C   CH2    0    .      -5.0804    1.8627   -5.1909
+HXG         CAN    C   CH2    0    .      -4.0152    0.8163   -4.8710
+HXG         CAQ    C   CH2    0    .      -3.8547    0.6996   -3.3568
+HXG         CAZ    C   C      0    .      -2.7830   -0.3406   -3.0371
+HXG         OAF    O   O      0    .      -2.4880   -1.1548   -3.8454
+HXG         OAV    O   O2     0    .      -2.1490   -0.3311   -1.7901
+HXG         CAT    C   CH2    0    .      -1.2342   -1.3740   -1.6119
+HXG         CBB    C   CH1    0    .      -0.4757   -1.1677   -0.3024
+HXG         OAY    O   O2     0    .      -0.0554   -2.4063    0.1930
+HXG         CBA    C   C      0    .      -0.9347   -2.9730    1.1217
+HXG         OAG    O   O      0    .      -1.5562   -2.2760    1.8508
+HXG         CAR    C   CH2    0    .      -1.0897   -4.4903    1.1992
+HXG         CAO    C   CH2    0    .      -0.8470   -4.9542    2.6340
+HXG         CAM    C   CH2    0    .      -1.3455   -6.3890    2.7964
+HXG         CAK    C   CH2    0    .      -0.8596   -6.9487    4.1318
+HXG         CAB    C   CH3    0    .      -1.5646   -8.2735    4.4154
+HXG         CAU    C   CH2    0    .       0.7414   -0.2802   -0.5535
+HXG         OAX    O   O2     0    .       1.1172    0.3444    0.6403
+HXG         PBD    P   P      0    .       1.7770    1.8528    0.5637
+HXG         OAI    O   O      0    .       2.2261    2.1345   -0.8502
+HXG         OAH    O   OP    -1    .       0.7454    2.8751    0.9773
+HXG         OAW    O   O2     0    .       3.0726    1.9379    1.5788
+HXG         CAP    C   CH2    0    .       3.6353    3.1917    1.8376
+HXG         CAS    C   CH2    0    .       5.0845    3.0167    2.2854
+HXG         NBC    N   NT     1    .       5.6174    4.2976    2.7110
+HXG         CAD    C   CH3    0    .       7.0529    4.1873    2.8951
+HXG         CAE    C   CH3    0    .       5.3348    5.2997    1.6992
+HXG         CAC    C   CH3    0    .       4.9972    4.6873    3.9645
+HXG         H1     H   HCH3   0    .      -7.1389    2.8836   -6.7494
+HXG         H2     H   HCH3   0    .      -5.8686    4.0824   -6.4409
+HXG         H3     H   HCH3   0    .      -6.0947    3.4302   -8.0749
+HXG         H4     H   HCH2   0    .      -5.4807    1.1593   -7.1805
+HXG         H5     H   HCH2   0    .      -4.1655    2.3412   -7.0743
+HXG         H6     H   HCH2   0    .      -6.0443    1.5197   -4.8299
+HXG         H7     H   HCH2   0    .      -4.8249    2.7988   -4.7059
+HXG         H8     H   HCH2   0    .      -4.3171   -0.1430   -5.2777
+HXG         H9     H   HCH2   0    .      -3.0705    1.1152   -5.3128
+HXG         H10    H   HCH2   0    .      -4.7975    0.3947   -2.9158
+HXG         H11    H   HCH2   0    .      -3.5589    1.6605   -2.9495
+HXG         H12    H   HCH2   0    .      -1.7655   -2.3191   -1.5770
+HXG         H13    H   HCH2   0    .      -0.5320   -1.3843   -2.4387
+HXG         H14    H   HCH1   0    .      -1.1267   -0.6916    0.4208
+HXG         H15    H   HCH2   0    .      -2.0933   -4.7673    0.8944
+HXG         H16    H   HCH2   0    .      -0.3686   -4.9615    0.5400
+HXG         H17    H   HCH2   0    .      -1.3825   -4.3056    3.3191
+HXG         H18    H   HCH2   0    .       0.2148   -4.9133    2.8525
+HXG         H19    H   HCH2   0    .      -2.4300   -6.3999    2.7729
+HXG         H20    H   HCH2   0    .      -0.9601   -6.9996    1.9867
+HXG         H21    H   HCH2   0    .      -1.0852   -6.2423    4.9235
+HXG         H22    H   HCH2   0    .       0.2120   -7.1117    4.0872
+HXG         H23    H   HCH3   0    .      -2.6040   -8.0837    4.6678
+HXG         H24    H   HCH3   0    .      -1.0756   -8.7732    5.2466
+HXG         H25    H   HCH3   0    .      -1.5159   -8.9056    3.5334
+HXG         H26    H   HCH2   0    .       0.4931    0.4734   -1.2933
+HXG         H27    H   HCH2   0    .       1.5631   -0.8878   -0.9179
+HXG         H29    H   HCH2   0    .       3.0718    3.6861    2.6218
+HXG         H30    H   HCH2   0    .       3.6056    3.7943    0.9362
+HXG         H31    H   HCH2   0    .       5.6749    2.6362    1.4588
+HXG         H32    H   HCH2   0    .       5.1254    2.3153    3.1120
+HXG         H33    H   HCH3   0    .       7.2646    3.4328    3.6473
+HXG         H34    H   HCH3   0    .       7.4508    5.1443    3.2203
+HXG         H35    H   HCH3   0    .       7.5177    3.9023    1.9555
+HXG         H36    H   HCH3   0    .       5.5960    4.9090    0.7198
+HXG         H37    H   HCH3   0    .       5.9196    6.1926    1.9006
+HXG         H38    H   HCH3   0    .       4.2773    5.5471    1.7201
+HXG         H39    H   HCH3   0    .       4.9348    3.8242    4.6213
+HXG         H40    H   HCH3   0    .       3.9985    5.0683    3.7713
+HXG         H41    H   HCH3   0    .       5.5944    5.4608    4.4388
+#
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.type
+_chem_comp_bond.value_dist
+_chem_comp_bond.value_dist_esd
+HXG   OAF     CAZ   double        1.185 0.020
+HXG   CAN     CAL   single        1.527 0.020
+HXG   CAN     CAQ   single        1.527 0.020
+HXG   CAZ     OAV   single        1.399 0.020
+HXG   CAZ     CAQ   single        1.527 0.020
+HXG   CAL     CAJ   single        1.527 0.020
+HXG   CAS     CAP   single        1.527 0.020
+HXG   CAS     NBC   single        1.451 0.020
+HXG   CAC     NBC   single        1.452 0.020
+HXG   CAA     CAJ   single        1.527 0.020
+HXG   OAV     CAT   single        1.399 0.020
+HXG   CAP     OAW   single        1.399 0.020
+HXG   NBC     CAD   single        1.452 0.020
+HXG   NBC     CAE   single        1.452 0.020
+HXG   OAW     PBD   single        1.648 0.020
+HXG   CAT     CBB   single        1.527 0.020
+HXG   OAX     PBD   single        1.648 0.020
+HXG   OAX     CAU   single        1.399 0.020
+HXG   CBB     CAU   single        1.527 0.020
+HXG   CBB     OAY   single        1.399 0.020
+HXG   PBD     OAI   deloc         1.510 0.020
+HXG   PBD     OAH   deloc         1.510 0.020
+HXG   OAY     CBA   single        1.399 0.020
+HXG   CBA     OAG   double        1.185 0.020
+HXG   CBA     CAR   single        1.527 0.020
+HXG   CAR     CAO   single        1.527 0.020
+HXG   CAM     CAO   single        1.528 0.020
+HXG   CAM     CAK   single        1.527 0.020
+HXG   CAB     CAK   single        1.527 0.020
+HXG   CAA     H1    single        1.086 0.020
+HXG   CAA     H2    single        1.086 0.020
+HXG   CAA     H3    single        1.086 0.020
+HXG   CAJ     H4    single        1.085 0.020
+HXG   CAJ     H5    single        1.085 0.020
+HXG   CAL     H6    single        1.085 0.020
+HXG   CAL     H7    single        1.085 0.020
+HXG   CAN     H8    single        1.085 0.020
+HXG   CAN     H9    single        1.085 0.020
+HXG   CAQ     H10   single        1.085 0.020
+HXG   CAQ     H11   single        1.085 0.020
+HXG   CAT     H12   single        1.085 0.020
+HXG   CAT     H13   single        1.085 0.020
+HXG   CBB     H14   single        1.083 0.020
+HXG   CAR     H15   single        1.085 0.020
+HXG   CAR     H16   single        1.085 0.020
+HXG   CAO     H17   single        1.085 0.020
+HXG   CAO     H18   single        1.085 0.020
+HXG   CAM     H19   single        1.085 0.020
+HXG   CAM     H20   single        1.085 0.020
+HXG   CAK     H21   single        1.085 0.020
+HXG   CAK     H22   single        1.085 0.020
+HXG   CAB     H23   single        1.086 0.020
+HXG   CAB     H24   single        1.086 0.020
+HXG   CAB     H25   single        1.086 0.020
+HXG   CAU     H26   single        1.085 0.020
+HXG   CAU     H27   single        1.085 0.020
+HXG   CAP     H29   single        1.085 0.020
+HXG   CAP     H30   single        1.085 0.020
+HXG   CAS     H31   single        1.085 0.020
+HXG   CAS     H32   single        1.085 0.020
+HXG   CAD     H33   single        1.086 0.020
+HXG   CAD     H34   single        1.086 0.020
+HXG   CAD     H35   single        1.086 0.020
+HXG   CAE     H36   single        1.086 0.020
+HXG   CAE     H37   single        1.086 0.020
+HXG   CAE     H38   single        1.086 0.020
+HXG   CAC     H39   single        1.086 0.020
+HXG   CAC     H40   single        1.086 0.020
+HXG   CAC     H41   single        1.086 0.020
+#
+loop_
+_chem_comp_angle.comp_id
+_chem_comp_angle.atom_id_1
+_chem_comp_angle.atom_id_2
+_chem_comp_angle.atom_id_3
+_chem_comp_angle.value_angle
+_chem_comp_angle.value_angle_esd
+HXG   H3      CAA     H2          109.47 3.000
+HXG   H3      CAA     H1          109.47 3.000
+HXG   H2      CAA     H1          109.47 3.000
+HXG   H3      CAA     CAJ         109.47 3.000
+HXG   H2      CAA     CAJ         109.47 3.000
+HXG   H1      CAA     CAJ         109.47 3.000
+HXG   H5      CAJ     H4          109.47 3.000
+HXG   H5      CAJ     CAL         109.47 3.000
+HXG   H4      CAJ     CAL         109.47 3.000
+HXG   H5      CAJ     CAA         109.47 3.000
+HXG   H4      CAJ     CAA         109.47 3.000
+HXG   CAL     CAJ     CAA         109.47 3.000
+HXG   H7      CAL     H6          109.47 3.000
+HXG   H7      CAL     CAN         109.47 3.000
+HXG   H6      CAL     CAN         109.47 3.000
+HXG   H7      CAL     CAJ         109.47 3.000
+HXG   H6      CAL     CAJ         109.47 3.000
+HXG   CAN     CAL     CAJ         109.47 3.000
+HXG   H9      CAN     H8          109.47 3.000
+HXG   H9      CAN     CAQ         109.47 3.000
+HXG   H8      CAN     CAQ         109.47 3.000
+HXG   H9      CAN     CAL         109.47 3.000
+HXG   H8      CAN     CAL         109.47 3.000
+HXG   CAQ     CAN     CAL         109.47 3.000
+HXG   H11     CAQ     H10         109.47 3.000
+HXG   H11     CAQ     CAZ         109.47 3.000
+HXG   H10     CAQ     CAZ         109.47 3.000
+HXG   H11     CAQ     CAN         109.47 3.000
+HXG   H10     CAQ     CAN         109.47 3.000
+HXG   CAZ     CAQ     CAN         109.47 3.000
+HXG   OAV     CAZ     OAF         120.00 3.000
+HXG   OAV     CAZ     CAQ         120.00 3.000
+HXG   OAF     CAZ     CAQ         120.00 3.000
+HXG   CAT     OAV     CAZ         113.89 3.000
+HXG   H13     CAT     H12         109.47 3.000
+HXG   H13     CAT     CBB         109.47 3.000
+HXG   H12     CAT     CBB         109.47 3.000
+HXG   H13     CAT     OAV         109.47 3.000
+HXG   H12     CAT     OAV         109.47 3.000
+HXG   CBB     CAT     OAV         109.47 3.000
+HXG   H14     CBB     CAU         109.47 3.000
+HXG   H14     CBB     OAY         109.47 3.000
+HXG   CAU     CBB     OAY         109.47 3.000
+HXG   H14     CBB     CAT         109.47 3.000
+HXG   OAY     CBB     CAT         109.47 3.000
+HXG   CAU     CBB     CAT         109.47 3.000
+HXG   CBA     OAY     CBB         113.89 3.000
+HXG   CAR     CBA     OAG         120.00 3.000
+HXG   CAR     CBA     OAY         120.00 3.000
+HXG   OAG     CBA     OAY         120.00 3.000
+HXG   H16     CAR     H15         109.47 3.000
+HXG   H16     CAR     CAO         109.47 3.000
+HXG   H15     CAR     CAO         109.47 3.000
+HXG   H16     CAR     CBA         109.47 3.000
+HXG   H15     CAR     CBA         109.47 3.000
+HXG   CAO     CAR     CBA         109.47 3.000
+HXG   H18     CAO     H17         109.47 3.000
+HXG   H18     CAO     CAM         109.47 3.000
+HXG   H17     CAO     CAM         109.47 3.000
+HXG   H18     CAO     CAR         109.47 3.000
+HXG   H17     CAO     CAR         109.47 3.000
+HXG   CAM     CAO     CAR         109.47 3.000
+HXG   H20     CAM     H19         109.47 3.000
+HXG   H20     CAM     CAK         109.47 3.000
+HXG   H19     CAM     CAK         109.47 3.000
+HXG   H20     CAM     CAO         109.47 3.000
+HXG   H19     CAM     CAO         109.47 3.000
+HXG   CAK     CAM     CAO         109.47 3.000
+HXG   H22     CAK     H21         109.47 3.000
+HXG   H22     CAK     CAB         109.47 3.000
+HXG   H21     CAK     CAB         109.47 3.000
+HXG   H22     CAK     CAM         109.47 3.000
+HXG   H21     CAK     CAM         109.47 3.000
+HXG   CAB     CAK     CAM         109.47 3.000
+HXG   H25     CAB     H24         109.47 3.000
+HXG   H25     CAB     H23         109.47 3.000
+HXG   H24     CAB     H23         109.47 3.000
+HXG   H25     CAB     CAK         109.47 3.000
+HXG   H24     CAB     CAK         109.47 3.000
+HXG   H23     CAB     CAK         109.47 3.000
+HXG   H27     CAU     H26         109.47 3.000
+HXG   H27     CAU     OAX         109.47 3.000
+HXG   H26     CAU     OAX         109.47 3.000
+HXG   H27     CAU     CBB         109.47 3.000
+HXG   H26     CAU     CBB         109.47 3.000
+HXG   OAX     CAU     CBB         109.47 3.000
+HXG   PBD     OAX     CAU         118.46 3.000
+HXG   OAW     PBD     OAH         109.47 3.000
+HXG   OAH     PBD     OAI         109.47 3.000
+HXG   OAW     PBD     OAI         109.47 3.000
+HXG   OAH     PBD     OAX         109.47 3.000
+HXG   OAI     PBD     OAX         109.47 3.000
+HXG   OAW     PBD     OAX         109.47 3.000
+HXG   CAP     OAW     PBD         118.46 3.000
+HXG   H30     CAP     H29         109.47 3.000
+HXG   H30     CAP     CAS         109.47 3.000
+HXG   H29     CAP     CAS         109.47 3.000
+HXG   H30     CAP     OAW         109.47 3.000
+HXG   H29     CAP     OAW         109.47 3.000
+HXG   CAS     CAP     OAW         109.47 3.000
+HXG   H32     CAS     H31         109.47 3.000
+HXG   H32     CAS     NBC         109.47 3.000
+HXG   H31     CAS     NBC         109.47 3.000
+HXG   H32     CAS     CAP         109.47 3.000
+HXG   H31     CAS     CAP         109.47 3.000
+HXG   NBC     CAS     CAP         109.47 3.000
+HXG   CAC     NBC     CAE         109.47 3.000
+HXG   CAE     NBC     CAD         109.47 3.000
+HXG   CAC     NBC     CAD         109.47 3.000
+HXG   CAE     NBC     CAS         109.47 3.000
+HXG   CAD     NBC     CAS         109.47 3.000
+HXG   CAC     NBC     CAS         109.47 3.000
+HXG   H35     CAD     H34         109.47 3.000
+HXG   H35     CAD     H33         109.47 3.000
+HXG   H34     CAD     H33         109.47 3.000
+HXG   H35     CAD     NBC         109.47 3.000
+HXG   H34     CAD     NBC         109.47 3.000
+HXG   H33     CAD     NBC         109.47 3.000
+HXG   H38     CAE     H37         109.47 3.000
+HXG   H38     CAE     H36         109.47 3.000
+HXG   H37     CAE     H36         109.47 3.000
+HXG   H38     CAE     NBC         109.47 3.000
+HXG   H37     CAE     NBC         109.47 3.000
+HXG   H36     CAE     NBC         109.47 3.000
+HXG   H41     CAC     H40         109.47 3.000
+HXG   H41     CAC     H39         109.47 3.000
+HXG   H40     CAC     H39         109.47 3.000
+HXG   H41     CAC     NBC         109.47 3.000
+HXG   H40     CAC     NBC         109.47 3.000
+HXG   H39     CAC     NBC         109.47 3.000
+#
+loop_
+_chem_comp_tor.comp_id
+_chem_comp_tor.id
+_chem_comp_tor.atom_id_1
+_chem_comp_tor.atom_id_2
+_chem_comp_tor.atom_id_3
+_chem_comp_tor.atom_id_4
+_chem_comp_tor.value_angle
+_chem_comp_tor.value_angle_esd
+_chem_comp_tor.period
+HXG Var_01         CAN     CAL     CAJ     CAA        -175.54  30.0 1
+HXG Var_02         CAQ     CAN     CAL     CAJ         174.73  30.0 1
+HXG Var_03         CAZ     CAQ     CAN     CAL        -179.64  30.0 3
+HXG Var_04         OAF     CAZ     CAQ     CAN         -20.55  30.0 1
+HXG Var_05         OAV     CAZ     CAQ     CAN         159.40  30.0 1
+HXG Var_06         CAT     OAV     CAZ     CAQ         177.28  30.0 3
+HXG Var_07         CBB     CAT     OAV     CAZ         172.81  30.0 3
+HXG Var_08         CAT     OAV     CAZ     OAF          -2.77  30.0 3
+HXG Var_09         PBD     OAX     CAU     CBB        -147.59  30.0 1
+HXG Var_10         OAG     CBA     OAY     CBB         -33.13  30.0 3
+HXG Var_11         CAR     CBA     OAY     CBB         147.10  30.0 3
+HXG Var_12         CAO     CAR     CBA     OAY         126.02  30.0 3
+HXG Var_13         CAM     CAO     CAR     CBA         165.51  30.0 3
+HXG Var_14         CAO     CAR     CBA     OAG         -53.75  30.0 3
+HXG Var_15         CAK     CAM     CAO     CAR         168.85  30.0 1
+HXG Var_16         CAB     CAK     CAM     CAO         169.50  30.0 3
+HXG Var_17         OAW     PBD     OAX     CAU        -136.49  30.0 3
+HXG Var_18         OAI     PBD     OAX     CAU         -16.48  30.0 3
+HXG Var_19         OAH     PBD     OAX     CAU         103.52  30.0 3
+HXG Var_20         CAP     OAW     PBD     OAX        -169.19  30.0 1
+HXG Var_21         CAS     CAP     OAW     PBD        -156.82  30.0 1
+HXG Var_22         CAP     OAW     PBD     OAI          70.81  30.0 1
+HXG Var_23         CAP     OAW     PBD     OAH         -49.19  30.0 1
+HXG Var_24         NBC     CAS     CAP     OAW        -173.03  30.0 1
+HXG Var_25         CAC     NBC     CAS     CAP          70.68  30.0 3
+HXG Var_26         CAD     NBC     CAS     CAP        -169.32  30.0 3
+HXG Var_27         CAE     NBC     CAS     CAP         -49.32  30.0 3
+HXG Var_28         H6      CAL     CAJ     CAA          64.46  30.0 1
+HXG Var_29         H7      CAL     CAJ     CAA         -55.54  30.0 1
+HXG Var_30         H8      CAN     CAL     CAJ         -65.27  30.0 1
+HXG Var_31         H9      CAN     CAL     CAJ          54.73  30.0 1
+HXG Var_32         H10     CAQ     CAN     CAL          60.36  30.0 3
+HXG Var_33         H11     CAQ     CAN     CAL         -59.64  30.0 3
+HXG Var_34         H1      CAA     CAJ     CAL         -66.72  30.0 3
+HXG Var_35         H2      CAA     CAJ     CAL          53.27  30.0 3
+HXG Var_36         H3      CAA     CAJ     CAL         173.27  30.0 3
+HXG Var_37         H4      CAJ     CAL     CAN          64.46  30.0 3
+HXG Var_38         H5      CAJ     CAL     CAN         -55.54  30.0 3
+HXG Var_39         H6      CAL     CAN     CAQ         -65.27  30.0 3
+HXG Var_40         H7      CAL     CAN     CAQ          54.73  30.0 3
+HXG Var_41         H12     CAT     OAV     CAZ         -67.19  30.0 3
+HXG Var_42         H13     CAT     OAV     CAZ          52.81  30.0 3
+HXG Var_43         H8      CAN     CAQ     CAZ          60.36  30.0 1
+HXG Var_44         H9      CAN     CAQ     CAZ         -59.64  30.0 1
+HXG Var_45         H10     CAQ     CAZ     OAF          99.45  30.0 3
+HXG Var_46         H11     CAQ     CAZ     OAF        -140.55  30.0 3
+HXG Var_47         H10     CAQ     CAZ     OAV         -80.61  30.0 3
+HXG Var_48         H11     CAQ     CAZ     OAV          39.40  30.0 3
+HXG Var_49         H15     CAR     CBA     OAY        -113.98  30.0 3
+HXG Var_50         H16     CAR     CBA     OAY           6.02  30.0 3
+HXG Var_51         H17     CAO     CAR     CBA          45.51  30.0 3
+HXG Var_52         H18     CAO     CAR     CBA         -74.50  30.0 3
+HXG Var_53         H15     CAR     CBA     OAG          66.25  30.0 3
+HXG Var_54         H16     CAR     CBA     OAG        -173.75  30.0 3
+HXG Var_55         H19     CAM     CAO     CAR         -71.15  30.0 1
+HXG Var_56         H20     CAM     CAO     CAR          48.86  30.0 1
+HXG Var_57         H21     CAK     CAM     CAO          49.50  30.0 3
+HXG Var_58         H22     CAK     CAM     CAO         -70.50  30.0 3
+HXG Var_59         H15     CAR     CAO     CAM          45.51  30.0 1
+HXG Var_60         H16     CAR     CAO     CAM         -74.49  30.0 1
+HXG Var_61         H23     CAB     CAK     CAM         -71.89  30.0 3
+HXG Var_62         H24     CAB     CAK     CAM         168.11  30.0 3
+HXG Var_63         H25     CAB     CAK     CAM          48.11  30.0 3
+HXG Var_64         H17     CAO     CAM     CAK         -71.15  30.0 3
+HXG Var_65         H18     CAO     CAM     CAK          48.85  30.0 3
+HXG Var_66         H19     CAM     CAK     CAB          49.50  30.0 1
+HXG Var_67         H20     CAM     CAK     CAB         -70.50  30.0 1
+HXG Var_68         H29     CAP     OAW     PBD          83.18  30.0 1
+HXG Var_69         H30     CAP     OAW     PBD         -36.82  30.0 1
+HXG Var_70         H26     CAU     OAX     PBD         -27.59  30.0 3
+HXG Var_71         H27     CAU     OAX     PBD          92.41  30.0 3
+HXG Var_72         H31     CAS     CAP     OAW          66.98  30.0 1
+HXG Var_73         H32     CAS     CAP     OAW         -53.03  30.0 1
+HXG Var_74         H39     CAC     NBC     CAS          42.43  30.0 3
+HXG Var_75         H40     CAC     NBC     CAS         -77.57  30.0 3
+HXG Var_76         H41     CAC     NBC     CAS         162.43  30.0 3
+HXG Var_77         H33     CAD     NBC     CAS         -59.62  30.0 3
+HXG Var_78         H34     CAD     NBC     CAS        -179.62  30.0 3
+HXG Var_79         H35     CAD     NBC     CAS          60.38  30.0 3
+HXG Var_80         H36     CAE     NBC     CAS         -47.14  30.0 3
+HXG Var_81         H37     CAE     NBC     CAS        -167.14  30.0 3
+HXG Var_82         H38     CAE     NBC     CAS          72.86  30.0 3
+HXG Var_83         H29     CAP     CAS     NBC         -53.03  30.0 3
+HXG Var_84         H30     CAP     CAS     NBC          66.98  30.0 3
+HXG Var_85         H31     CAS     NBC     CAD         -49.32  30.0 3
+HXG Var_86         H32     CAS     NBC     CAD          70.68  30.0 3
+HXG Var_87         H39     CAC     NBC     CAD         -77.57  30.0 3
+HXG Var_88         H40     CAC     NBC     CAD         162.43  30.0 3
+HXG Var_89         H41     CAC     NBC     CAD          42.43  30.0 3
+HXG Var_90         H36     CAE     NBC     CAD          72.86  30.0 3
+HXG Var_91         H37     CAE     NBC     CAD         -47.14  30.0 3
+HXG Var_92         H38     CAE     NBC     CAD        -167.14  30.0 3
+HXG Var_93         H31     CAS     NBC     CAE          70.68  30.0 3
+HXG Var_94         H32     CAS     NBC     CAE        -169.32  30.0 3
+HXG Var_95         H39     CAC     NBC     CAE         162.43  30.0 3
+HXG Var_96         H40     CAC     NBC     CAE          42.43  30.0 3
+HXG Var_97         H41     CAC     NBC     CAE         -77.57  30.0 3
+HXG Var_98         H33     CAD     NBC     CAE        -179.62  30.0 3
+HXG Var_99         H34     CAD     NBC     CAE          60.38  30.0 3
+HXG Var_100        H35     CAD     NBC     CAE         -59.62  30.0 3
+HXG Var_101        H31     CAS     NBC     CAC        -169.32  30.0 3
+HXG Var_102        H32     CAS     NBC     CAC         -49.32  30.0 3
+HXG Var_103        H33     CAD     NBC     CAC          60.38  30.0 3
+HXG Var_104        H34     CAD     NBC     CAC         -59.62  30.0 3
+HXG Var_105        H35     CAD     NBC     CAC        -179.62  30.0 3
+HXG Var_106        H36     CAE     NBC     CAC        -167.14  30.0 3
+HXG Var_107        H37     CAE     NBC     CAC          72.86  30.0 3
+HXG Var_108        H38     CAE     NBC     CAC         -47.14  30.0 3
+#
+loop_
+_chem_comp_chir.comp_id
+_chem_comp_chir.id
+_chem_comp_chir.atom_id_centre
+_chem_comp_chir.atom_id_1
+_chem_comp_chir.atom_id_2
+_chem_comp_chir.atom_id_3
+_chem_comp_chir.volume_sign
+HXG chir_01   CBB     CAT     CAU     OAY   positiv
+#
+loop_
+_chem_comp_plane_atom.comp_id
+_chem_comp_plane_atom.plane_id
+_chem_comp_plane_atom.atom_id
+_chem_comp_plane_atom.dist_esd
+HXG plan-1    CAQ 0.020
+HXG plan-1    CAZ 0.020
+HXG plan-1    OAF 0.020
+HXG plan-1    OAV 0.020
+HXG plan-2    OAY 0.020
+HXG plan-2    CBA 0.020
+HXG plan-2    OAG 0.020
+HXG plan-2    CAR 0.020

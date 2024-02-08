@@ -1,0 +1,4 @@
+! TPSS D4 DEF2-SV(P)
+! ENGRAD
+%PAL NPROCS 48 END
+*pdbfile +1 1 qm_1_h.pdb

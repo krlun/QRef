@@ -1,0 +1,26 @@
+{
+    "cif": [
+        "HXG.cif", 
+        "PLC.cif"
+    ], 
+    "ltype": 12, 
+    "n_atoms": 25363, 
+    "orca_binary": "/usr/local/orca_5_0_4_macosx_arm64_openmpi411/orca", 
+    "restart": "restart.pdb", 
+    "syst1": {
+        "g": {
+            "4555": 0.7201960784313726, 
+            "4597": 0.7303273213092851, 
+            "4725": 0.7303273213092851
+        }, 
+        "link_pairs": {
+            "4555": 4558, 
+            "4597": 4598, 
+            "4725": 4726
+        }
+    }, 
+    "syst1_files": [
+        "syst1"
+    ], 
+    "w_qm": 7.5
+}
