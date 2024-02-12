@@ -52,7 +52,7 @@ and
 
     os.remove('xyz_reciprocal.lock')
 
-Likewise the file `<path to Phenix>/modules/phenix/phenix/refinement/macro_cycle_real_space.py` should be edited in a similar manner, i.e with an added `import os` as well as surrounding the calls to `self.minimization_no_ncs()` and `self.minimization_ncs()` in the method `refine_xyz` in the class `run` with<br>
+Likewise the file `<path to Phenix>/modules/phenix/phenix/refinement/macro_cycle_real_space.py` should be edited in a similar manner, i.e. with an added `import os` as well as surrounding the calls to `self.minimization_no_ncs()` and `self.minimization_ncs()` in the method `refine_xyz` in the class `run` with<br>
 
     with open('xyz.lock', 'w'):
       pass
@@ -103,8 +103,8 @@ The general procedure to set up a quantum refinement job consists of
 
         There needs to be a parametrisation in the `junctfactor` file for the bond one intends to cleave; it is recommended that the user inspects the `junctfactor` file to verify that there is support to cleave the intended bond type. In the case parametrisation is lacking another selection for the QM system (and in particular where the link between QM and MM occurs) needs to be made or appropriate parametrisation added to the `junctfactor` file.
     - Ideally only the input model is needed as an argument for `qref_prep.py`. If there was a need to prepare restraint files for novel residues or ligands in point 2 above, `qref_prep.py` needs to be made aware of these. This can be achieved with the `-c` or `--cif` option.
-    - The output from `qref_prep.py` should be \#$\left(1+2 n_{syst1}\right)$ files as well as selection strings:
-        - `qref.dat`, which contains the settings for the QR interface. The file can be changed manually and it is a good idea to inspect that the value for `orca_binary` is the correct path for the actual Orca binary file (`qref_prep.py` tries to locate this file automatically but may sometimes fail).
+    - The output from `qref_prep.py` should be \# $\left(1+2 n_{syst1}\right)$ files as well as selection strings:
+        - `qref.dat`, which contains the settings for the QR interface. This file can be changed manually and it is a good idea to inspect that the value for `orca_binary` is the correct path for the actual Orca binary file (`qref_prep.py` tries to locate this file automatically but may sometimes fail).
         - `qm_i_c.pdb`, which is the model used to calculate $E_{MM1, i}$.
         - `qm_i_h.pdb`, which is the model used to calculate $E_{QM1, i}$.
 
@@ -114,13 +114,13 @@ The general procedure to set up a quantum refinement job consists of
     - All available options for `qref_prep.py` can be seen through the `-h` or `--help` option.
 
 5. The next step is to prepare the input files for Orca. Examples can be found in the `examples` folder.
-    - The input files should be named `qm_i.inp`, where `i` refers to the i:th QM region.
+    - The input files should be named `qm_i.inp`, where `i` refers to the i:th QM region; counting starts at 1.
     - The level of theory should match the junction type; using the default (type 12) the corresponding input to `Orca` then becomes `! TPSS D4 DEF2-SV(P)`.
     - Energy and gradient needs to be written to disk. This is achieved through the keyword `! ENGRAD`.
     - To read coordinates from a PDB file (`qm_i_h.pdb`) use `*pdbfile <charge> <multiplicity> qm_i_h.pdb`, where again `i` refers to the i:th QM region.
     - Custom settings can also be supplied (see the `examples` folder).
 
-6. At this point it is possible to start a quantum refinement. It is however recommended to first create an empty file named `qm.lock` (this disables QR) through for example the `touch` command, then start a refinement so that an `.eff` file is obtained (this file contains all the `Phenix` refinement settings). A good idea is to rename this file to `phenix.params` or similar, then edit this file and make sure the following options are set:
+6. At this point it is possible to start a quantum refinement. It is however recommended to first create an empty file named `qm.lock` (this disables QR) through for example the `touch` command, then start a refinement so that an `.eff` file is obtained (this file contains all the `Phenix` refinement settings for the current experimental data and model). A good idea is to rename this file to `phenix.params` or similar, then edit this file and make sure the following options are set:
     - For reciprocal space refinement (`phenix.refine`):
         - `refinement.pdb_interpretation.restraints_library.cdl = False`
         - `refinement.pdb_interpretation.restraints_library.mcl = False`

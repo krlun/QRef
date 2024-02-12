@@ -1,0 +1,3 @@
+! TPSS D4 DEF2-SV(P) PAL4
+! ENGRAD
+*pdbfile <charge> <multiplicity> qm_1_h.pdb
