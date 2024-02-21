@@ -83,7 +83,7 @@ The general procedure to set up a quantum refinement job consists of
 3. Prepare `syst1` files; these files define the QM regions.
     - If there is only one QM region the default is to look for a file named `syst1` by the software. For multiple QM regions the recommended, and default, naming scheme is `syst11`, `syst12`, etc.
     - Which atoms to include in the QM regions is defined using the serial number from the PDB file describing the entire model.
-        - While setting `sort_atoms = False` in the input to `Phenix` should ensure that the ordering in the input model is preserved, we have encountered instances where this is not adhered to. Thus the script `sort_pdb.py` is also provided with `QRef`; this script takes as input the name of a PDB file and outputs a new PDB file with the suffix `_sorted.pdb` where the atoms are sorted in the same order as that which `Phenix` uses internally. It is recommended to use the `_sorted.pdb` file as the input model for refinement, as well as the reference when defining the `syst1` files.
+        - While setting `sort_atoms = False` in the input to `Phenix` should ensure that the ordering in the input model is preserved, we have encountered instances where this is not adhered to. Thus it is recommended to use `iotbx.pdb.sort_atoms` (supplied with `Phenix`) which will give you a new PDB file with the suffix `_sorted.pdb` where the atoms are sorted in the same order as that which `Phenix` uses internally. It is recommended to use the `_sorted.pdb` file as the input model for refinement, as well as the reference when defining the `syst1` files.
     - The `syst1` files allows for multiple atoms or intervals of atoms to be specified on a single line, where `,` or `blank` works as delimiters; `-` is used to indicate an interval.
     - `#` and `!` can be used to include comments in the `syst1` files.
     - The second occurence of an atom in the `syst1` files will indicate that this is a link atom, i.e. it will be replaced by a hydrogen at the appropriate position in the QM calculation.
@@ -110,6 +110,8 @@ The general procedure to set up a quantum refinement job consists of
 
         The output PDB files can, and probably should, be used to inspect that the QM selection is proper.
         - Two selection strings are printed on the screen, one for reciprocal space and one for real space. They are intended to be used in regards to which selection of the model to refine when crafting the input to either `phenix.refine` or `phenix.real_space_refine`, see point 6 below.
+
+    - Harmonic bond length restraints can be added through the `-rb` or `--restraint_bond` option, using the syntax `i atom1_serial atom2_serial desired_distance_in_Å force_constant`. Experience has shown that the force constant needs to be $\geq$ 10 to achieve adherence to the restraint.
 
     - All available options for `qref_prep.py` can be seen through the `-h` or `--help` option.
 
