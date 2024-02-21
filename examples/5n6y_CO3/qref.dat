@@ -6,7 +6,7 @@
     "ltype": 12, 
     "n_atoms": 19168, 
     "orca_binary": "/usr/local/orca_5_0_4_macosx_arm64_openmpi411/orca", 
-    "restart": null, 
+    "restart": "restart.pdb", 
     "syst1": {
         "g": {
             "628": 0.7246710526315789, 
@@ -29,7 +29,8 @@
             "2726": 2725, 
             "2921": 2922, 
             "3429": 3430
-        }
+        }, 
+        "restraint_bond": []
     }, 
     "syst1_files": [
         "syst1"
