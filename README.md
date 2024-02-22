@@ -147,4 +147,8 @@ The general procedure to set up a quantum refinement job consists of
 
 7. To run the quantum refinement job, make sure that the `qm.lock` file has been deleted, then execute either `phenix.refine phenix.params` or `phenix.real_space_refine phenix.params`. If there is a need to restart the job with different settings for `Phenix`, make sure to delete the file `settings.pickle`.
 
+## Todo
+- Add symmetry support for the QM calculations.
+- Add support for angle restraints.
+
 ## Citation
