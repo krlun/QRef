@@ -37,7 +37,7 @@ where $J(\mathbf{R_{syst1,i}}; \mathbf{R})$ is the Jacobian between $\mathbf{R_{
 
 ## Installation
 ### Modules
-The directory "modules" should be placed under `<path to Phenix>`; `qref` will thus be a new directory under `modules`, whereas `energies.py` and `model.py` will overwrite their original counterparts in `modules/cctbx_project/cctbx/geometry_restraints` and `modules/cctbx_project/mmtbx/model`, respectively.
+The directory `modules` should be placed under `<path to Phenix>`; `qref` will thus be a new directory under `modules`, whereas the user should manually overwrite `energies.py` in `modules/cctbx_project/cctbx/geometry_restraints` and `model.py` in `modules/cctbx_project/mmtbx/model`, respectively, with the version of the file corresponding to their installation of `Phenix`.
 
 There is a commented out guard clause in `energies.py`:<br>
 
