@@ -150,5 +150,7 @@ The general procedure to set up a quantum refinement job consists of
 ## Todo
 - Add symmetry support for the QM calculations.
 - Add support for angle restraints.
+- Refactor code to be OOP.
+- Turn QRef into a proper restraint_manager class.
 
 ## Citation
