@@ -184,10 +184,15 @@ def main(args):
             g = calculate_g_factor(model_model, link_pairs=link_pairs, junc_factors=junc_factors, ltype=ltype, serial_to_index=serial_to_index)
             dat[syst1]['g'] = g
             dat[syst1]['restraint_bond'] = list()
+            dat[syst1]['restraint_angle'] = list()
             if args.restraint_bond is not None:
                 for restraint in args.restraint_bond:
                     if int(restraint[0]) == index:
                         dat[syst1]['restraint_bond'].append([int(restraint[1]), int(restraint[2]), float(restraint[3]), float(restraint[4])])
+            if args.restraint_angle is not None:
+                for restraint in args.restraint_angle:
+                    if int(restraint[0]) == index:
+                        dat[syst1]['restraint_angle'].append([int(restraint[1]), int(restraint[2]), int(restraint[3]), float(restraint[4], float(restraint[5]))])
             name_h = 'qm_' + str(index) + '_h.pdb'
             print('Writing file:  ' + name_h)
             write_pdb_h(name_h, model_model, link_pairs, g, serial_to_index)

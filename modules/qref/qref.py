@@ -177,13 +177,33 @@ def read_dat():
 
 
 def restraint_bond(sites_cart, gradients, restraints):
+    # restraint[0] = atom1_serial, restraint[1] = atom2_serial, restraint[2] = desired distance in Å, restraint[3] = force constant
     for restraint in restraints:
-        delta_components = np.array(sites_cart[restraint[0]-1]) - np.array(sites_cart[restraint[1]-1])
-        dist = np.sqrt(np.sum(delta_components**2))
-        d_U_ij_d_r_ij = 2*restraint[3]*(dist-restraint[2])
-        d_r_ij_d_xyz_i = delta_components/dist
-        gradients[restraint[0]-1] = d_U_ij_d_r_ij*d_r_ij_d_xyz_i
-        gradients[restraint[1]-1] = -d_U_ij_d_r_ij*d_r_ij_d_xyz_i
+        r_ij = np.array(sites_cart[restraint[0]-1]) - np.array(sites_cart[restraint[1]-1])
+        r = np.sqrt(np.sum(r_ij**2))
+        d_U_ij_d_r = 2*restraint[3]*(r - restraint[2])
+        d_r_d_r_ij = r_ij/r
+        gradients[restraint[0]-1] += d_U_ij_d_r*d_r_d_r_ij
+        gradients[restraint[1]-1] += -d_U_ij_d_r*d_r_d_r_ij
+    return gradients
+
+
+def restraint_angle(sites_cart, gradients, restraints):
+    # restraint[0] = atom1_serial (i), restraint[1] = atom2_serial ("middle" atom) (j), restraint[2] = atom3_serial (k), restraint[3] = desired angle in degrees, restraint[4] = force constant
+    for restraint in restraints:
+        r_ij = np.array(sites_cart[restraint[0]-1]) - np.array(sites_cart[restraint[1]-1])
+        r_kj = np.array(sites_cart[restraint[2]-1]) - np.array(sites_cart[restraint[1]-1])
+        norm_r_ij = np.linalg.norm(r_ij)
+        norm_r_kj = np.linalg.norm(r_kj)
+        alpha = np.degrees(np.arccos(np.dot(r_ij, r_ij)/(norm_r_ij * norm_r_kj)))
+        cos_alpha = np.cos(np.radians(alpha))
+        d_U_d_alpha = 2*restraint[4]*(alpha - restraint[3])
+        d_alpha_d_r_i = (1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_ij) * (r_ij * (cos_alpha/norm_r_ij) - (r_kj/norm_r_kj))
+        d_alpha_d_r_k = (1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_kj) * (r_kj * (cos_alpha/norm_r_kj) - (r_kj/norm_r_ij))
+        d_alpha_d_r_j = - d_alpha_d_r_i - d_alpha_d_r_k
+        gradients[restraint[0]-1] += d_U_d_alpha*d_alpha_d_r_i
+        gradients[restraint[1]-1] += d_U_d_alpha*d_alpha_d_r_j
+        gradients[restraint[2]-1] += d_U_d_alpha*d_alpha_d_r_k
     return gradients
 
 
@@ -264,6 +284,7 @@ def run(sites_cart, mm_real_gradients, mm_real_residual_sum):
 
         # update gradient (restraints)
         total_gradient = restraint_bond(sites_cart, total_gradient, dat[syst1]['restraint_bond'])
+        total_gradient = restraint_angle(sites_cart, total_gradient, dat[syst1]['restraint_angle'])
 
         # perform logging
         # needs an update to handle multiple qm systems
