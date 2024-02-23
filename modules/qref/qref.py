@@ -176,7 +176,7 @@ def read_dat():
     return dat
 
 
-def restraint_bond(sites_cart, gradients, restraints):
+def restraint_distance(sites_cart, gradients, restraints):
     # restraint[0] = atom1_serial, restraint[1] = atom2_serial, restraint[2] = desired distance in Å, restraint[3] = force constant
     for restraint in restraints:
         r_ij = np.array(sites_cart[restraint[0]-1]) - np.array(sites_cart[restraint[1]-1])
@@ -283,7 +283,7 @@ def run(sites_cart, mm_real_gradients, mm_real_residual_sum):
         total_gradient = calculate_total_gradient(qm_gradients, mm_model_residuals.gradients, total_gradient, qm_atoms, g, link_pairs, serial_to_index)
 
         # update gradient (restraints)
-        total_gradient = restraint_bond(sites_cart, total_gradient, dat[syst1]['restraint_bond'])
+        total_gradient = restraint_distance(sites_cart, total_gradient, dat[syst1]['restraint_distance'])
         total_gradient = restraint_angle(sites_cart, total_gradient, dat[syst1]['restraint_angle'])
 
         # perform logging
