@@ -177,7 +177,7 @@ def read_dat():
 
 
 def restraint_distance(sites_cart, gradients, restraints):
-    # restraint[0] = atom1_serial, restraint[1] = atom2_serial, restraint[2] = desired distance in Å, restraint[3] = force constant
+    # restraint[0] = atom1_serial, restraint[1] = atom2_serial, restraint[2] = desired distance in Angstrom, restraint[3] = force constant
     for restraint in restraints:
         r_ij = np.array(sites_cart[restraint[0]-1]) - np.array(sites_cart[restraint[1]-1])
         r = np.sqrt(np.sum(r_ij**2))
