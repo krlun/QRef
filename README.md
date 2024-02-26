@@ -103,7 +103,7 @@ The general procedure to set up a quantum refinement job consists of
 
         There needs to be a parametrisation in the `junctfactor` file for the bond one intends to cleave; it is recommended that the user inspects the `junctfactor` file to verify that there is support to cleave the intended bond type. In the case parametrisation is lacking another selection for the QM system (and in particular where the link between QM and MM occurs) needs to be made or appropriate parametrisation added to the `junctfactor` file.
     - Ideally only the input model is needed as an argument for `qref_prep.py`. If there was a need to prepare restraint files for novel residues or ligands in point 2 above, `qref_prep.py` needs to be made aware of these. This can be achieved with the `-c` or `--cif` option.
-    - The output from `qref_prep.py` should be \# $\left(1+2 n_{syst1}\right)$ files as well as selection strings:
+    - The output from `qref_prep.py` should be $\left(1+2 n_{syst1}\right)$ files as well as selection strings:
         - `qref.dat`, which contains the settings for the QR interface. This file can be changed manually and it is a good idea to inspect that the value for `orca_binary` is the correct path for the actual Orca binary file (`qref_prep.py` tries to locate this file automatically but may sometimes fail).
         - `qm_i_c.pdb`, which is the model used to calculate $E_{MM1, i}$.
         - `qm_i_h.pdb`, which is the model used to calculate $E_{QM1, i}$.

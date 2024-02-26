@@ -195,9 +195,9 @@ def restraint_angle(sites_cart, gradients, restraints):
         r_kj = np.array(sites_cart[restraint[2]-1]) - np.array(sites_cart[restraint[1]-1])
         norm_r_ij = np.linalg.norm(r_ij)
         norm_r_kj = np.linalg.norm(r_kj)
-        alpha = np.degrees(np.arccos(np.dot(r_ij, r_ij)/(norm_r_ij * norm_r_kj)))
-        cos_alpha = np.cos(np.radians(alpha))
-        d_U_d_alpha = 2*restraint[4]*(alpha - restraint[3])
+        alpha = np.arccos(np.dot(r_ij, r_ij)/(norm_r_ij * norm_r_kj))
+        cos_alpha = np.cos(alpha)
+        d_U_d_alpha = 2*restraint[4]*(alpha - np.degrees(restraint[3]))
         d_alpha_d_r_i = (1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_ij) * (r_ij * (cos_alpha/norm_r_ij) - (r_kj/norm_r_kj))
         d_alpha_d_r_k = (1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_kj) * (r_kj * (cos_alpha/norm_r_kj) - (r_kj/norm_r_ij))
         d_alpha_d_r_j = - d_alpha_d_r_i - d_alpha_d_r_k
