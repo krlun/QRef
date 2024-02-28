@@ -176,35 +176,39 @@ def read_dat():
     return dat
 
 
-def restraint_distance(sites_cart, gradients, restraints):
+def restraint_distance(sites_cart, gradients, target, restraints):
     # restraint[0] = atom1_serial, restraint[1] = atom2_serial, restraint[2] = desired distance in Angstrom, restraint[3] = force constant
     for restraint in restraints:
         r_ij = np.array(sites_cart[restraint[0]-1]) - np.array(sites_cart[restraint[1]-1])
         r = np.sqrt(np.sum(r_ij**2))
-        d_U_ij_d_r = 2*restraint[3]*(r - restraint[2])
+        delta_r = r - restraint[2]
+        d_U_ij_d_r = 2*restraint[3]*delta_r
         d_r_d_r_ij = r_ij/r
         gradients[restraint[0]-1] += d_U_ij_d_r*d_r_d_r_ij
         gradients[restraint[1]-1] += -d_U_ij_d_r*d_r_d_r_ij
-    return gradients
+        target += restraint[3]*delta_r**2
+    return gradients, target
 
 
-def restraint_angle(sites_cart, gradients, restraints):
+def restraint_angle(sites_cart, gradients, target, restraints):
     # restraint[0] = atom1_serial (i), restraint[1] = atom2_serial ("middle" atom) (j), restraint[2] = atom3_serial (k), restraint[3] = desired angle in degrees, restraint[4] = force constant
     for restraint in restraints:
         r_ij = np.array(sites_cart[restraint[0]-1]) - np.array(sites_cart[restraint[1]-1])
         r_kj = np.array(sites_cart[restraint[2]-1]) - np.array(sites_cart[restraint[1]-1])
         norm_r_ij = np.linalg.norm(r_ij)
         norm_r_kj = np.linalg.norm(r_kj)
-        alpha = np.arccos(np.dot(r_ij, r_ij)/(norm_r_ij * norm_r_kj))
-        cos_alpha = np.cos(alpha)
-        d_U_d_alpha = 2*restraint[4]*(alpha - np.degrees(restraint[3]))
-        d_alpha_d_r_i = (1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_ij) * (r_ij * (cos_alpha/norm_r_ij) - (r_kj/norm_r_kj))
-        d_alpha_d_r_k = (1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_kj) * (r_kj * (cos_alpha/norm_r_kj) - (r_kj/norm_r_ij))
+        cos_alpha = np.dot(r_ij, r_kj)/(norm_r_ij * norm_r_kj)
+        alpha = np.degrees(np.arccos(cos_alpha))
+        delta_alpha = alpha - restraint[3]
+        d_U_d_alpha = 2*restraint[4]*delta_alpha
+        d_alpha_d_r_i = (1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_ij) * (cos_alpha * (r_ij/norm_r_ij) - (r_kj/norm_r_kj))
+        d_alpha_d_r_k = (1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_kj) * (cos_alpha * (r_kj/norm_r_kj) - (r_ij/norm_r_ij))
         d_alpha_d_r_j = - d_alpha_d_r_i - d_alpha_d_r_k
         gradients[restraint[0]-1] += d_U_d_alpha*d_alpha_d_r_i
         gradients[restraint[1]-1] += d_U_d_alpha*d_alpha_d_r_j
         gradients[restraint[2]-1] += d_U_d_alpha*d_alpha_d_r_k
-    return gradients
+        target += restraint[4]*delta_alpha**2
+    return gradients, target
 
 
 def run(sites_cart, mm_real_gradients, mm_real_residual_sum):
@@ -283,8 +287,8 @@ def run(sites_cart, mm_real_gradients, mm_real_residual_sum):
         total_gradient = calculate_total_gradient(qm_gradients, mm_model_residuals.gradients, total_gradient, qm_atoms, g, link_pairs, serial_to_index)
 
         # update gradient (restraints)
-        total_gradient = restraint_distance(sites_cart, total_gradient, dat[syst1]['restraint_distance'])
-        total_gradient = restraint_angle(sites_cart, total_gradient, dat[syst1]['restraint_angle'])
+        total_gradient, target = restraint_distance(sites_cart, total_gradient, target, dat[syst1]['restraint_distance'])
+        total_gradient, target = restraint_angle(sites_cart, total_gradient, target, dat[syst1]['restraint_angle'])
 
         # perform logging
         # needs an update to handle multiple qm systems

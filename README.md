@@ -111,9 +111,9 @@ The general procedure to set up a quantum refinement job consists of
         The output PDB files can, and probably should, be used to inspect that the QM selection is proper.
         - Two selection strings are printed on the screen, one for reciprocal space and one for real space. They are intended to be used in regards to which selection of the model to refine when crafting the input to either `phenix.refine` or `phenix.real_space_refine`, see point 6 below.
 
-    - Harmonic (bond) distance restraints can be added through the `-rd` or `--restraint_distance` option, using the syntax `i atom1_serial atom2_serial desired_distance_in_Å force_constant`. Experience has shown that the force constant needs to be $\geq$ 10 to achieve adherence to the restraint.
+    - Harmonic (bond) distance restraints can be added through the `-rd` or `--restraint_distance` option, using the syntax `i atom1_serial atom2_serial desired_distance_in_Å force_constant`. Experience has shown that the force constant needs to be $\geq$ 2500 to achieve adherence to the restraint.
 
-    - Harmonic (bond) angle restraints can be added through the `-ra` or `--restraint_angle` option, using the syntax `i atom1_serial atom2_serial atom3_serial desired_angle_in_degrees force_constant`, where `atom2_serial` defines the angle tip. Experience has shown that the force constant needs to be $\geq$ 10 to achieve adherence to the restraint.
+    - Harmonic (bond) angle restraints can be added through the `-ra` or `--restraint_angle` option, using the syntax `i atom1_serial atom2_serial atom3_serial desired_angle_in_degrees force_constant`, where `atom2_serial` defines the angle tip. Experience has shown that the force constant needs to be $\geq$ 10 (?) to achieve adherence to the restraint.
 
     - All available options for `qref_prep.py` can be seen through the `-h` or `--help` option.
 
@@ -151,7 +151,7 @@ The general procedure to set up a quantum refinement job consists of
 
 ## Todo
 - Add symmetry support for the QM calculations.
-- Add support for angle restraints.
+- ~~Add support for angle restraints.~~ Done?
 - Refactor code to be OOP.
 - Turn QRef into a proper restraint_manager class.
 
