@@ -141,7 +141,7 @@ def parse_args(args):
     parser.add_argument('-l', '--ltype', nargs=1, default=12, type=int, help='link type (default: 12)')
     parser.add_argument('-w', '--w_qm', nargs=1, default=7.5, type=float, help='scaling factor for QM energy and gradients (default: 7.5)')
     parser.add_argument('-r', '--restart', nargs='?', const='restart.pdb', type=str, help='if specified creates a restart file (optional: name)')
-    parser.add_argument('-rb', '--restraint_distance', action='append', nargs=5, type=str, help='if specified applies a harmonic (bond) distance restraint according to \'i atom1_serial atom2_serial desired_distance force_constant\'')
+    parser.add_argument('-rd', '--restraint_distance', action='append', nargs=5, type=str, help='if specified applies a harmonic (bond) distance restraint according to \'i atom1_serial atom2_serial desired_distance force_constant\'')
     parser.add_argument('-ra', '--restraint_angle', action='append', nargs=6, type=str, help='if specified applies a harmonic (bond) angle restraint according to \'i atom1_serial atom2_serial atom3_serial desired_angle force_constant\'')
     parser.add_argument('-v', '--version', action="version", version="%(prog)s 0.0.1")
     return parser.parse_args(args)
