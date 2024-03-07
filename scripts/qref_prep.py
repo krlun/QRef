@@ -157,7 +157,8 @@ def main(args):
     syst1_files = args.syst1
     junc_factor_file = args.junctfactor
     ltype = args.ltype
-    junc_factors = read_junc_factors(junc_factor_file=junc_factor_file)
+    if args.skip_h is not True:
+        junc_factors = read_junc_factors(junc_factor_file=junc_factor_file)
     dm = DataManager()
     if args.cif is not None:
         for cif in args.cif:
