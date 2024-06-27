@@ -97,7 +97,6 @@ def suggest_selection_string(model):
         selection_string = selection_string[:-4] + ') and chain ' + chain.id + ') or ('
     selection_string = selection_string[:-5]
     print
-    print
     print('Suggested selection string (reciprocal space):')
     print
     print('\"' + selection_string + '\"')
@@ -143,12 +142,14 @@ def parse_args(args):
     parser.add_argument('-r', '--restart', nargs='?', const='restart.pdb', type=str, help='if specified creates a restart file (optional: name)')
     parser.add_argument('-rd', '--restraint_distance', nargs=5, action='append', type=str, help='if specified applies a harmonic (bond) distance restraint according to \'i atom1_serial atom2_serial desired_distance force_constant\'')
     parser.add_argument('-ra', '--restraint_angle', nargs=6, action='append', type=str, help='if specified applies a harmonic (bond) angle restraint according to \'i atom1_serial atom2_serial atom3_serial desired_angle force_constant\'')
-    parser.add_argument('-t', '--transform', nargs=4, action='append', type=str, help='if specified applies the specified transformations according to \'i atoms R t\'')
+    #parser.add_argument('-t', '--transform', nargs=4, action='append', type=str, help='if specified applies the specified transformations according to \'i atoms R t\'')
     parser.add_argument('-v', '--version', action="version", version="%(prog)s 0.2.0")
     return parser.parse_args(args)
 
 
 def main(args):
+    print('*** This is qref_prep.py ***')
+    print
     args = parse_args(args)
 
     model_real_file = args.pdb
@@ -169,6 +170,10 @@ def main(args):
     dat = dict()
 
     for index, syst1 in enumerate(syst1_files, 1):
+        print('----------')
+        print(syst1.center(10))
+        print('----------')
+        print
         qm_atoms, link_atoms = read_qm_and_link_atoms(syst1)
         serial_to_index = convert_serial_to_index(qm_atoms)
         model_model = select_qm_model(model=model_real, qm=qm_atoms)
@@ -186,7 +191,7 @@ def main(args):
             dat[syst1]['g'] = g
             dat[syst1]['restraint_distance'] = list()
             dat[syst1]['restraint_angle'] = list()
-            dat[syst1]['transform'] = list()
+            #dat[syst1]['transform'] = list() # to be implemented
             if args.restraint_distance is not None:
                 for restraint in args.restraint_distance:
                     if int(restraint[0]) == index:
@@ -195,18 +200,23 @@ def main(args):
                 for restraint in args.restraint_angle:
                     if int(restraint[0]) == index:
                         dat[syst1]['restraint_angle'].append([int(restraint[1]), int(restraint[2]), int(restraint[3]), float(restraint[4]), float(restraint[5])])
-            if args.transform is not None:
-                for transform in args.transform:
-                    if int(transform[0]) == index:
-                        dat[syst1]['transform'].append(dict())
-                        dat[syst1]['transform'][-1]['atoms'] = transform[1]
-                        dat[syst1]['transform'][-1]['R'] = transform[2]
-                        dat[syst1]['transform'][-1]['t'] = transform[3]
-
-                        # dat[syst1]['transforms'].extend(transform[1:])
+            # to be implemented
+            # if args.transform is not None:
+            #     for transform in args.transform:
+            #         if int(transform[0]) == index:
+            #             dat[syst1]['transform'].append(dict())
+            #             dat[syst1]['transform'][-1]['atoms'] = transform[1]
+            #             dat[syst1]['transform'][-1]['R'] = transform[2]
+            #             dat[syst1]['transform'][-1]['t'] = transform[3]
             name_h = 'qm_' + str(index) + '_h.pdb'
             print('Writing file:  ' + name_h)
             write_pdb_h(name_h, model_model, link_pairs, g, serial_to_index)
+
+
+        suggest_selection_string(model_model)
+
+    print('----------')
+    print
 
     if args.skip_h is not True:
         dat['n_atoms'] = model_real.get_number_of_atoms()
@@ -223,7 +233,8 @@ def main(args):
         print('Writing file:  ' + args.restart)
         prepare_restart(model_real_file, args.restart)
 
-    suggest_selection_string(model_model)
+    print
+    print('----------')
 
     # cleanup
     temp_files = ['settings.pickle']

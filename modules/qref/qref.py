@@ -13,6 +13,7 @@ from iotbx.data_manager import DataManager
 
 harkcal = 627.509474063112
 harkJ = 2625.499639479950
+bohrang = 0.529177249
 
 
 def read_qm_and_link_atoms(infile):
@@ -78,10 +79,6 @@ def read_energy_and_gradient_from_orca(infile):
     return energy, gradients
 
 
-def run_orca(orca_binary, inpfile):
-    os.system(orca_binary + ' ' + inpfile + ' > qm.out')
-
-
 def calculate_total_gradient(qm_gradients, mm_model_gradients, mm_real_gradients, qm_atoms, g, link_pairs, serial_to_index):
     for atom in qm_atoms:
         mm_real_gradients[atom-1] -= np.array(mm_model_gradients[serial_to_index[atom]])
@@ -124,8 +121,8 @@ def restore_serial_in_model(model, serial_to_index):
     for atom in atoms: atom.serial = str(index_to_serial[int(atom.serial) - 1]).rjust(width)
 
 
-def logging(w_qm, qm_energy, mm_energy, mm1_energy):
-    logfile = 'qref.log'
+def logging(index, w_qm, qm_energy, mm_energy, mm1_energy):
+    logfile = 'qref_' + str(index) + '.log'
     # macro_cycle_width = 12
     iter_width = 5
     width = 25
@@ -156,7 +153,7 @@ def logging(w_qm, qm_energy, mm_energy, mm1_energy):
         else:
             iter = str(int(log[-1].split()[0]) + 1)
         line += iter.rjust(iter_width)
-        if subprocess.call(['grep', '-q', 'ORCA TERMINATED NORMALLY', 'qm.out'], shell=False) != 0:
+        if subprocess.call(['grep', '-q', 'ORCA TERMINATED NORMALLY', 'qm_' + str(index) + '.out'], shell=False) != 0:
             line += 'Failed'.rjust(width)
         else:
             # line += '{:.12f}'.format(round(qm_energy, 12)).rjust(width)
@@ -225,7 +222,7 @@ def run(sites_cart, mm_real_gradients, mm_real_residual_sum):
     if dat['restart'] is not None:
         update_file_coordinates(infile=dat['restart'], sites_cart=sites_cart)
 
-    w_qm = harkcal * dat['w_qm']
+    # w_qm = harkcal * dat['w_qm'] # w_QM has the unit kcal/mol
 
     target = mm_real_residual_sum
     total_gradient = mm_real_gradients
@@ -260,15 +257,15 @@ def run(sites_cart, mm_real_gradients, mm_real_residual_sum):
         write_pdb_h(qm_h, mm_model, link_pairs=link_pairs, g=g, serial_to_index=serial_to_index)
 
         # run orca
-        orca_inp = 'qm_' + str(index) +'.inp'
-        run_orca(dat['orca_binary'], orca_inp)
+        orca_string = dat['orca_binary'] + ' qm_' + str(index) + '.inp > qm_' + str(index) + '.out'
+        os.system(orca_string)
 
         # read results from orca
-        qmengrad = 'qm_' + str(index) + '.engrad'
         qm_energy, qm_gradients = read_energy_and_gradient_from_orca(qmengrad)
+        qmengrad = 'qm_' + str(index) + '.engrad'
 
         # rescale qm gradients
-        qm_gradients = rescale_qm_gradients(qm_gradients, w_qm)
+        qm_gradients = rescale_qm_gradients(qm_gradients, dat['w_qm']*harkcal/bohrang)
 
         # calculate mm gradients and target for model system
         with open('settings.pickle', 'rb') as file:
@@ -281,7 +278,7 @@ def run(sites_cart, mm_real_gradients, mm_real_residual_sum):
         mm_model_residuals.gradients = mm_model_residuals.gradients*(1.0/mm_model_residuals.normalization_factor)
 
         # update target
-        target = target - mm_model_residuals.target + w_qm*qm_energy
+        target = target - mm_model_residuals.target + dat['w_qm']*harkcal*qm_energy
 
         # update gradient (QM/MM)
         total_gradient = calculate_total_gradient(qm_gradients, mm_model_residuals.gradients, total_gradient, qm_atoms, g, link_pairs, serial_to_index)
@@ -291,8 +288,7 @@ def run(sites_cart, mm_real_gradients, mm_real_residual_sum):
         total_gradient, target = restraint_angle(sites_cart, total_gradient, target, dat[syst1]['restraint_angle'])
 
         # perform logging
-        # needs an update to handle multiple qm systems
-        logging(w_qm=dat['w_qm'], qm_energy=qm_energy, mm_energy=mm_real_residual_sum, mm1_energy=mm_model_residuals.target)
+        logging(index=index, w_qm=dat['w_qm'], qm_energy=qm_energy, mm_energy=mm_real_residual_sum, mm1_energy=mm_model_residuals.target)
 
     # unlock
     os.remove('qm.lock')

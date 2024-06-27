@@ -13,7 +13,7 @@ E_{restraints}(\mathbf{R}) = E_{chem}(\mathbf{R}) + E_{SS}(\mathbf{R}) + E_{NCS}
 ```
 In this QR implementation $E_{chem}(\mathbf{R})$ (which traditionally is a molecular mechanics force field) is replaced using a subtractive QM/MM scheme (using hydrogen link-atoms) according to
 ```math
-E_{chem}(\mathbf{R}) = w_{QM}\sum_{i} \left(E_{QM1, i}(\mathbf{R_{syst1, i}}(\mathbf{R})) - E_{MM1, i}(\mathbf{R})\right) + E_{MM}(\mathbf{R}),
+E_{chem}(\mathbf{R}) = \sum_{i} \left(w_{QM}E_{QM1, i}(\mathbf{R_{syst1, i}}(\mathbf{R})) - E_{MM1, i}(\mathbf{R})\right) + E_{MM}(\mathbf{R}),
 ```
 where index 1 in turn indicates small, but interesting, parts of the structure. Additionally another scaling factor, $w_{QM}$, is needed due to the fact that crystallographic MM force fields are of a statistical nature, whereas $E_{QM1, i}$ represents physical energies. $\mathbf{R_{syst1, i}}$ in turn is the coordinate set for the i:th region of QM atoms, where the hydrogen link-atoms are placed at
 ```math
@@ -21,7 +21,7 @@ where index 1 in turn indicates small, but interesting, parts of the structure. 
 ```
 The gradient for the chemical restraints is then obtained as
 ```math
-\nabla E_{restraints}(\mathbf{R}) = w_{QM} \sum_{i} \left( \nabla E_{QM1, i}(\mathbf{R_{syst1, i}(R)}) \cdot J(\mathbf{R_{syst1,i}}; \mathbf{R}) - \nabla E_{MM1, i}(\mathbf{R}) \right) + \nabla E_{MM}(\mathbf{R})
+\nabla E_{restraints}(\mathbf{R}) = \sum_{i} \left( w_{QM} \nabla E_{QM1, i}(\mathbf{R_{syst1, i}(R)}) \cdot J(\mathbf{R_{syst1,i}}; \mathbf{R}) - \nabla E_{MM1, i}(\mathbf{R}) \right) + \nabla E_{MM}(\mathbf{R})
 ```
 where $J(\mathbf{R_{syst1,i}}; \mathbf{R})$ is the Jacobian between $\mathbf{R_{syst1,i}}$ and $\mathbf{R}$. While this obviosuly is a matrix of size $3N_{syst1, i} \times 3N$, for a single junction in one QM system this becomes a 6x6 matrix with the general shape
 ```math
