@@ -90,9 +90,9 @@ def write_pdb_h(outfile, model, link_pairs, g, serial_to_index):
 def suggest_selection_string(model):
     hierarchy = model.get_hierarchy()
     selection_string = '('
-    for chain in hierarchy.chains():
+    for chain in hierarchy.only_model().chains():
         selection_string += '('
-        for residue in chain.residues():
+        for residue in chain.residue_groups():
             selection_string += 'resseq ' + residue.resseq.strip() + ' or '
         selection_string = selection_string[:-4] + ') and chain ' + chain.id + ') or ('
     selection_string = selection_string[:-5]
@@ -141,15 +141,14 @@ def parse_args(args):
     parser.add_argument('-l', '--ltype', nargs=1, default=12, type=int, help='link type (default: 12)')
     parser.add_argument('-w', '--w_qm', nargs=1, default=7.5, type=float, help='scaling factor for QM energy and gradients (default: 7.5)')
     parser.add_argument('-r', '--restart', nargs='?', const='restart.pdb', type=str, help='if specified creates a restart file (optional: name)')
-    parser.add_argument('-rd', '--restraint_distance', action='append', nargs=5, type=str, help='if specified applies a harmonic (bond) distance restraint according to \'i atom1_serial atom2_serial desired_distance force_constant\'')
-    parser.add_argument('-ra', '--restraint_angle', action='append', nargs=6, type=str, help='if specified applies a harmonic (bond) angle restraint according to \'i atom1_serial atom2_serial atom3_serial desired_angle force_constant\'')
-    parser.add_argument('-v', '--version', action="version", version="%(prog)s 0.0.1")
+    parser.add_argument('-rd', '--restraint_distance', nargs=5, action='append', type=str, help='if specified applies a harmonic (bond) distance restraint according to \'i atom1_serial atom2_serial desired_distance force_constant\'')
+    parser.add_argument('-ra', '--restraint_angle', nargs=6, action='append', type=str, help='if specified applies a harmonic (bond) angle restraint according to \'i atom1_serial atom2_serial atom3_serial desired_angle force_constant\'')
+    parser.add_argument('-t', '--transform', nargs=4, action='append', type=str, help='if specified applies the specified transformations according to \'i atoms R t\'')
+    parser.add_argument('-v', '--version', action="version", version="%(prog)s 0.2.0")
     return parser.parse_args(args)
 
 
 def main(args):
-    print('*** This is qref_prep.py, version 0.2 ***\n')
-
     args = parse_args(args)
 
     model_real_file = args.pdb
@@ -187,6 +186,7 @@ def main(args):
             dat[syst1]['g'] = g
             dat[syst1]['restraint_distance'] = list()
             dat[syst1]['restraint_angle'] = list()
+            dat[syst1]['transform'] = list()
             if args.restraint_distance is not None:
                 for restraint in args.restraint_distance:
                     if int(restraint[0]) == index:
@@ -195,6 +195,15 @@ def main(args):
                 for restraint in args.restraint_angle:
                     if int(restraint[0]) == index:
                         dat[syst1]['restraint_angle'].append([int(restraint[1]), int(restraint[2]), int(restraint[3]), float(restraint[4]), float(restraint[5])])
+            if args.transform is not None:
+                for transform in args.transform:
+                    if int(transform[0]) == index:
+                        dat[syst1]['transform'].append(dict())
+                        dat[syst1]['transform'][-1]['atoms'] = transform[1]
+                        dat[syst1]['transform'][-1]['R'] = transform[2]
+                        dat[syst1]['transform'][-1]['t'] = transform[3]
+
+                        # dat[syst1]['transforms'].extend(transform[1:])
             name_h = 'qm_' + str(index) + '_h.pdb'
             print('Writing file:  ' + name_h)
             write_pdb_h(name_h, model_model, link_pairs, g, serial_to_index)
