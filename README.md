@@ -61,7 +61,7 @@ and
 
     os.remove('xyz.lock')
 
-This implementation of `QRef` has been verified to work with `Phenix` version 1.20.1-4487 and version 1.21-5207.
+This implementation of `QRef` has been verified to work with `Phenix` versions 1.20.1-4487, 1.21-5207 as well as 1.21.1-5286.
 
 ### Scripts
 The scripts in the folder `scripts` should be placed somewhere accessible by `$PATH`. The shebang in the scripts might need to be updated to point towards wherever `cctbx.python` is located.
