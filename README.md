@@ -67,7 +67,7 @@ This implementation of `QRef` has been verified to work with `Phenix` versions 1
 The scripts in the folder `scripts` should be placed somewhere accessible by `$PATH`. The shebang in the scripts might need to be updated to point towards wherever `cctbx.python` is located.
 
 ### Orca
-`Orca` can be found at [https://orcaforum.kofo.mpg.de/](orcaforum.kofo.mpg.de) - follow their guide for installation. QRef has been verified to work with `Orca` version 5.0.4.
+`Orca` can be found at [orcaforum.kofo.mpg.de](https://orcaforum.kofo.mpg.de) - follow their guide for installation. QRef has been verified to work with `Orca` version 5.0.4.
 
 ## Usage
 The general procedure to set up a quantum refinement job consists of
