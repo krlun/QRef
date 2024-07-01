@@ -19,7 +19,7 @@ where index 1 in turn indicates small, but interesting, parts of the structure. 
 ```math
 \overline{r}_{H_L} = \overline{r}_X + g_{bond}\left(\overline{r}_{C_L} - \overline{r}_X\right)
 ```
-implies that $(\mathbf{R_{syst1, i}}) = (\mathbf{R_{syst1, i}})(\mathbf{R})$, thus the gradient for the chemical restraints is then obtained as
+implies that $\mathbf{R_{syst1, i}} = \mathbf{R_{syst1, i}}(\mathbf{R})$, thus the gradient for the chemical restraints is then obtained as
 ```math
 \nabla E_{restraints}(\mathbf{R}) = \sum_{i} \left( w_{QM} \nabla E_{QM1, i}(\mathbf{R_{syst1, i}(R)}) \cdot J(\mathbf{R_{syst1,i}}; \mathbf{R}) - \nabla E_{MM1, i}(\mathbf{R}) \right) + \nabla E_{MM}(\mathbf{R})
 ```
