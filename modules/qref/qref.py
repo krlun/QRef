@@ -8,7 +8,6 @@ import json
 
 import numpy as np
 
-from cctbx.array_family import flex
 from iotbx.data_manager import DataManager
 
 harkcal = 627.509474063112
@@ -79,32 +78,31 @@ def read_energy_and_gradient_from_orca(infile):
     return energy, gradients
 
 
-def calculate_total_gradient(qm_gradients, mm_model_gradients, mm_real_gradients, qm_atoms, g, link_pairs, serial_to_index):
+def calculate_total_gradient(qm_gradients, mm1_gradients, mm_gradients, qm_atoms, g, link_pairs, serial_to_index):
     for atom in qm_atoms:
-        mm_real_gradients[atom-1] -= np.array(mm_model_gradients[serial_to_index[atom]])
+        mm_gradients[atom-1] -= np.array(mm1_gradients[serial_to_index[atom]])
         if atom not in link_pairs.keys():
-            mm_real_gradients[atom-1] += np.array(qm_gradients[serial_to_index[atom]])
+            mm_gradients[atom-1] += np.array(qm_gradients[serial_to_index[atom]])
         else:
-            mm_real_gradients[link_pairs[atom]-1] += (1-g[atom])*np.array(qm_gradients[serial_to_index[atom]])
-            mm_real_gradients[atom-1] += g[atom]*np.array(qm_gradients[serial_to_index[atom]])
-    return mm_real_gradients
+            mm_gradients[link_pairs[atom]-1] += (1-g[atom])*np.array(qm_gradients[serial_to_index[atom]])
+            mm_gradients[atom-1] += g[atom]*np.array(qm_gradients[serial_to_index[atom]])
+    return mm_gradients
 
 
 def rescale_qm_gradients(qm_gradients, w):
     return [tuple([w*component for component in gradient]) for gradient in qm_gradients]
 
 
-def calculate_target(qm_energy, mm_model_target, mm_real_target, w_qm):
-    return mm_real_target - mm_model_target + w_qm*qm_energy
+def calculate_target(qm_energy, mm1_target, mm_target, w_qm):
+    return mm_target - mm1_target + w_qm*qm_energy
 
 
 def update_file_coordinates(infile, sites_cart):
     with open(infile, 'r') as file:
         model = file.readlines()
-    
+    records = {'ATOM', 'HETATM'}
+    width = 8
     with open(infile, 'w') as file:
-        records = {'ATOM', 'HETATM'}
-        width = 8
         for line in model:
             if line[0:6].strip() in records:
                 serial = int(line[6:11].strip())
@@ -208,11 +206,11 @@ def restraint_angle(sites_cart, gradients, target, restraints):
     return gradients, target
 
 
-def run(sites_cart, mm_real_gradients, mm_real_residual_sum):
+def run(sites_cart, mm_gradients, mm_residual_sum):
     dat = read_dat()
 
     if not len(sites_cart) == dat['n_atoms']:
-        return mm_real_gradients, mm_real_residual_sum
+        return mm_gradients, mm_residual_sum
 
     # establish lock
     with open('qm.lock', 'w'):
@@ -222,10 +220,8 @@ def run(sites_cart, mm_real_gradients, mm_real_residual_sum):
     if dat['restart'] is not None:
         update_file_coordinates(infile=dat['restart'], sites_cart=sites_cart)
 
-    # w_qm = harkcal * dat['w_qm'] # w_QM has the unit kcal/mol
-
-    target = mm_real_residual_sum
-    total_gradient = mm_real_gradients
+    target = mm_residual_sum
+    total_gradient = mm_gradients
     
     # loop over all the definitions of syst1 and process
     for index, syst1 in enumerate(dat['syst1_files'], 1):
@@ -235,34 +231,34 @@ def run(sites_cart, mm_real_gradients, mm_real_residual_sum):
         # construct a dict {serial:index} for the indices of the link atoms in the qm system
         serial_to_index = convert_serial_to_index(qm_atoms)
 
-        # at this point we need a model object for model :( but we have sites_cart for model_real
-        qm_c = 'qm_' + str(index) + '_c.pdb'
-        qm_h = 'qm_' + str(index) + '_h.pdb'
-        update_file_coordinates(infile=qm_c, sites_cart=sites_cart)
-        dm_model = DataManager()
+        # at this point we need a model object for syst1 :( but we have sites_cart for model_real
+        mm1_file = 'mm_' + str(index) + '_c.pdb'
+        qm_file = 'qm_' + str(index) + '_h.pdb'
+        update_file_coordinates(infile=mm1_file, sites_cart=sites_cart)
+        dm = DataManager()
         if dat['cif'] is not None:
             for cif in dat['cif']:
-                dm_model.process_restraint_file(str(cif))
-        dm_model.process_model_file(qm_c)
-        mm_model = dm_model.get_model(filename=qm_c)
+                dm.process_restraint_file(str(cif))
+        dm.process_model_file(mm1_file)
+        model_mm1 = dm.get_model(filename=mm1_file)
 
         # restore original serial to model object
-        restore_serial_in_model(mm_model, serial_to_index)
+        restore_serial_in_model(model_mm1, serial_to_index)
 
         # read link_pairs and g
         link_pairs = dat[syst1]['link_pairs']
         g = dat[syst1]['g']
 
         # prepare for orca
-        write_pdb_h(qm_h, mm_model, link_pairs=link_pairs, g=g, serial_to_index=serial_to_index)
+        write_pdb_h(qm_file, model_mm1, link_pairs=link_pairs, g=g, serial_to_index=serial_to_index)
 
         # run orca
         orca_string = dat['orca_binary'] + ' qm_' + str(index) + '.inp > qm_' + str(index) + '.out'
         os.system(orca_string)
 
         # read results from orca
-        qm_energy, qm_gradients = read_energy_and_gradient_from_orca(qmengrad)
         qmengrad = 'qm_' + str(index) + '.engrad'
+        qm_energy, qm_gradients = read_energy_and_gradient_from_orca(qmengrad)
 
         # rescale qm gradients
         qm_gradients = rescale_qm_gradients(qm_gradients, dat['w_qm']*harkcal/bohrang)
@@ -270,25 +266,27 @@ def run(sites_cart, mm_real_gradients, mm_real_residual_sum):
         # calculate mm gradients and target for model system
         with open('settings.pickle', 'rb') as file:
             params = pickle.load(file)
-        mm_model.process(pdb_interpretation_params=params, make_restraints=True)
-        mm_model_residuals = mm_model.restraints_manager_energies_sites(compute_gradients=True)
+        model_mm1.process(pdb_interpretation_params=params, make_restraints=True)
+        model_mm1_residuals = model_mm1.restraints_manager_energies_sites(compute_gradients=True)
 
-        # unscale target and gradients in mm_model
-        mm_model_residuals.target = mm_model_residuals.target*(1.0/mm_model_residuals.normalization_factor)
-        mm_model_residuals.gradients = mm_model_residuals.gradients*(1.0/mm_model_residuals.normalization_factor)
+        # unscale target and gradients in model_mm1
+        model_mm1_residuals.target = model_mm1_residuals.target*(1.0/model_mm1_residuals.normalization_factor)
+        model_mm1_residuals.gradients = model_mm1_residuals.gradients*(1.0/model_mm1_residuals.normalization_factor)
 
         # update target
-        target = target - mm_model_residuals.target + dat['w_qm']*harkcal*qm_energy
+        target = target - model_mm1_residuals.target + dat['w_qm']*harkcal*qm_energy
+        print('target: ' + str(target))
+        print('residual_sum: ' + str(mm_residual_sum))
 
         # update gradient (QM/MM)
-        total_gradient = calculate_total_gradient(qm_gradients, mm_model_residuals.gradients, total_gradient, qm_atoms, g, link_pairs, serial_to_index)
+        total_gradient = calculate_total_gradient(qm_gradients, model_mm1_residuals.gradients, total_gradient, qm_atoms, g, link_pairs, serial_to_index)
 
         # update gradient (restraints)
         total_gradient, target = restraint_distance(sites_cart, total_gradient, target, dat[syst1]['restraint_distance'])
         total_gradient, target = restraint_angle(sites_cart, total_gradient, target, dat[syst1]['restraint_angle'])
 
         # perform logging
-        logging(index=index, w_qm=dat['w_qm'], qm_energy=qm_energy, mm_energy=mm_real_residual_sum, mm1_energy=mm_model_residuals.target)
+        logging(index=index, w_qm=dat['w_qm'], qm_energy=qm_energy, mm_energy=mm_residual_sum, mm1_energy=model_mm1_residuals.target)
 
     # unlock
     os.remove('qm.lock')

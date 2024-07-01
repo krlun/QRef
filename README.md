@@ -13,13 +13,13 @@ E_{restraints}(\mathbf{R}) = E_{chem}(\mathbf{R}) + E_{SS}(\mathbf{R}) + E_{NCS}
 ```
 In this QR implementation $E_{chem}(\mathbf{R})$ (which traditionally is a molecular mechanics force field) is replaced using a subtractive QM/MM scheme (using hydrogen link-atoms) according to
 ```math
-E_{chem}(\mathbf{R}) = \sum_{i} \left(w_{QM}E_{QM1, i}(\mathbf{R_{syst1, i}}(\mathbf{R})) - E_{MM1, i}(\mathbf{R})\right) + E_{MM}(\mathbf{R}),
+E_{chem}(\mathbf{R}) = \sum_{i} \left(w_{QM}E_{QM1, i}(\mathbf{R_{syst1, i}}) - E_{MM1, i}(\mathbf{R})\right) + E_{MM}(\mathbf{R}),
 ```
-where index 1 in turn indicates small, but interesting, parts of the structure. Additionally another scaling factor, $w_{QM}$, is needed due to the fact that crystallographic MM force fields are of a statistical nature, whereas $E_{QM1, i}$ represents physical energies. $\mathbf{R_{syst1, i}}$ in turn is the coordinate set for the i:th region of QM atoms, where the hydrogen link-atoms are placed at
+where index 1 in turn indicates small, but interesting, parts of the structure. Additionally another scaling factor, $w_{QM}$, is needed due to the fact that crystallographic MM force fields are of a statistical nature, whereas $E_{QM1, i}$ represents physical energies. $\mathbf{R_{syst1, i}}$ in turn is the coordinate set for the i:th region of QM atoms. Placing the hydrogen link-atoms at
 ```math
-\overline{r}_{H_L} = \overline{r}_X + g_{bond}\left(\overline{r}_{C_L} - \overline{r}_X\right).
+\overline{r}_{H_L} = \overline{r}_X + g_{bond}\left(\overline{r}_{C_L} - \overline{r}_X\right)
 ```
-The gradient for the chemical restraints is then obtained as
+implies that $(\mathbf{R_{syst1, i}}) = (\mathbf{R_{syst1, i}})(\mathbf{R})$, thus the gradient for the chemical restraints is then obtained as
 ```math
 \nabla E_{restraints}(\mathbf{R}) = \sum_{i} \left( w_{QM} \nabla E_{QM1, i}(\mathbf{R_{syst1, i}(R)}) \cdot J(\mathbf{R_{syst1,i}}; \mathbf{R}) - \nabla E_{MM1, i}(\mathbf{R}) \right) + \nabla E_{MM}(\mathbf{R})
 ```
@@ -67,20 +67,25 @@ This implementation of `QRef` has been verified to work with `Phenix` versions 1
 The scripts in the folder `scripts` should be placed somewhere accessible by `$PATH`. The shebang in the scripts might need to be updated to point towards wherever `cctbx.python` is located.
 
 ### Orca
-`Orca` can be found at https://orcaforum.kofo.mpg.de/ - follow their guide for installation. QRef has been verified to work with `Orca` version 5.0.4.
+`Orca` can be found at (orcaforum.kofo.mpg.de)[https://orcaforum.kofo.mpg.de/] - follow their guide for installation. QRef has been verified to work with `Orca` version 5.0.4.
 
 ## Usage
 The general procedure to set up a quantum refinement job consists of
 
-1. Build a model.
+1. Select QM region(s). Best practises for selecting proper QM region(s) can be found at for example:
+    - [doi.org/10.1002/anie.200802019](https://doi.org/10.1002/anie.200802019)
+    - [doi.org/10.1016/bs.mie.2016.05.014](https://doi.org/10.1016/bs.mie.2016.05.014)
+    - [doi.org/10.1021/cr5004419](https://doi.org/10.1021/cr5004419)
+
+2. Build a model.
     - The model in the QM regions needs to make chemical sense. This for example means that the QM regions should be protonated as well as being complete.
     - The model outside of the QM region, bar the carbon link atom, can be incomplete.
     - `phenix.ready_set add_h_to_water=True` can be useful for this purpose.
 
-2. Prepare restraint files for unknown residues and ligands. The script `qref_prep.py` will tell you if there are any missing restraint files.
+3. Prepare restraint files for unknown residues and ligands. The script `qref_prep.py` will tell you if there are any missing restraint files.
     - This can be achieved using `phenix.ready_set` and `phenix.elbow`.
 
-3. Prepare `syst1` files; these files define the QM regions.
+4. Prepare `syst1` files; these files define the QM regions.
     - If there is only one QM region the default is to look for a file named `syst1` by the software. For multiple QM regions the recommended, and default, naming scheme is `syst11`, `syst12`, etc.
     - Which atoms to include in the QM regions is defined using the serial number from the PDB file describing the entire model.
         - While setting `sort_atoms = False` in the input to `Phenix` should ensure that the ordering in the input model is preserved, we have encountered instances where this is not adhered to. Thus it is recommended to use `iotbx.pdb.sort_atoms` (supplied with `Phenix`) which will give you a new PDB file with the suffix `_sorted.pdb` where the atoms are sorted in the same order as that which `Phenix` uses internally. It is recommended to use the `_sorted.pdb` file as the input model for refinement, as well as the reference when defining the `syst1` files.
@@ -89,7 +94,7 @@ The general procedure to set up a quantum refinement job consists of
     - The second occurence of an atom in the `syst1` files will indicate that this is a link atom, i.e. it will be replaced by a hydrogen at the appropriate position in the QM calculation.
     - Examples are included in the `examples` folder.
 
-4. Run `qref_prep.py <model>_sorted.pdb` to generate `qref.dat` (a file containing settings for the QR interface), as well as PDB files describing the QM regions.
+5. Run `qref_prep.py <model>_sorted.pdb` to generate `qref.dat` (a file containing settings for the QR interface), as well as PDB files describing the QM regions.
     - The `junctfactor` file needs to be present in the same directory as where `qref_prep.py` is run. The `junctfactor` file contain ideal QM distances for the $C_L - H_L$ bonds for the link-atoms. If another `junctfactor` file is to be used this can be specified with the `-j` or `--junctfactor` option.
     - The theory used for the ideal $C_L - H_L$ QM distance can be changed with the `-l` or `--ltype` option. Default is type 12. The options are:
         - 6: B3LYP/6-31G*
@@ -102,10 +107,10 @@ The general procedure to set up a quantum refinement job consists of
         - 13: B97-D(RI)/def2-SV(P)
 
         There needs to be a parametrisation in the `junctfactor` file for the bond one intends to cleave; it is recommended that the user inspects the `junctfactor` file to verify that there is support to cleave the intended bond type. In the case parametrisation is lacking another selection for the QM system (and in particular where the link between QM and MM occurs) needs to be made or appropriate parametrisation added to the `junctfactor` file.
-    - Ideally only the input model is needed as an argument for `qref_prep.py`. If there was a need to prepare restraint files for novel residues or ligands in point 2 above, `qref_prep.py` needs to be made aware of these. This can be achieved with the `-c` or `--cif` option.
-    - The output from `qref_prep.py` should be $\left(1+2 n_{syst1}\right)$ files as well as selection strings:
+    - Ideally only the input model is needed as an argument for `qref_prep.py`. If there was a need to prepare restraint files for novel residues or ligands in point 3 above, `qref_prep.py` needs to be made aware of these. This can be achieved with the `-c` or `--cif` option.
+    - The output from `qref_prep.py` should be $\left(1+2 n_{syst1}\right)$ files as well as recommended selection strings for both real and reciprocal space. Additionally, a warning is given if the `syst1` file covers more than one conformation. In the case that all atoms in the `syst1` definition belong to the same conformation, this will be indicated by an `altloc` specifier.
         - `qref.dat`, which contains the settings for the QR interface. This file can be changed manually and it is a good idea to inspect that the value for `orca_binary` is the correct path for the actual Orca binary file (`qref_prep.py` tries to locate this file automatically but may sometimes fail).
-        - `qm_i_c.pdb`, which is the model used to calculate $E_{MM1, i}$.
+        - `mm_i_c.pdb`, which is the model used to calculate $E_{MM1, i}$.
         - `qm_i_h.pdb`, which is the model used to calculate $E_{QM1, i}$.
 
         The output PDB files can, and probably should, be used to inspect that the QM selection is proper.
@@ -117,14 +122,14 @@ The general procedure to set up a quantum refinement job consists of
 
     - All available options for `qref_prep.py` can be seen through the `-h` or `--help` option.
 
-5. The next step is to prepare the input files for Orca. Examples can be found in the `examples` folder.
+6. The next step is to prepare the input files for Orca. Examples can be found in the `examples` folder.
     - The input files should be named `qm_i.inp`, where `i` refers to the i:th QM region; counting starts at 1.
     - The level of theory should match the junction type; using the default (type 12) the corresponding input to `Orca` then becomes `! TPSS D4 DEF2-SV(P)`.
     - Energy and gradient needs to be written to disk. This is achieved through the keyword `! ENGRAD`.
     - To read coordinates from a PDB file (`qm_i_h.pdb`) use `*pdbfile <charge> <multiplicity> qm_i_h.pdb`, where again `i` refers to the i:th QM region.
     - Custom settings can also be supplied (see the `examples` folder).
 
-6. At this point it is possible to start a quantum refinement. It is however recommended to first create an empty file named `qm.lock` (this disables QR) through for example the `touch` command, then start a refinement so that an `.eff` file is obtained (this file contains all the `Phenix` refinement settings for the current experimental data and model). A good idea is to rename this file to `phenix.params` or similar, then edit this file and make sure the following options are set:
+7. At this point it is possible to start a quantum refinement. It is however recommended to first create an empty file named `qm.lock` (this disables QRef - additionally, if `qref.dat` is not present in the folder QRef will not run, i.e. this step can be run before starting to set up the QR job) through for example the `touch` command, then start a refinement so that an `.eff` file is obtained (this file contains all the `Phenix` refinement settings for the current experimental data and model). A good idea is to rename this file to `phenix.params` or similar, then edit this file and make sure the following options are set:
     - For reciprocal space refinement (`phenix.refine`):
         - `refinement.pdb_interpretation.restraints_library.cdl = False`
         - `refinement.pdb_interpretation.restraints_library.mcl = False`
@@ -134,6 +139,7 @@ The general procedure to set up a quantum refinement job consists of
         - `refinement.refine.strategy = *individual_sites individual_sites_real_space rigid_body *individual_adp group_adp tls occupancies group_anomalous`
         - `refinement.refine.sites.individual = <reciprocal selection string>`
         - `refinement.hydrogens.refine = *individual riding Auto`
+        - `refinement.hydrogens.real_space_optimize_x_h_orientation = False`
         - `refinement.main.nqh_flips = False`
     - For real space refinement (`phenix.real_space_refine`):
         - `refinement.run = *minimization_global rigid_body local_grid_search morphing simulated_annealing adp occupancy nqh_flips`
@@ -147,7 +153,7 @@ The general procedure to set up a quantum refinement job consists of
         - `pdb_interpretation.reference_coordinate_restraints.sigma = 0.01`
     - Other options can be set as needed.
 
-7. To run the quantum refinement job, make sure that the `qm.lock` file has been deleted, then execute either `phenix.refine phenix.params` or `phenix.real_space_refine phenix.params`. If there is a need to restart the job with different settings for `Phenix`, make sure to delete the file `settings.pickle`.
+8. To run the quantum refinement job, make sure that the `qm.lock` file has been deleted, then execute either `phenix.refine phenix.params` or `phenix.real_space_refine phenix.params`. If there is a need to restart the job with different settings for `Phenix`, make sure to delete the file `settings.pickle`.
 
 ## Todo
 - Add symmetry support for the QM calculations.

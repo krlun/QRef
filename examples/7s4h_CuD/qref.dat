@@ -18,6 +18,7 @@
             "4597": 4598, 
             "4725": 4726
         }, 
+        "restraint_angle": [], 
         "restraint_bond": []
     }, 
     "syst1_files": [

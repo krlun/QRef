@@ -107,7 +107,19 @@ def suggest_selection_string(model):
     print
 
 
-def write_dat(dat):    
+def check_altlocs(model):
+    hierarchy = model.get_hierarchy()
+    altlocs = set()
+    for atom in hierarchy.atoms(): altlocs.add(atom.pdb_label_columns()[4])
+    altlocs = sorted(list(altlocs))
+    if len(altlocs) != 1:
+        if altlocs[0] == ' ': altlocs[0] = '<blank>'
+        print('Warning, multiple altlocs for subsystem found:  ' + ', '.join(altlocs))
+    elif altlocs[0] != ' ':
+        print('Altloc:  \"and altloc ' + altlocs[0]) + '\"'
+
+
+def write_dat(dat):
     with open('qref.dat', 'w') as file:
         json.dump(dat, file, indent=4, sort_keys=True)
 
@@ -151,9 +163,7 @@ def main(args):
     print('*** This is qref_prep.py ***')
     print
     args = parse_args(args)
-
-    model_real_file = args.pdb
-
+    model_file = args.pdb
     syst1_files = args.syst1
     junc_factor_file = args.junctfactor
     ltype = args.ltype
@@ -163,9 +173,9 @@ def main(args):
     if args.cif is not None:
         for cif in args.cif:
             dm.process_restraint_file(cif)
-    dm.process_model_file(model_real_file)
-    model_real = dm.get_model(filename=model_real_file)
-    model_real.add_crystal_symmetry_if_necessary()
+    dm.process_model_file(model_file)
+    model_mm = dm.get_model(filename=model_file)
+    model_mm.add_crystal_symmetry_if_necessary()
 
     dat = dict()
 
@@ -176,18 +186,18 @@ def main(args):
         print
         qm_atoms, link_atoms = read_qm_and_link_atoms(syst1)
         serial_to_index = convert_serial_to_index(qm_atoms)
-        model_model = select_qm_model(model=model_real, qm=qm_atoms)
-        model_model.process(pdb_interpretation_params=model_model.get_current_pdb_interpretation_params(), make_restraints=True)
-        restore_serial_in_model(model_model, serial_to_index=serial_to_index)
-        name_c = 'qm_' + str(index) + '_c.pdb'
-        print('Writing file:  ' + name_c)
-        model_model.get_hierarchy().write_pdb_file(file_name=name_c, crystal_symmetry=model_real.crystal_symmetry())
+        model_mm1 = select_qm_model(model=model_mm, qm=qm_atoms)
+        model_mm1.process(pdb_interpretation_params=model_mm1.get_current_pdb_interpretation_params(), make_restraints=True)
+        restore_serial_in_model(model_mm1, serial_to_index=serial_to_index)
+        mm1_file = 'mm_' + str(index) + '_c.pdb'
+        print('Writing file:  ' + mm1_file)
+        model_mm1.get_hierarchy().write_pdb_file(file_name=mm1_file, crystal_symmetry=model_mm.crystal_symmetry())
 
         if args.skip_h is not True:
             dat[syst1] = dict()
-            link_pairs = identify_link_pairs(model_model, link_atoms, serial_to_index)
+            link_pairs = identify_link_pairs(model_mm1, link_atoms, serial_to_index)
             dat[syst1]['link_pairs'] = link_pairs
-            g = calculate_g_factor(model_model, link_pairs=link_pairs, junc_factors=junc_factors, ltype=ltype, serial_to_index=serial_to_index)
+            g = calculate_g_factor(model_mm1, link_pairs=link_pairs, junc_factors=junc_factors, ltype=ltype, serial_to_index=serial_to_index)
             dat[syst1]['g'] = g
             dat[syst1]['restraint_distance'] = list()
             dat[syst1]['restraint_angle'] = list()
@@ -208,18 +218,16 @@ def main(args):
             #             dat[syst1]['transform'][-1]['atoms'] = transform[1]
             #             dat[syst1]['transform'][-1]['R'] = transform[2]
             #             dat[syst1]['transform'][-1]['t'] = transform[3]
-            name_h = 'qm_' + str(index) + '_h.pdb'
-            print('Writing file:  ' + name_h)
-            write_pdb_h(name_h, model_model, link_pairs, g, serial_to_index)
+            qm_file = 'qm_' + str(index) + '_h.pdb'
+            print('Writing file:  ' + qm_file)
+            write_pdb_h(qm_file, model_mm1, link_pairs, g, serial_to_index)
 
-
-        suggest_selection_string(model_model)
-
-    print('----------')
-    print
+        suggest_selection_string(model_mm1)
+        check_altlocs(model_mm1)
+        print
 
     if args.skip_h is not True:
-        dat['n_atoms'] = model_real.get_number_of_atoms()
+        dat['n_atoms'] = model_mm.get_number_of_atoms()
         dat['restart'] = args.restart
         dat['w_qm'] = args.w_qm
         dat['cif'] = args.cif
@@ -231,7 +239,7 @@ def main(args):
 
     if args.restart is not None:
         print('Writing file:  ' + args.restart)
-        prepare_restart(model_real_file, args.restart)
+        prepare_restart(model_file, args.restart)
 
     print
     print('----------')

@@ -194,11 +194,11 @@ class energies(scitbx.restraints.energies):
     for extension_obj in self.extension_objects:
       extension_obj.energies_add(energies_obj=self)
     # QRef INSERT
-    if compute_gradients is True:
+    if compute_gradients is True and os.path.exists('qref.dat'):
       # if not os.path.exists('qm.lock') and (os.path.exists('xyz_reciprocal.lock') or os.path.exists('xyz.lock')):
       if not os.path.exists('qm.lock'):
         from qref import qref
-        self.gradients, self.residual_sum = qref.run(sites_cart=sites_cart, mm_real_gradients=self.gradients, mm_real_residual_sum=self.residual_sum)
+        self.gradients, self.residual_sum = qref.run(sites_cart=sites_cart, mm_gradients=self.gradients, mm_residual_sum=self.residual_sum)
     # QRef END
     self.finalize_target_and_gradients()
 

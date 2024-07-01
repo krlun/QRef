@@ -30,6 +30,7 @@
             "2921": 2922, 
             "3429": 3430
         }, 
+        "restraint_angle": [], 
         "restraint_bond": []
     }, 
     "syst1_files": [
