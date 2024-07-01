@@ -79,7 +79,7 @@ The general procedure to set up a quantum refinement job consists of
 
 2. Build a model.
     - The model in the QM regions needs to make chemical sense. This for example means that the QM regions should be protonated as well as being complete.
-    - The model outside of the QM region, bar the carbon link atom, can be incomplete.
+    - The model outside of the QM region (as well as the protonation of the carbon link atom) can be incomplete.
     - `phenix.ready_set add_h_to_water=True` can be useful for this purpose.
 
 3. Prepare restraint files for unknown residues and ligands. The script `qref_prep.py` will tell you if there are any missing restraint files.
