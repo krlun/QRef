@@ -275,8 +275,6 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
 
         # update target
         target = target - model_mm1_residuals.target + dat['w_qm']*harkcal*qm_energy
-        print('target: ' + str(target))
-        print('residual_sum: ' + str(mm_residual_sum))
 
         # update gradient (QM/MM)
         total_gradient = calculate_total_gradient(qm_gradients, model_mm1_residuals.gradients, total_gradient, qm_atoms, g, link_pairs, serial_to_index)
