@@ -225,6 +225,7 @@ def main(args):
         suggest_selection_string(model_mm1)
         check_altlocs(model_mm1)
         print
+        print('----------')
 
     if args.skip_h is not True:
         dat['n_atoms'] = model_mm.get_number_of_atoms()
@@ -234,15 +235,16 @@ def main(args):
         dat['orca_binary'] = locate_binary('orca')
         dat['ltype'] = ltype
         dat['syst1_files'] = args.syst1
+        print('----------')
+        print
         print('Writing file:  qref.dat')
+        print
+        print('----------')
         write_dat(dat)
 
     if args.restart is not None:
         print('Writing file:  ' + args.restart)
         prepare_restart(model_file, args.restart)
-
-    print
-    print('----------')
 
     # cleanup
     temp_files = ['settings.pickle']
