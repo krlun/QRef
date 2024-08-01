@@ -43,7 +43,7 @@ def calculate_g_factor(model, link_pairs, junc_factors, ltype, serial_to_index):
         if bond not in junc_factors[resname].keys():
             raise SystemExit(bond + ' (between atoms ' + str(value) + ' and ' + str(key) + ') missing for ' + resname + ' in junction factor file. Exiting...')
         if ltype not in junc_factors[resname][bond].keys():
-            raise SystemExit('Missing ltype ' +  ltype + ' for bond ' + bond + ' in residue ' + resname + ' in junction factor file. Exiting...')
+            raise SystemExit('Missing ltype ' + str(ltype) + ' for bond ' + bond + ' in residue ' + resname + ' in junction factor file. Exiting...')
         c_h_ideal = junc_factors[resname][bond][ltype] # eg. print(junc_factors['PHE']['CB-CG'][12])
         g[key] = c_h_ideal/model.restraints_manager.geometry.bond_params_table.lookup(serial_to_index[key], serial_to_index[value]).distance_ideal
     return g
