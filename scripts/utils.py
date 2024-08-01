@@ -43,7 +43,7 @@ def read_junc_factors(junc_factor_file):
                     while line != '\n' and line:
                         line = re.split(delimiters, line)[0].strip().split()
                         ltype = int(line[0])
-                        distance = float(line[1][0:line[1].index('d')])
+                        distance = float(line[1].split('d')[0])
                         junc_factors[res][bond][ltype] = distance
                         line = file.readline()
             line = file.readline()
