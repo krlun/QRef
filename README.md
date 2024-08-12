@@ -37,13 +37,13 @@ where $J(\mathbf{R_{syst1,i}}; \mathbf{R})$ is the Jacobian between $\mathbf{R_{
 
 ## Installation
 ### Modules
-The directory `modules` should be placed under `<path to Phenix>`; `qref` will thus be a new directory under `modules`, whereas the user should manually overwrite `energies.py` in `modules/cctbx_project/cctbx/geometry_restraints` and `model.py` in `modules/cctbx_project/mmtbx/model`, respectively, with the version of the file corresponding to their installation of `Phenix`.
+The directory `modules` should be placed under `$PHENIX`; `qref` will thus be a new directory under `modules`, whereas the user should manually overwrite `energies.py` in `modules/cctbx_project/cctbx/geometry_restraints` and `model.py` in `modules/cctbx_project/mmtbx/model`, respectively, with the version of the file corresponding to their installation of `Phenix`.
 
 There is a commented out guard clause in `energies.py`:<br>
 
     # if not os.path.exists('qm.lock') and (os.path.exists('xyz_reciprocal.lock') or os.path.exists('xyz.lock')):
 
-This is the recommended way to use the quantum restraints, as they are not always needed. In order to make this work one has to edit the file `<path to Phenix>/modules/phenix/phenix/refinement/xyz_reciprocal_space.py` and `import os` as well as surround the call to `mmtbx.refinement.minimization.lbfgs(...)` in the method `run_lbfgs` in the class `run_all` with<br>
+This is the recommended way to use the quantum restraints, as they are not always needed. In order to make this work one has to edit the file `$PHENIX/modules/phenix/phenix/refinement/xyz_reciprocal_space.py` and `import os` as well as surround the call to `mmtbx.refinement.minimization.lbfgs(...)` in the method `run_lbfgs` in the class `run_all` with<br>
 
     with open('xyz_reciprocal.lock', 'w'):
         pass
@@ -52,7 +52,7 @@ and
 
     os.remove('xyz_reciprocal.lock')
 
-Likewise the file `<path to Phenix>/modules/phenix/phenix/refinement/macro_cycle_real_space.py` should be edited in a similar manner, i.e. with an added `import os` as well as surrounding the calls to `self.minimization_no_ncs()` and `self.minimization_ncs()` in the method `refine_xyz` in the class `run` with<br>
+Likewise the file `$PHENIX/modules/phenix/phenix/refinement/macro_cycle_real_space.py` should be edited in a similar manner, i.e. with an added `import os` as well as surrounding the calls to `self.minimization_no_ncs()` and `self.minimization_ncs()` in the method `refine_xyz` in the class `run` with<br>
 
     with open('xyz.lock', 'w'):
       pass
@@ -144,13 +144,15 @@ The general procedure to set up a quantum refinement job consists of
     - For real space refinement (`phenix.real_space_refine`):
         - `refinement.run = *minimization_global rigid_body local_grid_search morphing simulated_annealing adp occupancy nqh_flips`
         - `pdb_interpretation.restraints_library.cdl = False`
-        - `pdb_interpretation.restraints_library.mdl = False`
+        - `pdb_interpretation.restraints_library.mcl = False`
         - `pdb_interpretation.restraints_library.cis_pro_eh99 = False`
         - `pdb_interpretation.sort_atoms = False`
         - `pdb_interpretation.secondary_structure = False`
         - `pdb_interpretation.reference_coordinate_restraints.enabled = True`
         - `pdb_interpretation.reference_coordinate_restraints.selection = <real space selection string>`
         - `pdb_interpretation.reference_coordinate_restraints.sigma = 0.01`
+        - `pdb_interpretation.flip_symmetric_amino_acids = False`
+        - `pdb_interpretation.ramachandran_plot_restraints.enabled = False`
     - Other options can be set as needed.
 
 8. To run the quantum refinement job, make sure that the `qm.lock` file has been deleted, then execute either `phenix.refine phenix.params` or `phenix.real_space_refine phenix.params`. If there is a need to restart the job with different settings for `Phenix`, make sure to delete the file `settings.pickle`.
