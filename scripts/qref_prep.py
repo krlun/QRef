@@ -154,7 +154,7 @@ def parse_args(args):
     parser.add_argument('-r', '--restart', nargs='?', const='restart.pdb', type=str, help='if specified creates a restart file (optional: name)')
     parser.add_argument('-rd', '--restraint_distance', nargs=5, action='append', type=str, help='if specified applies a harmonic (bond) distance restraint according to \'i atom1_serial atom2_serial desired_distance force_constant\'')
     parser.add_argument('-ra', '--restraint_angle', nargs=6, action='append', type=str, help='if specified applies a harmonic (bond) angle restraint according to \'i atom1_serial atom2_serial atom3_serial desired_angle force_constant\'')
-    #parser.add_argument('-t', '--transform', nargs=4, action='append', type=str, help='if specified applies the specified transformations according to \'i atoms R t\'')
+    # parser.add_argument('-t', '--transform', nargs=14, action='append', type=str, help='if specified applies the specified transformations according to \'i \"atoms\" R t\', where the matrix R should be given in row-wise order')
     parser.add_argument('-v', '--version', action="version", version="%(prog)s 0.2.0")
     return parser.parse_args(args)
 
@@ -201,7 +201,7 @@ def main(args):
             dat[syst1]['g'] = g
             dat[syst1]['restraint_distance'] = list()
             dat[syst1]['restraint_angle'] = list()
-            #dat[syst1]['transform'] = list() # to be implemented
+            # dat[syst1]['transform'] = list() # to be implemented
             if args.restraint_distance is not None:
                 for restraint in args.restraint_distance:
                     if int(restraint[0]) == index:
@@ -224,7 +224,6 @@ def main(args):
 
         suggest_selection_string(model_mm1)
         check_altlocs(model_mm1)
-        print
         print('----------')
 
     if args.skip_h is not True:
