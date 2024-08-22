@@ -15,24 +15,29 @@ harkJ = 2625.499639479950
 bohrang = 0.529177249
 
 
-def read_qm_and_link_atoms(infile):
-    # reads QM and link atoms from syst1 file, assuming that the numbering in the syst1 file corresponds to serial in pdb for the whole protein
-    # lines can be commented out with # and !, multiple atoms and intervals can be specified per line (separated by either , or blank)
-    # first occurance of atom will be treated as part of qm system, second occurance as link atom
-    qm = set()
-    link_atoms = set()
+def parse_atoms_line(line):
     comments = '[#!]'
-    delimiters = '[^,\s]+'
+    delimiters = '[^,\\s]+'
+    atoms = set()
+    line = re.findall(delimiters, re.split(comments, line)[0])
+    for interval in line:
+        interval = [int(x) for x in interval.split('-')]
+        for i in range(min(interval), max(interval) + 1):
+            atoms.add(i)
+    return atoms
+
+
+def read_qm_and_link_atoms(infile):
+    qm_atoms = set()
+    link_atoms = set()
     with open(infile, 'r') as file:
         line = file.readline()
         while line:
-            line = re.findall(delimiters, re.split(comments, line)[0])
-            for interval in line:
-                interval = interval.split('-')
-                for i in range(min([int(x) for x in interval]), max([int(x) for x in interval]) + 1):
-                    link_atoms.add(i) if i in qm else qm.add(i)
+            atoms = parse_atoms_line(line)
+            for atom in atoms:
+                link_atoms.add(atom) if atom in qm_atoms else qm_atoms.add(atom)
             line = file.readline()
-    return qm, link_atoms
+    return qm_atoms, link_atoms
 
 
 def convert_serial_to_index(qm):
@@ -171,7 +176,7 @@ def read_dat():
     return dat
 
 
-def restraint_distance(sites_cart, gradients, target, restraints):
+def apply_restraints_distance(sites_cart, gradients, target, restraints):
     # restraint[0] = atom1_serial, restraint[1] = atom2_serial, restraint[2] = desired distance in Angstrom, restraint[3] = force constant
     for restraint in restraints:
         r_ij = np.array(sites_cart[restraint[0]-1]) - np.array(sites_cart[restraint[1]-1])
@@ -185,7 +190,7 @@ def restraint_distance(sites_cart, gradients, target, restraints):
     return gradients, target
 
 
-def restraint_angle(sites_cart, gradients, target, restraints):
+def apply_restraints_angle(sites_cart, gradients, target, restraints):
     # restraint[0] = atom1_serial (i), restraint[1] = atom2_serial ("middle" atom) (j), restraint[2] = atom3_serial (k), restraint[3] = desired angle in degrees, restraint[4] = force constant
     for restraint in restraints:
         r_ij = np.array(sites_cart[restraint[0]-1]) - np.array(sites_cart[restraint[1]-1])
@@ -206,6 +211,23 @@ def restraint_angle(sites_cart, gradients, target, restraints):
     return gradients, target
 
 
+def apply_transforms(model, transforms, serial_to_index):
+    for transform in transforms:
+        R = np.array(transform['R'])
+        t = np.array(transform['t'])
+        atoms_model = model.get_hierarchy().atoms()
+        for atom in parse_atoms_line(transform['atoms']):
+            atoms_model[serial_to_index[atom]].xyz = np.matmul(R, atoms_model[serial_to_index[atom]].xyz) + t
+
+
+def rotate_gradients(gradients, transforms, serial_to_index):
+    for transform in transforms:
+        R_inv = np.linalg.inv(np.array(transform['R']))
+        for atom in parse_atoms_line(transform['atoms']):
+            gradients[serial_to_index[atom]] = np.matmul(R_inv, gradients[serial_to_index[atom]])
+    return gradients
+
+
 def run(sites_cart, mm_gradients, mm_residual_sum):
     dat = read_dat()
 
@@ -223,7 +245,7 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
     target = mm_residual_sum
     total_gradient = mm_gradients
     
-    # loop over all the definitions of syst1 and process
+    # loop over all the definitions of syst1 and process (order matters)
     for index, syst1 in enumerate(dat['syst1_files'], 1):
         # read syst1 file, which containts QM system + link atoms
         qm_atoms, link_atoms = read_qm_and_link_atoms(syst1)
@@ -242,14 +264,25 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
         dm.process_model_file(mm1_file)
         model_mm1 = dm.get_model(filename=mm1_file)
 
-        # restore original serial to model object
+        # calculate mm gradients and target for model system
+        with open('settings.pickle', 'rb') as file:
+            params = pickle.load(file)
+        model_mm1.process(pdb_interpretation_params=params, make_restraints=True)
+        model_mm1_residuals = model_mm1.restraints_manager_energies_sites(compute_gradients=True)
+
+        # unscale target and gradients in model_mm1
+        model_mm1_residuals.target = model_mm1_residuals.target*(1.0/model_mm1_residuals.normalization_factor)
+        model_mm1_residuals.gradients = model_mm1_residuals.gradients*(1.0/model_mm1_residuals.normalization_factor)
+
+        # restore original serial to model object; this needs to come after model_mm1.process()
         restore_serial_in_model(model_mm1, serial_to_index)
 
         # read link_pairs and g
         link_pairs = dat[syst1]['link_pairs']
         g = dat[syst1]['g']
 
-        # prepare for orca
+        # prepare for orca, transform model_mm1 if necessary
+        apply_transforms(model_mm1, dat[syst1]['transforms'], serial_to_index)
         write_pdb_h(qm_file, model_mm1, link_pairs=link_pairs, g=g, serial_to_index=serial_to_index)
 
         # run orca
@@ -263,15 +296,8 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
         # rescale qm gradients
         qm_gradients = rescale_qm_gradients(qm_gradients, dat['w_qm']*harkcal/bohrang)
 
-        # calculate mm gradients and target for model system
-        with open('settings.pickle', 'rb') as file:
-            params = pickle.load(file)
-        model_mm1.process(pdb_interpretation_params=params, make_restraints=True)
-        model_mm1_residuals = model_mm1.restraints_manager_energies_sites(compute_gradients=True)
-
-        # unscale target and gradients in model_mm1
-        model_mm1_residuals.target = model_mm1_residuals.target*(1.0/model_mm1_residuals.normalization_factor)
-        model_mm1_residuals.gradients = model_mm1_residuals.gradients*(1.0/model_mm1_residuals.normalization_factor)
+        # rotate gradients back if needed
+        qm_gradients = rotate_gradients(qm_gradients, dat[syst1]['transforms'], serial_to_index)
 
         # update target
         target = target - model_mm1_residuals.target + dat['w_qm']*harkcal*qm_energy
@@ -280,8 +306,8 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
         total_gradient = calculate_total_gradient(qm_gradients, model_mm1_residuals.gradients, total_gradient, qm_atoms, g, link_pairs, serial_to_index)
 
         # update gradient (restraints)
-        total_gradient, target = restraint_distance(sites_cart, total_gradient, target, dat[syst1]['restraint_distance'])
-        total_gradient, target = restraint_angle(sites_cart, total_gradient, target, dat[syst1]['restraint_angle'])
+        total_gradient, target = apply_restraints_distance(sites_cart, total_gradient, target, dat[syst1]['restraints_distance'])
+        total_gradient, target = apply_restraints_angle(sites_cart, total_gradient, target, dat[syst1]['restraints_angle'])
 
         # perform logging
         logging(index=index, w_qm=dat['w_qm'], qm_energy=qm_energy, mm_energy=mm_residual_sum, mm1_energy=model_mm1_residuals.target)

@@ -1,4 +1,4 @@
-#!/Applications/phenix-1.20.1-4487/build/bin/cctbx.python
+#!/Applications/phenix-1.21.2-5419/build/bin/cctbx.python
 
 import os
 import sys
@@ -6,9 +6,12 @@ import argparse
 import json
 import subprocess
 
+import numpy as np
+
 from iotbx.data_manager import DataManager
 from cctbx.array_family import flex
 
+from utils import parse_atoms_line
 from utils import read_qm_and_link_atoms
 from utils import read_junc_factors
 
@@ -70,6 +73,15 @@ def select_qm_model(model, qm):
     for atom in qm:
         sel[atom-1] = True
     return model.select(sel)
+
+
+def apply_transforms(model, transforms, serial_to_index):
+    for transform in transforms:
+        R = np.array(transform['R'])
+        t = np.array(transform['t'])
+        atoms_model = model.get_hierarchy().atoms()
+        for atom in parse_atoms_line(transform['atoms']):
+            atoms_model[serial_to_index[atom]].xyz = np.matmul(R, atoms_model[serial_to_index[atom]].xyz) + t
 
 
 def write_pdb_h(outfile, model, link_pairs, g, serial_to_index):
@@ -154,7 +166,7 @@ def parse_args(args):
     parser.add_argument('-r', '--restart', nargs='?', const='restart.pdb', type=str, help='if specified creates a restart file (optional: name)')
     parser.add_argument('-rd', '--restraint_distance', nargs=5, action='append', type=str, help='if specified applies a harmonic (bond) distance restraint according to \'i atom1_serial atom2_serial desired_distance force_constant\'')
     parser.add_argument('-ra', '--restraint_angle', nargs=6, action='append', type=str, help='if specified applies a harmonic (bond) angle restraint according to \'i atom1_serial atom2_serial atom3_serial desired_angle force_constant\'')
-    # parser.add_argument('-t', '--transform', nargs=14, action='append', type=str, help='if specified applies the specified transformations according to \'i \"atoms\" R t\', where the matrix R should be given in row-wise order')
+    parser.add_argument('-t', '--transform', nargs=14, action='append', type=str, help='if specified applies the specified transformations according to \'i \"atoms\" R t\', where the matrix R should be given in row-wise order')
     parser.add_argument('-v', '--version', action="version", version="%(prog)s 0.2.0")
     return parser.parse_args(args)
 
@@ -196,28 +208,28 @@ def main(args):
         if args.skip_h is not True:
             dat[syst1] = dict()
             link_pairs = identify_link_pairs(model_mm1, link_atoms, serial_to_index)
-            dat[syst1]['link_pairs'] = link_pairs
             g = calculate_g_factor(model_mm1, link_pairs=link_pairs, junc_factors=junc_factors, ltype=ltype, serial_to_index=serial_to_index)
+            dat[syst1]['link_pairs'] = link_pairs
             dat[syst1]['g'] = g
-            dat[syst1]['restraint_distance'] = list()
-            dat[syst1]['restraint_angle'] = list()
-            # dat[syst1]['transform'] = list() # to be implemented
+            dat[syst1]['restraints_distance'] = list()
+            dat[syst1]['restraints_angle'] = list()
+            dat[syst1]['transforms'] = list()
             if args.restraint_distance is not None:
                 for restraint in args.restraint_distance:
                     if int(restraint[0]) == index:
-                        dat[syst1]['restraint_distance'].append([int(restraint[1]), int(restraint[2]), float(restraint[3]), float(restraint[4])])
+                        dat[syst1]['restraints_distance'].append([int(restraint[1]), int(restraint[2]), float(restraint[3]), float(restraint[4])])
             if args.restraint_angle is not None:
                 for restraint in args.restraint_angle:
                     if int(restraint[0]) == index:
-                        dat[syst1]['restraint_angle'].append([int(restraint[1]), int(restraint[2]), int(restraint[3]), float(restraint[4]), float(restraint[5])])
-            # to be implemented
-            # if args.transform is not None:
-            #     for transform in args.transform:
-            #         if int(transform[0]) == index:
-            #             dat[syst1]['transform'].append(dict())
-            #             dat[syst1]['transform'][-1]['atoms'] = transform[1]
-            #             dat[syst1]['transform'][-1]['R'] = transform[2]
-            #             dat[syst1]['transform'][-1]['t'] = transform[3]
+                        dat[syst1]['restraints_angle'].append([int(restraint[1]), int(restraint[2]), int(restraint[3]), float(restraint[4]), float(restraint[5])])
+            if args.transform is not None:
+                for transform in args.transform:
+                    if int(transform[0]) == index:
+                        dat[syst1]['transforms'].append(dict())
+                        dat[syst1]['transforms'][-1]['atoms'] = transform[1]
+                        dat[syst1]['transforms'][-1]['R'] = [[float(x) for x in transform[3*i+2:3*i+5]] for i in range(3)]
+                        dat[syst1]['transforms'][-1]['t'] = [float(x) for x in transform[11:14]]
+                apply_transforms(model_mm1, dat[syst1]['transforms'], serial_to_index)
             qm_file = 'qm_' + str(index) + '_h.pdb'
             print('Writing file:  ' + qm_file)
             write_pdb_h(qm_file, model_mm1, link_pairs, g, serial_to_index)

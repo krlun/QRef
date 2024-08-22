@@ -1,5 +1,5 @@
 # QRef
-`QRef` is a plugin for the crystallographic software suite `Phenix` enabling what in the literature commonly is referred to as "quantum refinement" (QR) in both real and reciprocal space, utilising the free software Orca as the quantum chemistry engine. This first version of `QRef` using `Phenix` was implemented under the paradigm "correctness and completeness first, performance and adherence to coding standards later".
+`QRef` is a plugin for the crystallographic software suite `Phenix` enabling what in the literature commonly is referred to as "quantum refinement" (QR) in both real and reciprocal space, utilising the (for academic users) free software Orca as the quantum chemistry engine. This first version of `QRef` using `Phenix` was implemented under the paradigm "correctness and completeness first, performance and adherence to coding standards later".
 
 ## Theory
 Refinement of macromolecules in both real and and reciprocal space relies on previous knowledge (i.e. a Bayesian prior) for the structure. This is usually encoded as a (pseudo-energy) penalty term, $E_{restraints}(\mathbf{R})$, giving rise to a target function for the refinement with the general appearance
@@ -61,13 +61,13 @@ and
 
     os.remove('xyz.lock')
 
-This implementation of `QRef` has been verified to work with `Phenix` versions 1.20.1-4487, 1.21-5207 as well as 1.21.1-5286.
+This implementation of `QRef` has been verified to work with `Phenix` versions 1.20.1-4487, 1.21-5207, 1.21.1-5286 as well as 1.21.2-5419.
 
 ### Scripts
 The scripts in the folder `scripts` should be placed somewhere accessible by `$PATH`. The shebang in the scripts might need to be updated to point towards wherever `cctbx.python` is located.
 
 ### Orca
-`Orca` can be found at [orcaforum.kofo.mpg.de](https://orcaforum.kofo.mpg.de) - follow their guide for installation. QRef has been verified to work with `Orca` version 5.0.4.
+`Orca` can be found at [orcaforum.kofo.mpg.de](https://orcaforum.kofo.mpg.de) - follow their guide for installation. QRef has been verified to work with `Orca` versions 5.0.4 and 6.0.0.
 
 ## Usage
 The general procedure to set up a quantum refinement job consists of
@@ -120,7 +120,9 @@ The general procedure to set up a quantum refinement job consists of
 
     - Harmonic (bond) angle restraints can be added through the `-ra` or `--restraint_angle` option, using the syntax `i atom1_serial atom2_serial atom3_serial desired_angle_in_degrees force_constant`, where `atom2_serial` defines the angle tip. Experience has shown that the force constant needs to be $\geq$ 10 (?) to achieve adherence to the restraint.
 
-    - All available options for `qref_prep.py` can be seen through the `-h` or `--help` option.
+    - Symmetry interactions are handled through the `-t` or `--transform` option, using the syntax `i "<atoms>" R11 R12 R13 R21 R22 R23 R31 R32 R33 t1 t2 t3` for each of the desired transforms, where `<atoms>` follow the same syntax as for `syst1` files (do note the usage of quotation marks, i.e. `<atoms>` should be given as a string). `R` is the rotation matrix (in Cartesian coordinates) in row-wise order and `t` is the translation vector (in Cartesian coordinates). To obtain $R$ and $t$, find for example the fractional rotation matrix $R_{frac}$ and the fractional translation vector $t_{frac}$ for the symmetry operator of interest (which can be found through using for example Coot), together with the desired fractional unit cell translation vector, $t_{u}$. $R$ is then calculated as $R = S^{-1}R_{frac}S$ and $t = S^{-1}(t_{frac} + t_{u})$, where $S$ is the Cartesian to fractional conversion matrix for the space group the crystal belongs to (which can be found in the `SCALEn` records in a PDB file).
+
+    - All available options for `qref_prep.py` can be seen through `-h` or `--help`.
 
 6. The next step is to prepare the input files for Orca. Examples can be found in the `examples` folder.
     - The input files should be named `qm_i.inp`, where `i` refers to the i:th QM region; counting starts at 1.
@@ -136,6 +138,7 @@ The general procedure to set up a quantum refinement job consists of
         - `refinement.pdb_interpretation.restraints_library.cis_pro_eh99 = False`
         - `refinement.pdb_interpretation.secondary_structure.enabled = False`
         - `refinement.pdb_interpretation.sort_atoms = False`
+        - `refinement.pdb_interpretation.flip_symmetric_amino_acids = False`
         - `refinement.refine.strategy = *individual_sites individual_sites_real_space rigid_body *individual_adp group_adp tls occupancies group_anomalous`
         - `refinement.refine.sites.individual = <reciprocal selection string>`
         - `refinement.hydrogens.refine = *individual riding Auto`
@@ -146,20 +149,21 @@ The general procedure to set up a quantum refinement job consists of
         - `pdb_interpretation.restraints_library.cdl = False`
         - `pdb_interpretation.restraints_library.mcl = False`
         - `pdb_interpretation.restraints_library.cis_pro_eh99 = False`
+        - `pdb_interpretation.flip_symmetric_amino_acids = False`
         - `pdb_interpretation.sort_atoms = False`
         - `pdb_interpretation.secondary_structure = False`
         - `pdb_interpretation.reference_coordinate_restraints.enabled = True`
         - `pdb_interpretation.reference_coordinate_restraints.selection = <real space selection string>`
         - `pdb_interpretation.reference_coordinate_restraints.sigma = 0.01`
-        - `pdb_interpretation.flip_symmetric_amino_acids = False`
         - `pdb_interpretation.ramachandran_plot_restraints.enabled = False`
     - Other options can be set as needed.
 
 8. To run the quantum refinement job, make sure that the `qm.lock` file has been deleted, then execute either `phenix.refine phenix.params` or `phenix.real_space_refine phenix.params`. If there is a need to restart the job with different settings for `Phenix`, make sure to delete the file `settings.pickle`.
 
 ## Todo
-- Add symmetry support for the QM calculations.
-- ~~Add support for angle restraints.~~ Done?
+- ~~Add symmetry support for the QM calculations.~~ Done.
+- ~~Add support for distance restraints.~~ Done.
+- ~~Add support for angle restraints.~~ Done.
 - Refactor code to be OOP.
 - Turn QRef into a proper restraint_manager class.
 

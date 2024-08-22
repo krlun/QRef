@@ -2,22 +2,27 @@ import re
 import json
 
 
+def parse_atoms_line(line):
+    comments = '[#!]'
+    delimiters = '[^,\\s]+'
+    atoms = set()
+    line = re.findall(delimiters, re.split(comments, line)[0])
+    for interval in line:
+        interval = [int(x) for x in interval.split('-')]
+        for i in range(min(interval), max(interval) + 1):
+            atoms.add(i)
+    return atoms
+
+
 def read_qm_and_link_atoms(infile):
-    # reads QM and link atoms from syst1 file, assuming that the numbering in the syst1 file corresponds to serial in pdb for the whole protein
-    # lines can be commented out with # and !, multiple atoms and intervals can be specified per line (separated by either , or blank)
-    # first occurance of atom will be treated as part of qm system, second occurance as link atom
     qm_atoms = set()
     link_atoms = set()
-    comments = '[#!]'
-    delimiters = '[^,\s]+'
     with open(infile, 'r') as file:
         line = file.readline()
         while line:
-            line = re.findall(delimiters, re.split(comments, line)[0])
-            for interval in line:
-                interval = interval.split('-')
-                for i in range(min([int(x) for x in interval]), max([int(x) for x in interval]) + 1):
-                    link_atoms.add(i) if i in qm_atoms else qm_atoms.add(i)
+            atoms = parse_atoms_line(line)
+            for atom in atoms:
+                link_atoms.add(atom) if atom in qm_atoms else qm_atoms.add(atom)
             line = file.readline()
     return qm_atoms, link_atoms
 
