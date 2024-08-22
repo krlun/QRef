@@ -17,7 +17,7 @@ E_{chem}(\mathbf{R}) = \sum_{i} \left(w_{QM}E_{QM1, i}(\mathbf{R_{syst1, i}}) - 
 ```
 where index 1 in turn indicates small, but interesting, parts of the structure. Additionally another scaling factor, $w_{QM}$, is needed due to the fact that crystallographic MM force fields are of a statistical nature, whereas $E_{QM1, i}$ represents physical energies. $\mathbf{R_{syst1, i}}$ in turn is the coordinate set for the i:th region of QM atoms. Placing the hydrogen link-atoms at
 ```math
-\overline{r}_{H_L} = \overline{r}_X + g_{bond}\left(\overline{r}_{C_L} - \overline{r}_X\right)
+\overline{r_{H_L}} = \overline{r_X} + g_{bond}\left(\overline{r_{C_L}} - \overline{r_X}\right)
 ```
 implies that $\mathbf{R_{syst1, i}} = \mathbf{R_{syst1, i}}(\mathbf{R})$, thus the gradient for the chemical restraints is then obtained as
 ```math
