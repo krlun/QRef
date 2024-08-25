@@ -114,7 +114,7 @@ The general procedure to set up a quantum refinement job consists of
         - `qm_i_h.pdb`, which is the model used to calculate $E_{QM1, i}$.
 
         The output PDB files can, and probably should, be used to inspect that the QM selection is proper.
-        - Two selection strings are printed on the screen, one for reciprocal space and one for real space. They are intended to be used in regards to which selection of the model to refine when crafting the input to either `phenix.refine` or `phenix.real_space_refine`, see point 6 below.
+        - Two selection strings are printed on the screen, one for reciprocal space and one for real space. They are intended to be used in regards to which selection of the model to refine when crafting the input to either `phenix.refine` or `phenix.real_space_refine`, see point 7 below.
 
     - Harmonic (bond) distance restraints can be added through the `-rd` or `--restraint_distance` option, using the syntax `i atom1_serial atom2_serial desired_distance_in_Å force_constant`. Experience has shown that the force constant needs to be $\geq$ 2500 to achieve adherence to the restraint.
 
