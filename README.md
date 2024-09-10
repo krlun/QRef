@@ -160,6 +160,14 @@ The general procedure to set up a quantum refinement job consists of
 
 8. To run the quantum refinement job, make sure that the `qm.lock` file has been deleted, then execute either `phenix.refine phenix.params` or `phenix.real_space_refine phenix.params`. If there is a need to restart the job with different settings for `Phenix`, make sure to delete the file `settings.pickle`.
 
+## Notes
+### For COSMOS@LUNARC users
+When using ORCA/6.0.0 either manually run (before you submit your job) or add to the beginning of your submit script the exports below:<br>
+
+    export OMPI_MCA_btl='^uct,ofi'
+    export OMPI_MCA_pml='ucx'
+    export OMPI_MCA_mtl='^ofi'
+
 ## Todo
 - ~~Add symmetry support for the QM calculations.~~ Done.
 - ~~Add support for distance restraints.~~ Done.
