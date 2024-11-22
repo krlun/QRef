@@ -27,7 +27,7 @@ def parse_atoms_line(line):
     return atoms
 
 
-def read_qm_and_link_atoms(infile):
+def read_syst1(infile):
     qm_atoms = set()
     link_atoms = set()
     with open(infile, 'r') as file:
@@ -248,7 +248,7 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
     # loop over all the definitions of syst1 and process (order matters)
     for index, syst1 in enumerate(dat['syst1_files'], 1):
         # read syst1 file, which containts QM system + link atoms
-        qm_atoms, link_atoms = read_qm_and_link_atoms(syst1)
+        qm_atoms, link_atoms = read_syst1(syst1)
 
         # construct a dict {serial:index} for the indices of the link atoms in the qm system
         serial_to_index = convert_serial_to_index(qm_atoms)

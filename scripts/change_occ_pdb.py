@@ -2,7 +2,7 @@
 
 import sys
 import argparse
-from utils import read_qm_and_link_atoms
+from utils import read_syst1
 
 
 def parse_and_update(occupancy, infile, outfile, atoms=None, residues=None):
@@ -27,7 +27,7 @@ def read_residues(infile):
     return residues
 
 
-def parse_args(args):
+def parse_args():
     parser = argparse.ArgumentParser(
         description='Rudimentary script that changes occupancies in a PDB file based on either a syst1 file or a list of residues (columns 17-26 in the PDB file are used as identifiers).'
     )
@@ -37,15 +37,15 @@ def parse_args(args):
     group.add_argument('-s', '--syst1', type=str, help='name of the syst1 file')
     group.add_argument('-r', '--residues', type=str, help='name of the residue file')
     parser.add_argument('-v', '--version', action="version", version="%(prog)s 0.0.1")
-    return parser.parse_args(args)
+    return parser.parse_args()
 
-def main(args):
+def main():
     args = parse_args(args)
     occupancy = '{:.2f}'.format(round(float(args.occupancy), 2))
     atoms = None
     residues = None
     if args.syst1 is not None:
-        atoms, _ = read_qm_and_link_atoms(args.syst1)
+        atoms, _ = read_syst1(args.syst1)
         outfile = args.pdb[:-4] + '_' + args.syst1 + '_' + occupancy + args.pdb[-4:]
     elif args.residues is not None:
         residues = read_residues(args.residues)
@@ -53,4 +53,4 @@ def main(args):
     parse_and_update(occupancy, args.pdb, outfile, atoms=atoms, residues=residues)
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

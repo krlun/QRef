@@ -6,14 +6,13 @@ import argparse
 import json
 import subprocess
 
-import numpy as np
-
 from iotbx.data_manager import DataManager
-from cctbx.array_family import flex
 
-from utils import parse_atoms_line
-from utils import read_qm_and_link_atoms
+from utils import apply_transforms
+from utils import read_syst1
 from utils import read_junc_factors
+from utils import select_qm_model
+from utils import write_pdb_h
 
 
 def identify_link_pairs(model, link_atoms, serial_to_index):
@@ -65,38 +64,6 @@ def restore_serial_in_model(model, serial_to_index):
     atoms = model.get_hierarchy().atoms()
     width = 5
     for atom in atoms: atom.serial = str(index_to_serial[int(atom.serial) - 1]).rjust(width)
-
-
-def select_qm_model(model, qm):
-    hierarchy = model.get_hierarchy()
-    sel = flex.bool(hierarchy.atoms_size())
-    for atom in qm:
-        sel[atom-1] = True
-    return model.select(sel)
-
-
-def apply_transforms(model, transforms, serial_to_index):
-    for transform in transforms:
-        R = np.array(transform['R'])
-        t = np.array(transform['t'])
-        atoms_model = model.get_hierarchy().atoms()
-        for atom in parse_atoms_line(transform['atoms']):
-            atoms_model[serial_to_index[atom]].xyz = np.matmul(R, atoms_model[serial_to_index[atom]].xyz) + t
-
-
-def write_pdb_h(outfile, model, link_pairs, g, serial_to_index):
-    hierarchy = model.get_hierarchy()
-    atoms = hierarchy.atoms()
-    for atom in atoms:
-        atom_serial = int(atom.serial.strip())
-        if atom.element_is_hydrogen() or atom_serial in link_pairs.keys():
-            atom.element = ' H'
-        if atom_serial in link_pairs.keys():
-            c_qm = atoms[serial_to_index[link_pairs[atom_serial]]]
-            atom.xyz = (c_qm.xyz[0] + g[atom_serial]*(atom.xyz[0] - c_qm.xyz[0]), 
-                c_qm.xyz[1] + g[atom_serial]*(atom.xyz[1] - c_qm.xyz[1]),
-                c_qm.xyz[2] + g[atom_serial]*(atom.xyz[2] - c_qm.xyz[2]))
-    hierarchy.write_pdb_file(file_name=outfile, crystal_symmetry=model.crystal_symmetry())
 
 
 def suggest_selection_string(model):
@@ -152,7 +119,7 @@ def locate_binary(binary):
     return binary if len(out) < len(binary) else out.rstrip()
 
 
-def parse_args(args):
+def parse_args():
     parser = argparse.ArgumentParser(
         description='Prepares for quantum refinement by extracting the QM system(s) as well as saving a settings file (qref.dat).'
     )
@@ -167,14 +134,14 @@ def parse_args(args):
     parser.add_argument('-rd', '--restraint_distance', nargs=5, action='append', type=str, help='if specified applies a harmonic (bond) distance restraint according to \'i atom1_serial atom2_serial desired_distance force_constant\'')
     parser.add_argument('-ra', '--restraint_angle', nargs=6, action='append', type=str, help='if specified applies a harmonic (bond) angle restraint according to \'i atom1_serial atom2_serial atom3_serial desired_angle force_constant\'')
     parser.add_argument('-t', '--transform', nargs=14, action='append', type=str, help='if specified applies the specified transformations according to \'i \"atoms\" R t\', where the matrix R should be given in row-wise order')
-    parser.add_argument('-v', '--version', action="version", version="%(prog)s 0.2.0")
-    return parser.parse_args(args)
+    parser.add_argument('-v', '--version', action="version", version="%(prog)s 0.3.0")
+    return parser.parse_args()
 
 
-def main(args):
+def main():
     print('*** This is qref_prep.py ***')
     print
-    args = parse_args(args)
+    args = parse_args()
     model_file = args.pdb
     syst1_files = args.syst1
     junc_factor_file = args.junctfactor
@@ -196,7 +163,7 @@ def main(args):
         print(syst1.center(10))
         print('----------')
         print
-        qm_atoms, link_atoms = read_qm_and_link_atoms(syst1)
+        qm_atoms, link_atoms = read_syst1(syst1)
         serial_to_index = convert_serial_to_index(qm_atoms)
         model_mm1 = select_qm_model(model=model_mm, qm=qm_atoms)
         model_mm1.process(pdb_interpretation_params=model_mm1.get_current_pdb_interpretation_params(), make_restraints=True)
@@ -254,7 +221,10 @@ def main(args):
         write_dat(dat)
 
     if args.restart is not None:
+        print
         print('Writing file:  ' + args.restart)
+        print
+        print('----------')
         prepare_restart(model_file, args.restart)
 
     # cleanup
@@ -265,4 +235,4 @@ def main(args):
 
 
 if (__name__ == "__main__"):
-    main(sys.argv[1:])
+    main()

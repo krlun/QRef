@@ -176,5 +176,5 @@ When using ORCA/6.0.0 either manually run (before you submit your job) or add to
 - Turn QRef into a proper restraint_manager class.
 
 ## Citation
-Lundgren, K. J., Caldararu, O., Oksanen, E., & Ryde, U. (2024). Quantum refinement in real and reciprocal space using the *Phenix* and *ORCA* software. IUCrJ, **11**(6).  
+Lundgren, K. J. M., Caldararu, O., Oksanen, E., & Ryde, U. (2024). "Quantum refinement in real and reciprocal space using the *Phenix* and *ORCA* software", IUCrJ, **11**(6), 921-937.  
 [doi.org/10.1107/S2052252524008406](https://doi.org/10.1107/S2052252524008406)
