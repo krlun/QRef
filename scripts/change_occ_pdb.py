@@ -40,7 +40,7 @@ def parse_args():
     return parser.parse_args()
 
 def main():
-    args = parse_args(args)
+    args = parse_args()
     occupancy = '{:.2f}'.format(round(float(args.occupancy), 2))
     atoms = None
     residues = None

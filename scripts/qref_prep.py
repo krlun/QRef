@@ -95,7 +95,7 @@ def check_altlocs(model):
         if altlocs[0] == ' ': altlocs[0] = '<blank>'
         print('Warning, multiple altlocs for subsystem found:  ' + ', '.join(altlocs))
     elif altlocs[0] != ' ':
-        print('Altloc:  \"and altloc ' + altlocs[0]) + '\"'
+        print('Altloc:  \"and altloc ' + altlocs[0] + '\"')
 
 
 def write_dat(dat):
