@@ -286,8 +286,8 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
         write_pdb_h(qm_file, model_mm1, link_pairs=link_pairs, g=g, serial_to_index=serial_to_index)
 
         # run orca
-        orca_string = dat['orca_binary'] + ' qm_' + str(index) + '.inp > qm_' + str(index) + '.out'
-        os.system(orca_string)
+        subprocess.check_call([dat['orca_binary'], 'qm_' + str(index) + '.inp'],
+            stdout=open('qm_' + str(index) + '.out', 'w'), stderr=subprocess.STDOUT)
 
         # read results from orca
         qmengrad = 'qm_' + str(index) + '.engrad'
