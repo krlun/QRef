@@ -156,7 +156,7 @@ def logging(index, w_qm, qm_energy, mm_energy, mm1_energy):
         else:
             iter = str(int(log[-1].split()[0]) + 1)
         line += iter.rjust(iter_width)
-        if subprocess.call(['grep', '-q', 'ORCA TERMINATED NORMALLY', 'qm_' + str(index) + '.out'], shell=False) != 0:
+        if not any('ORCA TERMINATED NORMALLY' in out_line for out_line in open('qm_' + str(index) + '.out')):
             line += 'Failed'.rjust(width)
         else:
             # line += '{:.12f}'.format(round(qm_energy, 12)).rjust(width)
