@@ -19,15 +19,20 @@ def identify_link_pairs(model, link_atoms, serial_to_index):
     link_pairs = dict()
     hierarchy = model.get_hierarchy()
     atoms = hierarchy.atoms()
+    bond_params_table = model.restraints_manager.geometry.bond_params_table
     for link in link_atoms:
         min_distance = float('inf')
+        closest = None
         link_atom = atoms[serial_to_index[link]]
         for atom in atoms:
-            if atom != link_atom and atom.element.strip() == 'C':
+            serial = int(atom.serial.strip())
+            if serial != link and bond_params_table.lookup(serial_to_index[link], serial_to_index[serial]) is not None:
                 distance = atom.distance(link_atom)
                 if distance < min_distance:
-                    closest = int(atom.serial.strip())
+                    closest = serial
                     min_distance = distance
+        if closest is None:
+            raise SystemExit('No atom bonded to link atom ' + str(link) + ' in the QM system. Exiting...')
         link_pairs[link] = closest
     return link_pairs
 
@@ -38,7 +43,7 @@ def calculate_g_factor(model, link_pairs, junc_factors, ltype, serial_to_index):
     for key, value in link_pairs.items():
         c_qm = atoms[serial_to_index[value]]
         link_atom = atoms[serial_to_index[key]]
-        resname = link_atom.parent().resname
+        resname = link_atom.parent().resname.strip()
         bond = '-'.join([c_qm.name.strip(), link_atom.name.strip()])
         if resname not in junc_factors.keys():
             raise SystemExit(resname + ' missing in junction factor file. Exiting...')

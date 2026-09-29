@@ -532,3 +532,5 @@ VAL CB CA     HC  # Val CB-CA junction
 12   0.9819d0     # TPSS/def2-SV(P), Erik H, 9/11-16
 
 
+DG  N9   C1'  H1  # DG N9-C1' junction
+12   1.0190d0     # Guanin, C1, TPSS-D4/RI, def2-SV(P), UR 12/6-26

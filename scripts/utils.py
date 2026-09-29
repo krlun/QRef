@@ -49,8 +49,8 @@ def read_junc_factors(junc_factor_file):
             line = re.split(delimiters, line)[0].strip()
             if len(line) > 0:
                 line = line.split()
-                res = line[0]
-                if len(res) == 3:
+                if len(line) == 4:
+                    res = line[0]
                     if res not in junc_factors.keys():
                         junc_factors[res] = dict()
                     # bond = '-'.join(sorted(line[1:3]))
@@ -95,4 +95,3 @@ def write_pdb_h(outfile, model, link_pairs, g, serial_to_index):
                 c_qm.xyz[1] + g[atom_serial]*(atom.xyz[1] - c_qm.xyz[1]),
                 c_qm.xyz[2] + g[atom_serial]*(atom.xyz[2] - c_qm.xyz[2]))
     hierarchy.write_pdb_file(file_name=outfile, crystal_symmetry=model.crystal_symmetry(), anisou=False)
-    
