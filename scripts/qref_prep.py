@@ -1,5 +1,7 @@
 #!/Applications/phenix-1.21.2-5419/build/bin/cctbx.python
 
+from __future__ import absolute_import, division, print_function
+
 import os
 import sys
 import argparse
@@ -80,15 +82,15 @@ def suggest_selection_string(model):
             selection_string += 'resseq ' + residue.resseq.strip() + ' or '
         selection_string = selection_string[:-4] + ') and chain ' + chain.id + ') or ('
     selection_string = selection_string[:-5]
-    print
+    print()
     print('Suggested selection string (reciprocal space):')
-    print
+    print()
     print('\"' + selection_string + '\"')
-    print
+    print()
     print('Suggested selection string (real space):')
-    print
+    print()
     print('\"all and not (' + selection_string + ')\"')
-    print
+    print()
 
 
 def check_altlocs(model):
@@ -121,7 +123,10 @@ def prepare_restart(infile, outfile):
 def locate_binary(binary):
     proc = subprocess.Popen(['which', binary], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
     (out, err) = proc.communicate()
-    return binary if len(out) < len(binary) else out.rstrip()
+    if not isinstance(out, str):    # bytes under python 3, already str under 2
+        out = out.decode()
+    out = out.rstrip()
+    return out if out else binary
 
 
 def parse_args():
@@ -145,7 +150,7 @@ def parse_args():
 
 def main():
     print('*** This is qref_prep.py ***')
-    print
+    print()
     args = parse_args()
     model_file = args.pdb
     syst1_files = args.syst1
@@ -167,7 +172,7 @@ def main():
         print('----------')
         print(syst1.center(10))
         print('----------')
-        print
+        print()
         qm_atoms, link_atoms = read_syst1(syst1)
         serial_to_index = convert_serial_to_index(qm_atoms)
         model_mm1 = select_qm_model(model=model_mm, qm=qm_atoms)
@@ -219,16 +224,16 @@ def main():
         dat['ltype'] = ltype
         dat['syst1_files'] = args.syst1
         print('----------')
-        print
+        print()
         print('Writing file:  qref.dat')
-        print
+        print()
         print('----------')
         write_dat(dat)
 
     if args.restart is not None:
-        print
+        print()
         print('Writing file:  ' + args.restart)
-        print
+        print()
         print('----------')
         prepare_restart(model_file, args.restart)
 

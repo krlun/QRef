@@ -1,5 +1,7 @@
 #!/Applications/phenix-1.21.2-5419/build/bin/cctbx.python
 
+from __future__ import absolute_import, division, print_function
+
 import argparse
 import os
 import shutil
@@ -65,7 +67,7 @@ def main():
     dm.process_model_file(model_file)
     model_mm = dm.get_model(filename=model_file)
     print('----------')
-    print
+    print()
     for index, syst1 in enumerate(dat['syst1_files'], 1):
         qm_atoms, link_atoms = read_syst1(syst1)
         serial_to_index = {value: key for key, value in dict(enumerate(sorted(qm_atoms))).items()}
@@ -82,7 +84,7 @@ def main():
         shutil.copy(qm_inp_file, geo_opt_dir)
         shutil.copy('qm_' + str(index) + '.gbw', geo_opt_dir + '/qm.gbw')
         modify_qm_input(geo_opt_dir + '/' + qm_inp_file, sorted(link_atoms), serial_to_index)
-    print
+    print()
     print('----------')
 
 
