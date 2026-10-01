@@ -170,8 +170,8 @@ def logging(index, w_qm, qm_energy, mm_energy, mm1_energy):
     return
 
 
-def read_dat():
-    with open('qref.dat', 'r') as file:
+def read_dat(infile):
+    with open(infile, 'r') as file:
         dat = json.load(file, object_hook=lambda d: {int(key) if key.isdigit() else key: value for key, value in d.items()})
     return dat
 
@@ -229,7 +229,7 @@ def rotate_gradients(gradients, transforms, serial_to_index):
 
 
 def run(sites_cart, mm_gradients, mm_residual_sum):
-    dat = read_dat()
+    dat = read_dat('qref.dat')
 
     if not len(sites_cart) == dat['n_atoms']:
         return mm_gradients, mm_residual_sum
