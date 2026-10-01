@@ -1,5 +1,5 @@
 # QRef
-`QRef` is a plugin for the crystallographic software suite `Phenix` enabling what in the literature commonly is referred to as "quantum refinement" (QR) in both real and reciprocal space, utilising the (for academic users) free software Orca as the quantum chemistry engine. This first version of `QRef` using `Phenix` was implemented under the paradigm "correctness and completeness first, performance and adherence to coding standards later".
+`QRef` is a plugin for the macromolecular software suite `Phenix` enabling what in the literature commonly is referred to as "quantum refinement" (QR) in both real and reciprocal space, utilising the (for academic users) free software Orca as the quantum chemistry engine. This first version of `QRef` using `Phenix` was implemented under the paradigm "correctness and completeness first, performance and adherence to coding standards later".
 
 ## Theory
 Refinement of macromolecules in both real and and reciprocal space relies on previous knowledge (i.e. a Bayesian prior) for the structure. This is usually encoded as a (pseudo-energy) penalty term, $E_{restraints}(\mathbf{R})$, giving rise to a target function for the refinement with the general appearance
@@ -36,38 +36,41 @@ where $J(\mathbf{R_{syst1,i}}; \mathbf{R})$ is the Jacobian between $\mathbf{R_{
 ```
 
 ## Installation
-### Modules
-The directory `modules` should be placed under `$PHENIX`; `qref` will thus be a new directory under `modules`, whereas the user should manually overwrite `energies.py` in `modules/cctbx_project/cctbx/geometry_restraints` and `model.py` in `modules/cctbx_project/mmtbx/model`, respectively, with the version of the file corresponding to their installation of `Phenix`.
+### Installer
+`install.py` installs `QRef` into the installation of `Phenix` given by `$PHENIX`:<br>
 
-There is a commented out guard clause in `energies.py`:<br>
+    source /path/to/phenix/phenix_env.sh
+    ./install.py
 
-    # if not os.path.exists('qm.lock') and (os.path.exists('xyz_reciprocal.lock') or os.path.exists('xyz.lock')):
+The `qref` module is copied into that installation, and `energies.py` in `cctbx` and `model.py` in `mmtbx` are modified so that `QRef` is called during refinement. Each modified file is backed up as `<file>.qref-orig`; `./install.py --dry-run` lists the changes without making them and `./install.py --uninstall` reverses the installation.
 
-This is the recommended way to use the quantum restraints, as they are not always needed. In order to make this work one has to edit the file `$PHENIX/modules/phenix/phenix/refinement/xyz_reciprocal_space.py` and `import os` as well as surround the call to `mmtbx.refinement.minimization.lbfgs(...)` in the method `run_lbfgs` in the class `run_all` with<br>
+`--phenix DIR` installs into `DIR` instead of `$PHENIX`, which is useful when more than one version of `Phenix` is present. `--source DIR` installs from the `QRef` directory `DIR` instead of the one `install.py` itself is in. `--link` makes the installation import `qref` from the `QRef` directory rather than copying it, so that several installations can share one copy of `QRef`.
 
-    with open('xyz_reciprocal.lock', 'w'):
-        pass
+A file that is already patched is left alone, so running `install.py` again reports what it skipped and changes nothing. `--force` patches it again, starting over from the `.qref-orig` backup.
 
-and
+`QRef` has been verified to work with `Phenix` versions 1.20.1-4487, 1.21-5207, 1.21.1-5286, 1.21.2-5419, 2.0-5936, 2.1-6084 and 2.2.1-6174.
 
-    os.remove('xyz_reciprocal.lock')
+### Guard clause
+`QRef` is only needed while coordinates are being refined. To restrict it to that, `install.py` also modifies<br>
 
-Likewise the file `$PHENIX/modules/phenix/phenix/refinement/macro_cycle_real_space.py` should be edited in a similar manner, i.e. with an added `import os` as well as surrounding the calls to `self.minimization_no_ncs()` and `self.minimization_ncs()` in the method `refine_xyz` in the class `run` with<br>
+    $PHENIX/.../phenix/refinement/xyz_reciprocal_space.py
+    $PHENIX/.../phenix/refinement/macro_cycle_real_space.py
 
-    with open('xyz.lock', 'w'):
-      pass
-
-and
-
-    os.remove('xyz.lock')
-
-This implementation of `QRef` has been verified to work with `Phenix` versions 1.20.1-4487, 1.21-5207, 1.21.1-5286 as well as 1.21.2-5419.
+so that a lock file exists while coordinates are refined, and `QRef` runs only when it does. Use `--phenix-edits report` to print these modifications and make them by hand instead, or `--guard always` to leave the two files untouched, at the cost of running QM calculations outside coordinate refinement as well.
 
 ### Scripts
-The scripts in the folder `scripts` should be placed somewhere accessible by `$PATH`. The shebang in the scripts might need to be updated to point towards wherever `cctbx.python` is located.
+
+    ./install.py --scripts ~/bin --templates ~/qref
+
+installs the scripts into a directory of your choice, which should be on `$PATH`. `--templates` copies `junctfactor` and `qm_1.inp`.
+
+Per default, the supporting scripts run under whichever installation of `Phenix` is sourced when they are called. A pinned version of `cctbx.python` can be specified through `--pin-shebang`, so that they run without `phenix_env.sh` having been sourced.
+
+### Shifted models
+`phenix.real_space_refine` does not shift the model back to the original coordinate frame when `pdb_interpretation.sort_atoms = False`. `--shift-hint` makes `phenix.real_space_refine` print the `phenix.pdbtools translate=` command at the end of refinement (can be found in the .log file), which can then be used to correct the output model.
 
 ### Orca
-`Orca` can be found at [orcaforum.kofo.mpg.de](https://orcaforum.kofo.mpg.de) - follow their guide for installation. QRef has been verified to work with `Orca` versions 5.0.4, 6.0.0 and 6.1.0.
+`Orca` can be found at [orcaforum.kofo.mpg.de](https://orcaforum.kofo.mpg.de) - follow their guide for installation. QRef has been verified to work with `Orca` versions 5.0.4, 6.0.0, 6.1.0 and 6.1.1.
 
 ## Usage
 The general procedure to set up a quantum refinement job consists of

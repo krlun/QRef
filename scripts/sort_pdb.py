@@ -1,4 +1,4 @@
-#!/Applications/phenix-1.20.1-4487/build/bin/cctbx.python
+#!/usr/bin/env cctbx.python
 
 import sys, os
 import mmtbx.model

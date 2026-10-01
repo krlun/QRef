@@ -1,4 +1,4 @@
-#!/opt/homebrew/Caskroom/miniconda/base/bin/python
+#!/usr/bin/env cctbx.python
 
 import sys
 import argparse

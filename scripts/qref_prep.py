@@ -1,4 +1,4 @@
-#!/Applications/phenix-1.21.2-5419/build/bin/cctbx.python
+#!/usr/bin/env cctbx.python
 
 from __future__ import absolute_import, division, print_function
 
