@@ -1,2 +1,9 @@
 *.pyc
 .DS_Store
+
+# QRef run artefacts
+qm.lock
+xyz.lock
+xyz_reciprocal.lock
+settings.pickle
+qref_*.log
