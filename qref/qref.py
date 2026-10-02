@@ -166,6 +166,40 @@ def rotate_gradients(gradients, transforms, serial_to_index):
     return gradients
 
 
+class Region(object):
+    """One syst1 definition: its atoms, its junctions and the files named after it."""
+
+    def __init__(self, index, syst1, dat):
+        self.index = index
+        self.qm_atoms, self.link_atoms = read_syst1(syst1)
+        self.serial_to_index = convert_serial_to_index(self.qm_atoms)
+        self.link_pairs = dat[syst1]['link_pairs']
+        self.g = dat[syst1]['g']
+        self.transforms = dat[syst1]['transforms']
+        self.restraints_distance = dat[syst1]['restraints_distance']
+        self.restraints_angle = dat[syst1]['restraints_angle']
+
+    @property
+    def mm1_file(self):
+        return 'mm_%d_c.pdb' % self.index
+
+    @property
+    def qm_file(self):
+        return 'qm_%d_h.pdb' % self.index
+
+    @property
+    def input_file(self):
+        return 'qm_%d.inp' % self.index
+
+    @property
+    def output_file(self):
+        return 'qm_%d.out' % self.index
+
+    @property
+    def engrad_file(self):
+        return 'qm_%d.engrad' % self.index
+
+
 def run(sites_cart, mm_gradients, mm_residual_sum):
     dat = read_dat('qref.dat')
 
@@ -185,22 +219,16 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
     
     # loop over all the definitions of syst1 and process (order matters)
     for index, syst1 in enumerate(dat['syst1_files'], 1):
-        # read syst1 file, which containts QM system + link atoms
-        qm_atoms, link_atoms = read_syst1(syst1)
-
-        # construct a dict {serial:index} for the indices of the link atoms in the qm system
-        serial_to_index = convert_serial_to_index(qm_atoms)
+        region = Region(index, syst1, dat)
 
         # at this point we need a model object for syst1 :( but we have sites_cart for model_real
-        mm1_file = 'mm_' + str(index) + '_c.pdb'
-        qm_file = 'qm_' + str(index) + '_h.pdb'
-        update_file_coordinates(infile=mm1_file, sites_cart=sites_cart)
+        update_file_coordinates(infile=region.mm1_file, sites_cart=sites_cart)
         dm = DataManager()
         if dat['cif'] is not None:
             for cif in dat['cif']:
                 dm.process_restraint_file(str(cif))
-        dm.process_model_file(mm1_file)
-        model_mm1 = dm.get_model(filename=mm1_file)
+        dm.process_model_file(region.mm1_file)
+        model_mm1 = dm.get_model(filename=region.mm1_file)
 
         # calculate mm gradients and target for model system
         with open('settings.pickle', 'rb') as file:
@@ -213,39 +241,35 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
         model_mm1_residuals.gradients = model_mm1_residuals.gradients*(1.0/model_mm1_residuals.normalization_factor)
 
         # restore original serial to model object; this needs to come after model_mm1.process()
-        restore_serial_in_model(model_mm1, serial_to_index)
-
-        # read link_pairs and g
-        link_pairs = dat[syst1]['link_pairs']
-        g = dat[syst1]['g']
+        restore_serial_in_model(model_mm1, region.serial_to_index)
 
         # prepare for orca, transform model_mm1 if necessary
-        apply_transforms(model_mm1, dat[syst1]['transforms'], serial_to_index)
-        write_pdb_h(qm_file, model_mm1, link_pairs=link_pairs, g=g, serial_to_index=serial_to_index)
+        apply_transforms(model_mm1, region.transforms, region.serial_to_index)
+        write_pdb_h(region.qm_file, model_mm1, link_pairs=region.link_pairs,
+            g=region.g, serial_to_index=region.serial_to_index)
 
         # run orca
-        subprocess.check_call([dat['orca_binary'], 'qm_' + str(index) + '.inp'],
-            stdout=open('qm_' + str(index) + '.out', 'w'), stderr=subprocess.STDOUT)
+        subprocess.check_call([dat['orca_binary'], region.input_file],
+            stdout=open(region.output_file, 'w'), stderr=subprocess.STDOUT)
 
         # read results from orca
-        qmengrad = 'qm_' + str(index) + '.engrad'
-        qm_energy, qm_gradients = read_energy_and_gradient_from_orca(qmengrad)
+        qm_energy, qm_gradients = read_energy_and_gradient_from_orca(region.engrad_file)
 
         # rescale qm gradients
         qm_gradients = rescale_qm_gradients(qm_gradients, dat['w_qm']*harkcal/bohrang)
 
         # rotate gradients back if needed
-        qm_gradients = rotate_gradients(qm_gradients, dat[syst1]['transforms'], serial_to_index)
+        qm_gradients = rotate_gradients(qm_gradients, region.transforms, region.serial_to_index)
 
         # update target
         target = target - model_mm1_residuals.target + dat['w_qm']*harkcal*qm_energy
 
         # update gradient (QM/MM)
-        total_gradient = calculate_total_gradient(qm_gradients, model_mm1_residuals.gradients, total_gradient, qm_atoms, g, link_pairs, serial_to_index)
+        total_gradient = calculate_total_gradient(qm_gradients, model_mm1_residuals.gradients, total_gradient, region.qm_atoms, region.g, region.link_pairs, region.serial_to_index)
 
         # update gradient (restraints)
-        total_gradient, target = apply_restraints_distance(sites_cart, total_gradient, target, dat[syst1]['restraints_distance'])
-        total_gradient, target = apply_restraints_angle(sites_cart, total_gradient, target, dat[syst1]['restraints_angle'])
+        total_gradient, target = apply_restraints_distance(sites_cart, total_gradient, target, region.restraints_distance)
+        total_gradient, target = apply_restraints_angle(sites_cart, total_gradient, target, region.restraints_angle)
 
         # perform logging
         logging(index=index, w_qm=dat['w_qm'], qm_energy=qm_energy, mm_energy=mm_residual_sum, mm1_energy=model_mm1_residuals.target)

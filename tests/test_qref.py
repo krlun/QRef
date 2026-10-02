@@ -82,3 +82,27 @@ def test_gradient_matches_finite_difference(prepared, serial, axis):
     assert analytic == pytest.approx(numeric, rel=TOLERANCE), (
         f'atom {serial} axis {axis}: gradient {analytic:.8f}, '
         f'finite difference {numeric:.8f}')
+
+
+def test_restart_file_follows_the_coordinates(prepared):
+    """run() rewrites the restart file from sites_cart, to three decimals."""
+    name, model = prepared
+    with open('qref.dat') as handle:
+        restart = json.load(handle)['restart']
+    if restart is None:
+        pytest.skip(f'{name} has no restart file')
+
+    serial, axis = 4555, 0
+    sites_cart = moved(serial, axis, model.get_sites_cart(), +0.5)
+    contribution(model, sites_cart)
+
+    with open(restart) as handle:
+        for line in handle:
+            if line[0:6].strip() in ('ATOM', 'HETATM') \
+                    and int(line[6:11]) == serial:
+                written = [float(line[30:38]), float(line[38:46]),
+                           float(line[46:54])]
+                break
+        else:
+            raise AssertionError(f'serial {serial} not in {restart}')
+    assert written == pytest.approx(list(sites_cart[serial - 1]), abs=5e-4)
