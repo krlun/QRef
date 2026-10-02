@@ -1,43 +1,35 @@
-import re
-import json
+"""Support code for the scripts.
 
-import numpy as np
+Everything the scripts share with the QRef interface lives in qref/common.py
+and is re-exported here, so that there is one definition of it. The qref module
+is found either because it is installed in the installation of Phenix being
+used, or, when a script is run from the QRef directory, beside the script.
+"""
+from __future__ import absolute_import, division, print_function
+
+import os
+import re
+import sys
 
 from cctbx.array_family import flex
 
+try:
+    import qref
+except ImportError:
+    root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    if not os.path.isfile(os.path.join(root, 'qref', '__init__.py')):
+        raise SystemExit('Cannot find the qref module. Install QRef with '
+                         'install.py, or run the script from the QRef '
+                         'directory. Exiting...')
+    sys.path.insert(0, root)
 
-def apply_transforms(model, transforms, serial_to_index):
-    for transform in transforms:
-        R = np.array(transform['R'])
-        t = np.array(transform['t'])
-        atoms_model = model.get_hierarchy().atoms()
-        for atom in parse_atoms_line(transform['atoms']):
-            atoms_model[serial_to_index[atom]].xyz = np.matmul(R, atoms_model[serial_to_index[atom]].xyz) + t
-
-
-def parse_atoms_line(line):
-    comments = '[#!]'
-    delimiters = '[^,\\s]+'
-    atoms = set()
-    line = re.findall(delimiters, re.split(comments, line)[0])
-    for interval in line:
-        interval = [int(x) for x in interval.split('-')]
-        for i in range(min(interval), max(interval) + 1):
-            atoms.add(i)
-    return atoms
-
-
-def read_syst1(infile):
-    qm_atoms = set()
-    link_atoms = set()
-    with open(infile, 'r') as file:
-        line = file.readline()
-        while line:
-            atoms = parse_atoms_line(line)
-            for atom in atoms:
-                link_atoms.add(atom) if atom in qm_atoms else qm_atoms.add(atom)
-            line = file.readline()
-    return qm_atoms, link_atoms
+from qref.common import apply_transforms
+from qref.common import convert_serial_to_index
+from qref.common import parse_atoms_line
+from qref.common import read_dat
+from qref.common import read_syst1
+from qref.common import restore_serial_in_model
+from qref.common import write_pdb_h
 
 
 def read_junc_factors(junc_factor_file):
@@ -68,30 +60,9 @@ def read_junc_factors(junc_factor_file):
     return junc_factors
 
 
-def read_dat(infile):
-    with open(infile, 'r') as file:
-        dat = json.load(file, object_hook=lambda d: {int(key) if key.isdigit() else key: value for key, value in d.items()})
-    return dat
-
-
 def select_qm_model(model, qm):
     hierarchy = model.get_hierarchy()
     sel = flex.bool(hierarchy.atoms_size())
     for atom in qm:
         sel[atom-1] = True
     return model.select(sel)
-
-
-def write_pdb_h(outfile, model, link_pairs, g, serial_to_index):
-    hierarchy = model.get_hierarchy()
-    atoms = hierarchy.atoms()
-    for atom in atoms:
-        atom_serial = int(atom.serial.strip())
-        if atom.element_is_hydrogen() or atom_serial in link_pairs.keys():
-            atom.element = ' H'
-        if atom_serial in link_pairs.keys():
-            c_qm = atoms[serial_to_index[link_pairs[atom_serial]]]
-            atom.xyz = (c_qm.xyz[0] + g[atom_serial]*(atom.xyz[0] - c_qm.xyz[0]), 
-                c_qm.xyz[1] + g[atom_serial]*(atom.xyz[1] - c_qm.xyz[1]),
-                c_qm.xyz[2] + g[atom_serial]*(atom.xyz[2] - c_qm.xyz[2]))
-    hierarchy.write_pdb_file(file_name=outfile, crystal_symmetry=model.crystal_symmetry(), anisou=False)

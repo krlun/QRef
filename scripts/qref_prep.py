@@ -11,8 +11,10 @@ import subprocess
 from iotbx.data_manager import DataManager
 
 from utils import apply_transforms
+from utils import convert_serial_to_index
 from utils import read_syst1
 from utils import read_junc_factors
+from utils import restore_serial_in_model
 from utils import select_qm_model
 from utils import write_pdb_h
 
@@ -56,21 +58,6 @@ def calculate_g_factor(model, link_pairs, junc_factors, ltype, serial_to_index):
         c_h_ideal = junc_factors[resname][bond][ltype] # eg. print(junc_factors['PHE']['CB-CG'][12])
         g[key] = c_h_ideal/model.restraints_manager.geometry.bond_params_table.lookup(serial_to_index[key], serial_to_index[value]).distance_ideal
     return g
-
-
-def convert_serial_to_index(qm):
-    qm_sorted = sorted(qm)
-    indices = dict()
-    for i in range(len(qm_sorted)):
-        indices[qm_sorted[i]] = i
-    return indices
-
-
-def restore_serial_in_model(model, serial_to_index):
-    index_to_serial = {value: key for key, value in serial_to_index.items()}
-    atoms = model.get_hierarchy().atoms()
-    width = 5
-    for atom in atoms: atom.serial = str(index_to_serial[int(atom.serial) - 1]).rjust(width)
 
 
 def suggest_selection_string(model):

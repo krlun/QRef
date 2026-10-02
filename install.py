@@ -741,8 +741,14 @@ def remove_recorded(report, records, directory):
             report.entry(name, 'would remove')
         else:
             os.remove(record['path'])
+            drop_pycache(record['path'])    # left behind by running the script
             report.entry(name, 'removed')
-    if not os.path.isdir(directory) or os.listdir(directory):
+    if not os.path.isdir(directory):
+        return
+    cache = os.path.join(directory, '__pycache__')
+    if os.path.isdir(cache) and not os.listdir(cache) and not report.dry_run:
+        os.rmdir(cache)
+    if os.listdir(directory):
         return
     if report.dry_run:
         report.line('    directory would be left empty')

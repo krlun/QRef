@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import absolute_import, division
 import os
 import sys
 import subprocess
@@ -10,57 +10,17 @@ import numpy as np
 
 from iotbx.data_manager import DataManager
 
+from qref.common import apply_transforms
+from qref.common import convert_serial_to_index
+from qref.common import parse_atoms_line
+from qref.common import read_dat
+from qref.common import read_syst1
+from qref.common import restore_serial_in_model
+from qref.common import write_pdb_h
+
 harkcal = 627.509474063112
 harkJ = 2625.499639479950
 bohrang = 0.529177249
-
-
-def parse_atoms_line(line):
-    comments = '[#!]'
-    delimiters = '[^,\\s]+'
-    atoms = set()
-    line = re.findall(delimiters, re.split(comments, line)[0])
-    for interval in line:
-        interval = [int(x) for x in interval.split('-')]
-        for i in range(min(interval), max(interval) + 1):
-            atoms.add(i)
-    return atoms
-
-
-def read_syst1(infile):
-    qm_atoms = set()
-    link_atoms = set()
-    with open(infile, 'r') as file:
-        line = file.readline()
-        while line:
-            atoms = parse_atoms_line(line)
-            for atom in atoms:
-                link_atoms.add(atom) if atom in qm_atoms else qm_atoms.add(atom)
-            line = file.readline()
-    return qm_atoms, link_atoms
-
-
-def convert_serial_to_index(qm):
-    qm_sorted = sorted(qm)
-    indices = dict()
-    for i in range(len(qm_sorted)):
-        indices[qm_sorted[i]] = i
-    return indices
-
-
-def write_pdb_h(outfile, model, link_pairs, g, serial_to_index):
-    hierarchy = model.get_hierarchy()
-    atoms = hierarchy.atoms()
-    for atom in atoms:
-        atom_serial = int(atom.serial.strip())
-        if atom.element_is_hydrogen() or atom_serial in link_pairs.keys():
-            atom.element = ' H'
-        if atom_serial in link_pairs.keys():
-            c_qm = atoms[serial_to_index[link_pairs[atom_serial]]]
-            atom.xyz = (c_qm.xyz[0] + g[atom_serial]*(atom.xyz[0] - c_qm.xyz[0]), 
-                c_qm.xyz[1] + g[atom_serial]*(atom.xyz[1] - c_qm.xyz[1]),
-                c_qm.xyz[2] + g[atom_serial]*(atom.xyz[2] - c_qm.xyz[2]))
-    hierarchy.write_pdb_file(file_name=outfile, crystal_symmetry=model.crystal_symmetry(), anisou=False)
 
 
 def read_energy_and_gradient_from_orca(infile):
@@ -117,13 +77,6 @@ def update_file_coordinates(infile, sites_cart):
             file.write(line)
 
 
-def restore_serial_in_model(model, serial_to_index):
-    index_to_serial = {value: key for key, value in serial_to_index.items()}
-    atoms = model.get_hierarchy().atoms()
-    width = 5
-    for atom in atoms: atom.serial = str(index_to_serial[int(atom.serial) - 1]).rjust(width)
-
-
 def logging(index, w_qm, qm_energy, mm_energy, mm1_energy):
     logfile = 'qref_' + str(index) + '.log'
     # macro_cycle_width = 12
@@ -170,12 +123,6 @@ def logging(index, w_qm, qm_energy, mm_energy, mm1_energy):
     return
 
 
-def read_dat(infile):
-    with open(infile, 'r') as file:
-        dat = json.load(file, object_hook=lambda d: {int(key) if key.isdigit() else key: value for key, value in d.items()})
-    return dat
-
-
 def apply_restraints_distance(sites_cart, gradients, target, restraints):
     # restraint[0] = atom1_serial, restraint[1] = atom2_serial, restraint[2] = desired distance in Angstrom, restraint[3] = force constant
     for restraint in restraints:
@@ -209,15 +156,6 @@ def apply_restraints_angle(sites_cart, gradients, target, restraints):
         gradients[restraint[2]-1] += d_U_d_alpha*d_alpha_d_r_k
         target += restraint[4]*delta_alpha**2
     return gradients, target
-
-
-def apply_transforms(model, transforms, serial_to_index):
-    for transform in transforms:
-        R = np.array(transform['R'])
-        t = np.array(transform['t'])
-        atoms_model = model.get_hierarchy().atoms()
-        for atom in parse_atoms_line(transform['atoms']):
-            atoms_model[serial_to_index[atom]].xyz = np.matmul(R, atoms_model[serial_to_index[atom]].xyz) + t
 
 
 def rotate_gradients(gradients, transforms, serial_to_index):
