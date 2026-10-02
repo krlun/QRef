@@ -106,3 +106,22 @@ def test_restart_file_follows_the_coordinates(prepared):
         else:
             raise AssertionError(f'serial {serial} not in {restart}')
     assert written == pytest.approx(list(sites_cart[serial - 1]), abs=5e-4)
+
+
+def test_log_gains_a_row_per_call(prepared):
+    """run() appends one row per call to qref_i.log, numbered from 1."""
+    name, model = prepared
+    contribution(model)
+    contribution(model)
+
+    with open('qref_1.log') as handle:
+        header, first, second = handle.read().splitlines()
+    assert header.split() == ['iter', 'QM', 'energy', '(kJ/mol)', 'MM', 'energy',
+                              '("kJ/mol")', 'MM1', 'energy', '("kJ/mol")',
+                              'QM/MM', 'energy', '("kJ/mol")']
+    for row, iteration in ((first, '1'), (second, '2')):
+        fields = row.split()
+        assert fields[0] == iteration
+        assert len(fields) == 5
+        for energy in fields[1:]:
+            float(energy)
