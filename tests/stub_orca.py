@@ -54,6 +54,12 @@ def main(argv):
     if len(argv) != 1:
         raise SystemExit('usage: stub_orca.py <input>')
     stem = os.path.splitext(argv[0])[0]
+    # Orca writes no .engrad and no banner when it fails; a hard error exits
+    # non-zero, an unconverged SCF exits 0
+    failure = os.environ.get('STUB_ORCA_FAIL')
+    if failure is not None:
+        print('stub_orca: failing on request')
+        return 4 if failure == 'exit' else 0
     sites = coordinates(pdb_from_input(argv[0]))
     write_engrad(stem + '.engrad', sites)
     print(f'stub_orca: {len(sites)} atoms')

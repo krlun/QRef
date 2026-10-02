@@ -125,3 +125,28 @@ def test_log_gains_a_row_per_call(prepared):
         assert len(fields) == 5
         for energy in fields[1:]:
             float(energy)
+
+
+@pytest.mark.parametrize('failure', ['exit', 'noscf'])
+def test_failed_orca_falls_back_on_the_previous_gradient(prepared, monkeypatch,
+                                                         failure):
+    """Logged as Failed and refined on with the gradient Orca left last time, so
+    an unconverged step does not end the refinement."""
+    name, model = prepared
+    expected, _ = contribution(model)
+
+    monkeypatch.setenv('STUB_ORCA_FAIL', failure)
+    gradients, _ = contribution(model)
+
+    assert list(gradients) == list(expected)
+    with open('qref_1.log') as handle:
+        assert handle.read().splitlines()[-1].split() == ['2', 'Failed']
+
+
+def test_failed_orca_raises_with_no_gradient_to_fall_back_on(prepared,
+                                                             monkeypatch):
+    """Nothing to refine on when the first call is the one that fails."""
+    name, model = prepared
+    monkeypatch.setenv('STUB_ORCA_FAIL', 'exit')
+    with pytest.raises(qref.OrcaFailed):
+        contribution(model)

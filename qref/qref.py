@@ -23,6 +23,10 @@ harkJ = 2625.499639479950
 bohrang = 0.529177249
 
 
+class OrcaFailed(Exception):
+    """Orca failed with no earlier gradient to carry on with."""
+
+
 def read_energy_and_gradient_from_orca(infile):
     gradients = list()
     with open(infile, 'r') as file:
@@ -155,7 +159,8 @@ class Region(object):
         return gradients, target
 
     def _log(self, qm_energy, mm_energy, mm1_energy):
-        """Append a row of energies to this region's log."""
+        """Append a row to this region's log; qm_energy is None for a failed run,
+        whose energies belong to the previous iteration and are left out."""
         logfile = self.log_file
         # macro_cycle_width = 12
         iter_width = 5
@@ -186,9 +191,7 @@ class Region(object):
         else:
             iter = str(int(log[-1].split()[0]) + 1)
         line += iter.rjust(iter_width)
-        with open(self.output_file, 'r') as file:
-            terminated = any('ORCA TERMINATED NORMALLY' in out_line for out_line in file)
-        if not terminated:
+        if qm_energy is None:
             line += 'Failed'.rjust(width)
         else:
             scale = self.w_qm*harkcal
@@ -224,29 +227,43 @@ class Region(object):
         restore_serial_in_model(model_mm1, self.serial_to_index)
         return model_mm1, residuals
 
+    def _orca_succeeded(self, status):
+        """Whether Orca exited cleanly and ran to completion."""
+        if status != 0 or not os.path.exists(self.engrad_file):
+            return False
+        with open(self.output_file, 'r') as file:
+            return any('ORCA TERMINATED NORMALLY' in line for line in file)
+
     def qm_energy_and_gradient(self, model_mm1):
-        """Run Orca on this region and return its energy and rescaled gradients."""
+        """Run Orca on this region and return its energy, rescaled gradients, and
+        whether Orca finished.  A failed run writes no gradient, so the one from
+        the previous iteration is used instead."""
         apply_transforms(model_mm1, self.transforms, self.serial_to_index)
         write_pdb_h(self.qm_file, model_mm1, link_pairs=self.link_pairs, g=self.g,
             serial_to_index=self.serial_to_index)
-        subprocess.check_call([self.orca_binary, self.input_file],
-            stdout=open(self.output_file, 'w'), stderr=subprocess.STDOUT)
+        with open(self.output_file, 'w') as out:
+            status = subprocess.call([self.orca_binary, self.input_file],
+                stdout=out, stderr=subprocess.STDOUT)
+        succeeded = self._orca_succeeded(status)
+        if not succeeded and not os.path.exists(self.engrad_file):
+            raise OrcaFailed('%s did not finish, see %s'
+                             % (self.orca_binary, self.output_file))
         qm_energy, qm_gradients = read_energy_and_gradient_from_orca(self.engrad_file)
         qm_gradients = rescale_qm_gradients(qm_gradients, self.w_qm*harkcal/bohrang)
         qm_gradients = self._rotate_back(qm_gradients)
-        return qm_energy, qm_gradients
+        return qm_energy, qm_gradients, succeeded
 
     def contribute(self, sites_cart, gradient, target, mm_residual_sum):
         """Add this region to the gradient and target, and log what it added."""
         model_mm1, mm1 = self.mm1_energies(sites_cart)
-        qm_energy, qm_gradients = self.qm_energy_and_gradient(model_mm1)
+        qm_energy, qm_gradients, succeeded = self.qm_energy_and_gradient(model_mm1)
 
         target = target - mm1.target + self.w_qm*harkcal*qm_energy
         gradient = self._add_qm_mm(gradient, qm_gradients, mm1.gradients)
         gradient, target = self._apply_restraints_distance(sites_cart, gradient, target)
         gradient, target = self._apply_restraints_angle(sites_cart, gradient, target)
 
-        self._log(qm_energy, mm_residual_sum, mm1.target)
+        self._log(qm_energy if succeeded else None, mm_residual_sum, mm1.target)
         return gradient, target
 
 
