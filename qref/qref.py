@@ -173,32 +173,34 @@ class Region(object):
             header += '\n'
             with open(logfile, 'w') as file:
                 file.write(header)
+        # The iteration counter continues from the last row written.
         with open(logfile, 'r') as file:
             log = file.readlines()
-        with open(logfile, 'w') as file:
-            file.writelines(log)
-            line = ''
-            # line += str(macro_cycle).rjust(macro_cycle_width)
-            # if len(log) == 1 or int(log[-1].split()[0].strip()) != macro_cycle:
-            #     iter = '1'.rjust(iter_width)
-            # else:
-            if len(log) == 1:
-                iter = '1'
-            else:
-                iter = str(int(log[-1].split()[0]) + 1)
-            line += iter.rjust(iter_width)
-            if not any('ORCA TERMINATED NORMALLY' in out_line for out_line in open(self.output_file)):
-                line += 'Failed'.rjust(width)
-            else:
-                # line += '{:.12f}'.format(round(qm_energy, 12)).rjust(width)
-                # line += '{:.12f}'.format(round(qm_energy*harkcal, 12)).rjust(width)
-                line += '{:.10f}'.format(round(qm_energy*harkJ, 10)).rjust(width)
-                line += '{:.10f}'.format(round((mm_energy/(self.w_qm*harkcal))*harkJ, 10)).rjust(width)
-                line += '{:.10f}'.format(round((mm1_energy/(self.w_qm*harkcal))*harkJ, 10)).rjust(width)
-                line += '{:.10f}'.format(round((qm_energy + mm_energy/(self.w_qm*harkcal) - mm1_energy/(self.w_qm*harkcal))*harkJ, 10)).rjust(width)
-            line += '\n'
+        line = ''
+        # line += str(macro_cycle).rjust(macro_cycle_width)
+        # if len(log) == 1 or int(log[-1].split()[0].strip()) != macro_cycle:
+        #     iter = '1'.rjust(iter_width)
+        # else:
+        if len(log) == 1:
+            iter = '1'
+        else:
+            iter = str(int(log[-1].split()[0]) + 1)
+        line += iter.rjust(iter_width)
+        with open(self.output_file, 'r') as file:
+            terminated = any('ORCA TERMINATED NORMALLY' in out_line for out_line in file)
+        if not terminated:
+            line += 'Failed'.rjust(width)
+        else:
+            scale = self.w_qm*harkcal
+            # line += '{:.12f}'.format(round(qm_energy, 12)).rjust(width)
+            # line += '{:.12f}'.format(round(qm_energy*harkcal, 12)).rjust(width)
+            line += '{:.10f}'.format(round(qm_energy*harkJ, 10)).rjust(width)
+            line += '{:.10f}'.format(round((mm_energy/scale)*harkJ, 10)).rjust(width)
+            line += '{:.10f}'.format(round((mm1_energy/scale)*harkJ, 10)).rjust(width)
+            line += '{:.10f}'.format(round((qm_energy + mm_energy/scale - mm1_energy/scale)*harkJ, 10)).rjust(width)
+        line += '\n'
+        with open(logfile, 'a') as file:
             file.write(line)
-        return
 
     def mm1_energies(self, sites_cart):
         """The model for this region, and its MM energy and gradients unscaled."""
