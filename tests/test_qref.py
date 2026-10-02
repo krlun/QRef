@@ -150,3 +150,17 @@ def test_failed_orca_raises_with_no_gradient_to_fall_back_on(prepared,
     monkeypatch.setenv('STUB_ORCA_FAIL', 'exit')
     with pytest.raises(qref.OrcaFailed):
         contribution(model)
+
+
+def test_lock_is_released(prepared, monkeypatch):
+    """A lock left behind silently disables QRef on the next refinement started
+    in the same directory."""
+    name, model = prepared
+    monkeypatch.setenv('STUB_ORCA_FAIL', 'exit')
+    with pytest.raises(qref.OrcaFailed):
+        contribution(model)
+    assert not os.path.exists('qm.lock')
+
+    monkeypatch.delenv('STUB_ORCA_FAIL')
+    contribution(model)
+    assert not os.path.exists('qm.lock')

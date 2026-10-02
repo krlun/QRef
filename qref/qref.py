@@ -273,24 +273,23 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
     if not len(sites_cart) == dat['n_atoms']:
         return mm_gradients, mm_residual_sum
 
-    # establish lock
     with open('qm.lock', 'w'):
         pass
 
-    # if specified, update coordinates of restart file
-    if dat['restart'] is not None:
-        update_file_coordinates(infile=dat['restart'], sites_cart=sites_cart)
+    try:
+        # if specified, update coordinates of restart file
+        if dat['restart'] is not None:
+            update_file_coordinates(infile=dat['restart'], sites_cart=sites_cart)
 
-    target = mm_residual_sum
-    total_gradient = mm_gradients
-    
-    # loop over all the definitions of syst1 and process (order matters)
-    for index, syst1 in enumerate(dat['syst1_files'], 1):
-        region = Region(index, syst1, dat)
-        total_gradient, target = region.contribute(sites_cart, total_gradient,
-            target, mm_residual_sum)
+        target = mm_residual_sum
+        total_gradient = mm_gradients
 
-    # unlock
-    os.remove('qm.lock')
+        # loop over all the definitions of syst1 and process (order matters)
+        for index, syst1 in enumerate(dat['syst1_files'], 1):
+            region = Region(index, syst1, dat)
+            total_gradient, target = region.contribute(sites_cart, total_gradient,
+                target, mm_residual_sum)
+    finally:
+        os.remove('qm.lock')
 
     return total_gradient, target
