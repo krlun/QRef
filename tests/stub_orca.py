@@ -63,7 +63,8 @@ def main(argv):
     sites = coordinates(pdb_from_input(argv[0]))
     write_engrad(stem + '.engrad', sites)
     print(f'stub_orca: {len(sites)} atoms')
-    # qref's logging() reads this out of qm_i.out to tell success from failure
+    # qref's _orca_succeeded() reads this out of qm_i.out to tell success from
+    # failure
     print('ORCA TERMINATED NORMALLY')
     return 0
 
