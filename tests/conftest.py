@@ -91,7 +91,8 @@ def installation():
     cctbx, so a reference value holds for one installation only."""
     version = os.environ.get('PHENIX_VERSION')
     if version:
-        return version
+        # phenix_env.sh sets the bare version, the build path carries the prefix
+        return version if version.startswith('phenix') else 'phenix-' + version
     import libtbx.load_env
     path = abs(libtbx.env.build_path)
     while path not in (os.sep, ''):
