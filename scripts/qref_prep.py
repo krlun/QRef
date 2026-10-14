@@ -1,4 +1,5 @@
 #!/usr/bin/env cctbx.python
+# -*- coding: utf-8 -*-
 
 from __future__ import absolute_import, division, print_function
 
@@ -137,27 +138,27 @@ def locate_binary(binary):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Prepares for quantum refinement by extracting the QM system(s) as well as saving a settings file (qref.dat).'
+        description='Prepares for quantum refinement: writes the model of each QM region (mm_i_c.pdb and qm_i_h.pdb) and the settings for QRef (qref.dat).'
     )
-    parser.add_argument('pdb', type=str, help='PDB file describing the entire model.')
-    parser.add_argument('-c', '--cif', nargs='+', type=str, help='CIF files describing the restraints for novel ligands')
-    parser.add_argument('-s', '--syst1', nargs='+', default=['syst1'], type=str, help='name of the file(s) describing what should constitute the QM system(s) (default: \'syst1\')')
-    parser.add_argument('-u', '--skip_h', action='store_true')
-    parser.add_argument('-j', '--junctfactor', nargs=1, default=['junctfactor'], type=str, help='name of file containing the junction factors (default: \'junctfactor\')')
-    parser.add_argument('-l', '--ltype', nargs=1, default=[12], type=int, help='link type (default: 12)')
-    parser.add_argument('-w', '--w_qm', nargs=1, default=[7.5], type=float, help='scaling factor for QM energy and gradients (default: 7.5)')
-    parser.add_argument('-r', '--restart', nargs='?', const='restart.pdb', type=str, help='if specified creates a restart file (optional: name)')
-    parser.add_argument('-rd', '--restraint_distance', nargs=5, action='append', type=str, help='if specified applies a harmonic (bond) distance restraint according to \'i atom1_serial atom2_serial desired_distance force_constant\'')
-    parser.add_argument('-ra', '--restraint_angle', nargs=6, action='append', type=str, help='if specified applies a harmonic (bond) angle restraint according to \'i atom1_serial atom2_serial atom3_serial desired_angle force_constant\'')
-    parser.add_argument('-t', '--transform', nargs=14, action='append', type=str, help='if specified applies the specified transformations according to \'i \"atoms\" R t\', where the matrix R should be given in row-wise order')
+    parser.add_argument('pdb', type=str, help='PDB file describing the entire model')
+    parser.add_argument('-c', '--cif', nargs='+', type=str, metavar='CIF', help='CIF files with restraints for residues and ligands')
+    parser.add_argument('-s', '--syst1', nargs='+', default=['syst1'], type=str, metavar='SYST1', help='files defining the QM regions, one per region (default: syst1)')
+    parser.add_argument('-u', '--skip_h', action='store_true', help='only write mm_i_c.pdb')
+    parser.add_argument('-j', '--junctfactor', nargs=1, default=['junctfactor'], type=str, metavar='FILE', help='file with the ideal C-H distances for the link atoms (default: junctfactor)')
+    parser.add_argument('-l', '--ltype', nargs=1, default=[12], type=int, metavar='LTYPE', help='level of theory for the C-H distances in the junctfactor file (default: 12, TPSS(RI)/def2-SV(P))')
+    parser.add_argument('-w', '--w_qm', nargs=1, default=[7.5], type=float, metavar='W_QM', help='weight of the QM energy and gradients, in mol/kcal (default: 7.5)')
+    parser.add_argument('-r', '--restart', nargs='?', const='restart.pdb', type=str, metavar='FILE', help='write a restart file (default name: restart.pdb)')
+    parser.add_argument('-rd', '--restraint_distance', nargs=5, action='append', type=str, metavar=('I', 'ATOM1', 'ATOM2', 'DISTANCE', 'k'), help='harmonic distance restraint in QM region I between atoms ATOM1 and ATOM2 (serial numbers), with the ideal DISTANCE in Å and force constant k; can be repeated')
+    parser.add_argument('-ra', '--restraint_angle', nargs=6, action='append', type=str, metavar=('I', 'ATOM1', 'ATOM2', 'ATOM3', 'ANGLE', 'k'), help='harmonic angle restraint in QM region I on the angle ATOM1-ATOM2-ATOM3 (serial numbers), with the ideal ANGLE in degrees and force constant k; can be repeated')
+    parser.add_argument('-t', '--transform', nargs=14, action='append', type=str, metavar=('I', 'ATOMS', 'R11', 'R12', 'R13', 'R21', 'R22', 'R23', 'R31', 'R32', 'R33', 'T1', 'T2', 'T3'), help='symmetry transform of ATOMS in QM region I, given in quotes in the syntax of syst1 files, by the rotation matrix R, row-wise, and the translation T, both Cartesian; can be repeated')
     parser.add_argument('-v', '--version', action="version", version="%(prog)s 0.3.1")
     return parser.parse_args()
 
 
 def main():
+    args = parse_args()
     print('*** This is qref_prep.py ***')
     print()
-    args = parse_args()
     model_file = args.pdb
     syst1_files = args.syst1
     junc_factor_file = args.junctfactor[0]

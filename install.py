@@ -809,46 +809,42 @@ def parse_args(argv):
     parser.add_argument('--phenix', default=os.environ.get('PHENIX'),
                         help='Phenix prefix (default: $PHENIX)')
     parser.add_argument('--guard', choices=['locks', 'always'], default='locks',
-                        help='"locks" runs QRef only while coordinates are '
-                             'refined, which needs the two Phenix/refinement '
-                             'files to set the lock (default); "always" runs it '
-                             'whenever qref.dat is present and qm.lock is not, '
-                             'leaving those two files untouched.')
+                        help='"locks" (default) runs QRef only while '
+                             'coordinates are refined; "always" runs it '
+                             'whenever qref.dat is present and qm.lock is not')
     parser.add_argument('--phenix-edits', choices=['apply', 'report', 'skip'],
                         default='apply',
-                        help='What to do with the two Phenix/refinement files: '
+                        help='what to do with the two Phenix/refinement files: '
                              'edit in place (default), print the located edits '
-                             'so you can apply them yourself, or leave alone.')
+                             'so you can apply them yourself, or leave alone')
     parser.add_argument('--shift-hint', action='store_true',
-                        help='Also print the translation needed to correct the '
+                        help='also print the translation needed to correct the '
                              'output of phenix.real_space_refine, which does not '
                              'shift the model back to the original coordinate '
-                             'frame when sort_atoms = False.')
+                             'frame when sort_atoms = False')
     parser.add_argument('--scripts', metavar='DIR',
-                        help='Also install scripts/ here, shebangs rewritten to '
-                             'this installation (put DIR on your PATH).')
+                        help='also install scripts/ here (put DIR on your PATH)')
     parser.add_argument('--pin-shebang', action='store_true',
-                        help='if specified sets the shebang of the installed '
-                             'scripts to the cctbx.python of this installation, '
-                             'instead of leaving them to follow whichever '
-                             'Phenix is sourced when they run')
+                        help='run the installed scripts with the cctbx.python of '
+                             'the Phenix installation QRef is installed into, '
+                             'instead of whichever Phenix is sourced when they run')
     parser.add_argument('--templates', metavar='DIR',
-                        help='Also copy templates/ here.')
+                        help='also copy templates/ here')
     parser.add_argument('--link', action='store_true',
-                        help='Point a .pth at the checkout instead of copying '
+                        help='point a .pth at the checkout instead of copying '
                              'the QRef package, and install --scripts as '
                              'wrappers that run the scripts in the checkout, so '
                              'that several installations share one source and '
-                             'pulling the checkout updates them.')
+                             'pulling the checkout updates them')
     parser.add_argument('--source', default=HERE,
-                        help='QRef checkout (default: the one this script is in).')
+                        help='QRef checkout (default: the one this script is in)')
     parser.add_argument('--dry-run', action='store_true',
-                        help='Show what would change and touch nothing.')
+                        help='show what would change and touch nothing')
     parser.add_argument('--force', action='store_true',
-                        help='Re-apply over an existing install, starting from '
-                             f'the {BACKUP_SUFFIX} backups.')
+                        help='re-apply over an existing install, starting from '
+                             f'the {BACKUP_SUFFIX} backups')
     parser.add_argument('--uninstall', action='store_true',
-                        help='Restore the backups and remove what was installed.')
+                        help='restore the backups and remove what was installed')
     return parser.parse_args(argv)
 
 
