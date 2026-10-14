@@ -148,6 +148,16 @@ The general procedure to set up a quantum refinement job consists of
         - `refinement.hydrogens.refine = *individual riding Auto`
         - `refinement.hydrogens.real_space_optimize_x_h_orientation = False`
         - `refinement.main.nqh_flips = False`
+        - If the QM regions have been duplicated into separate altlocs (see point 4) and occupancies are refined, the occupancies of the whole QM region should be constrained as one group. Using the reciprocal selection string printed by `qref_prep.py`:
+
+          ```
+          refinement.refine.occupancies {
+            constrained_group {
+              selection = altloc A and (<reciprocal selection string>)
+              selection = altloc B and (<reciprocal selection string>)
+            }
+          }
+          ```
     - For real space refinement (`phenix.real_space_refine`):
         - `refinement.run = *minimization_global rigid_body local_grid_search morphing simulated_annealing adp occupancy nqh_flips`
         - `pdb_interpretation.restraints_library.cdl = False`
