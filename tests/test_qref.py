@@ -3,8 +3,10 @@ import os
 
 import pytest
 
-from conftest import REFERENCE
+from conftest import REFERENCE, ROOT
 from qref import qref
+from qref.common import convert_serial_to_index, restore_serial_in_model
+import qref_prep
 
 # at a link atom the step reaches Orca scaled by the junction factor g and
 # rounded to the three decimals of qm_i_h.pdb, so one near 0.001 is mostly
@@ -164,3 +166,61 @@ def test_lock_is_released(prepared, monkeypatch):
     monkeypatch.delenv('STUB_ORCA_FAIL')
     contribution(model)
     assert not os.path.exists('qm.lock')
+
+
+# syst1 files in order, and how qref_prep.py exits on them (None: it carries on);
+# the second occurrence of a serial makes it a link atom
+OVERLAPS = {
+    'disjoint': (['1-5\n5\n', '6-9\n'], None),
+    'link atom in all three': (['1-5\n5\n', '5-9\n5\n', '5 10-12\n5\n'], None),
+    'link atom, then QM atom': (['1-5\n5\n', '5-9\n'],
+                                'syst12 shares atoms 5 with syst11.'),
+    'QM atom, then link atom': (['1-5\n', '5-9\n5\n'],
+                                'syst12 shares atoms 5 with syst11.'),
+    'QM atoms in the first and third': (['1-5\n5\n', '6-9\n', '3-4 10\n'],
+                                        'syst13 shares atoms 3, 4 with syst11.'),
+}
+
+
+@pytest.mark.parametrize('name', sorted(OVERLAPS))
+def test_regions_share_only_link_atoms(name, tmp_path, monkeypatch):
+    """E_MM counts the restraints among atoms that QM regions share once, but each
+    region subtracts them, so only link atoms, which have none among them, may be
+    shared."""
+    texts, message = OVERLAPS[name]
+    monkeypatch.chdir(tmp_path)
+    files = [f'syst1{index}' for index in range(1, len(texts) + 1)]
+    for syst1, text in zip(files, texts):
+        with open(syst1, 'w') as handle:
+            handle.write(text)
+    if message is None:
+        qref_prep.check_overlap(files)
+        return
+    with pytest.raises(SystemExit) as raised:
+        qref_prep.check_overlap(files)
+    assert str(raised.value).startswith(message)
+
+
+def test_link_atoms_do_not_count_as_altlocs(tmp_path, capsys):
+    """A region of altloc A cut at blank link atoms is one conformation."""
+    # MET A 102 in 5n6y: N and C blank, CA to CE altloc A
+    region = {793, 794} | set(range(796, 801))
+    with open(os.path.join(ROOT, 'examples', '5n6y_CO3', '5n6y_sorted.pdb')) as handle:
+        lines = [line for line in handle if line.startswith('CRYST1')
+                 or (line[0:6].strip() in ('ATOM', 'HETATM')
+                     and int(line[6:11]) in region)]
+    path = str(tmp_path / 'met102_a.pdb')
+    with open(path, 'w') as handle:
+        handle.writelines(lines)
+
+    from iotbx.data_manager import DataManager
+    manager = DataManager()
+    manager.process_model_file(path)
+    model = manager.get_model(filename=path)
+    # as qref_prep.main() does before check_altlocs()
+    restore_serial_in_model(model, convert_serial_to_index(region))
+
+    qref_prep.check_altlocs(model, link_atoms={793, 794})
+    assert capsys.readouterr().out == 'Altloc:  "and altloc A"\n'
+    qref_prep.check_altlocs(model, link_atoms=set())
+    assert capsys.readouterr().out.startswith('Warning, multiple altlocs')

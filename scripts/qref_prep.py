@@ -41,6 +41,23 @@ def identify_link_pairs(model, link_atoms, serial_to_index):
     return link_pairs
 
 
+def check_overlap(syst1_files):
+    # E_MM counts the restraints among atoms that two QM regions share once, but
+    # each region subtracts them again in E_MM1. Link atoms may be shared: there
+    # are no restraints among them, and Orca only sees the hydrogens replacing them.
+    regions = dict()
+    qm_only = set()
+    for syst1 in syst1_files:
+        qm_atoms, link_atoms = read_syst1(syst1)
+        shared = sorted(atom for atom in qm_atoms if atom in regions and (atom in qm_only or atom not in link_atoms))
+        if shared:
+            others = sorted(set(other for atom in shared for other in regions[atom]))
+            raise SystemExit(syst1 + ' shares atoms ' + ', '.join(str(atom) for atom in shared) + ' with ' + ', '.join(others) + '. QM regions must not share atoms other than link atoms; duplicate the QM region into separate altlocs instead. Exiting...')
+        for atom in qm_atoms:
+            regions.setdefault(atom, []).append(syst1)
+        qm_only |= qm_atoms - link_atoms
+
+
 def calculate_g_factor(model, link_pairs, junc_factors, ltype, serial_to_index):
     g = dict()
     atoms = model.get_hierarchy().atoms()
@@ -80,10 +97,12 @@ def suggest_selection_string(model):
     print()
 
 
-def check_altlocs(model):
+def check_altlocs(model, link_atoms):
+    # link atoms can be shared between the regions of different altlocs
     hierarchy = model.get_hierarchy()
     altlocs = set()
-    for atom in hierarchy.atoms(): altlocs.add(atom.pdb_label_columns()[4])
+    for atom in hierarchy.atoms():
+        if int(atom.serial) not in link_atoms: altlocs.add(atom.pdb_label_columns()[4])
     altlocs = sorted(list(altlocs))
     if len(altlocs) != 1:
         if altlocs[0] == ' ': altlocs[0] = '<blank>'
@@ -145,6 +164,7 @@ def main():
     ltype = args.ltype[0]
     if args.skip_h is not True:
         junc_factors = read_junc_factors(junc_factor_file=junc_factor_file)
+        check_overlap(syst1_files)
     dm = DataManager()
     if args.cif is not None:
         for cif in args.cif:
@@ -199,7 +219,7 @@ def main():
             write_pdb_h(qm_file, model_mm1, link_pairs, g, serial_to_index)
 
         suggest_selection_string(model_mm1)
-        check_altlocs(model_mm1)
+        check_altlocs(model_mm1, link_atoms)
         print('----------')
 
     if args.skip_h is not True:

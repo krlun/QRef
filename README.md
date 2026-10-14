@@ -15,7 +15,7 @@ In this QR implementation $E_{chem}(\mathbf{R})$ (which traditionally is a molec
 ```math
 E_{chem}(\mathbf{R}) = \sum_{i} \left(w_{QM}E_{QM1, i}(\mathbf{R_{syst1, i}}) - E_{MM1, i}(\mathbf{R})\right) + E_{MM}(\mathbf{R}),
 ```
-where index 1 in turn indicates small, but interesting, parts of the structure. Additionally another scaling factor, $w_{QM}$, is needed due to the fact that crystallographic MM force fields are of a statistical nature, whereas $E_{QM1, i}$ represents physical energies. $\mathbf{R_{syst1, i}}$ in turn is the coordinate set for the i:th region of QM atoms. Placing the hydrogen link-atoms at
+where index 1 in turn indicates small, but interesting, parts of the structure. The QM regions must not have QM atoms in common: a restraint between atoms that belong to several regions is included only once in $E_{MM}(\mathbf{R})$, but is subtracted once in each of their $E_{MM1, i}(\mathbf{R})$. Additionally another scaling factor, $w_{QM}$, is needed due to the fact that crystallographic MM force fields are of a statistical nature, whereas $E_{QM1, i}$ represents physical energies. $\mathbf{R_{syst1, i}}$ in turn is the coordinate set for the i:th region of QM atoms. Placing the hydrogen link-atoms at
 ```math
 \overline{r_{H_L}} = \overline{r_X} + g_{bond}\left(\overline{r_{C_L}} - \overline{r_X}\right)
 ```
@@ -90,6 +90,7 @@ The general procedure to set up a quantum refinement job consists of
 
 4. Prepare `syst1` files; these files define the QM regions.
     - If there is only one QM region the default is to look for a file named `syst1` by the software. For multiple QM regions the recommended, and default, naming scheme is `syst11`, `syst12`, etc.
+    - QM regions must not share atoms other than link atoms; `qref_prep.py` exits if any other atom occurs in more than one `syst1` file. For a QM region with alternative conformations, duplicate the QM region into separate altlocs in the model and define one QM region per altloc, e.g. `syst11` for altloc A and `syst12` for altloc B.
     - Which atoms to include in the QM regions is defined using the serial number from the PDB file describing the entire model.
         - While setting `sort_atoms = False` in the input to `Phenix` should ensure that the ordering in the input model is preserved, we have encountered instances where this is not adhered to. Thus it is recommended to use `iotbx.pdb.sort_atoms` (supplied with `Phenix`) which will give you a new PDB file with the suffix `_sorted.pdb` where the atoms are sorted in the same order as that which `Phenix` uses internally. It is recommended to use the `_sorted.pdb` file as the input model for refinement, as well as the reference when defining the `syst1` files.
     - The `syst1` files allows for multiple atoms or intervals of atoms to be specified on a single line, where `,` or `blank` works as delimiters; `-` is used to indicate an interval.
