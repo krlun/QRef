@@ -42,11 +42,21 @@ where $J(\mathbf{R_{syst1,i}}; \mathbf{R})$ is the Jacobian between $\mathbf{R_{
     source /path/to/phenix/phenix_env.sh
     ./install.py
 
-The `qref` module is copied into that installation, and `energies.py` in `cctbx` and `model.py` in `mmtbx` are modified so that `QRef` is called during refinement. Each modified file is backed up as `<file>.qref-orig`; `./install.py --dry-run` lists the changes without making them and `./install.py --uninstall` reverses the installation.
+The `qref` module is copied into that installation, and `energies.py` in `cctbx` and `model.py` in `mmtbx` are modified so that `QRef` is called during refinement. Each modified file is backed up as `<file>.qref-orig`.
 
-`--phenix DIR` installs into `DIR` instead of `$PHENIX`, which is useful when more than one version of `Phenix` is present. `--source DIR` installs from the `QRef` directory `DIR` instead of the one `install.py` itself is in. `--link` makes the installation import `qref` from the `QRef` directory rather than copying it, so that several installations can share one copy of `QRef`.
+`--dry-run` lists the changes without making them.
 
-A file that is already patched is left alone, so running `install.py` again reports what it skipped and changes nothing. `--force` patches it again, starting over from the `.qref-orig` backup.
+`--uninstall` reverses the installation.
+
+`--phenix DIR` installs into `DIR` instead of `$PHENIX`, which is useful when more than one version of `Phenix` is present.
+
+`--source DIR` installs from the `QRef` directory `DIR` instead of the one `install.py` itself is in.
+
+`--link` makes the installation import `qref` from the `QRef` directory rather than copying it, so that several installations can share one copy of `QRef`. It also installs the scripts (see below) as wrappers that run them from the `QRef` directory, so a `git pull` updates both.
+
+A file that is already patched is left alone, so running `install.py` again reports what it skipped and changes nothing.
+
+`--force` patches an already patched file again, starting over from the `.qref-orig` backup.
 
 `QRef` has been verified to work with `Phenix` versions 1.20.1-4487, 1.21-5207, 1.21.1-5286, 1.21.2-5419, 2.0-5936, 2.1-6084 and 2.2.1-6174.
 

@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import shutil
 import stat
 import subprocess
@@ -635,22 +636,29 @@ def install_package(report, checkout, link):
                         ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '*.pyo'))
     return destination
 
-class Extra(collections.namedtuple('Extra', 'option shebang plain')):
+class Extra(collections.namedtuple('Extra', 'option shebang plain support')):
     """Files installed outside the package: the scripts and the templates.
 
     `option` is the command line option naming where they go, `shebang` the
-    files whose first line is rewritten, `plain` those copied as they are.
+    files whose first line is rewritten, `plain` those copied as they are, and
+    `support` those copied only for the `shebang` files to import.
     """
 
-    def install(self, report, checkout, dest, pin=False):
+    def install(self, report, checkout, dest, pin=False, link=False):
         """Copy the files into `dest`.  Returns the paths written.
 
         With `pin`, the shebang of the files in `shebang` is set to this
         installation's cctbx.python; otherwise they keep `#!/usr/bin/env
         cctbx.python` and follow whichever Phenix is sourced when they run.
 
-        utils.py travels with the scripts: they all import it, and python only
-        puts a script's own directory on sys.path.
+        With `link`, each file in `shebang` is instead a wrapper that runs it
+        from the checkout, so that pulling the checkout updates it.  The wrapper
+        itself never changes, so its digest in the manifest stays valid, which
+        a symlink into the checkout would not.
+
+        utils.py travels with copied scripts: they all import it, and python
+        only puts a script's own directory on sys.path.  Linked scripts find it
+        in the checkout.
         """
         layout = report.layout
         source = os.path.join(checkout, self.option)
@@ -662,13 +670,22 @@ class Extra(collections.namedtuple('Extra', 'option shebang plain')):
         if not report.dry_run and not os.path.isdir(dest):
             os.makedirs(dest)
         written = []
-        for name in self.shebang + self.plain:
+        for name in self.shebang + self.plain + (() if link else self.support):
             src, out = os.path.join(source, name), os.path.join(dest, name)
             if not os.path.exists(src):
                 report.entry(name, f'missing in {source}, skipped')
                 continue
             lines, detail = None, []
-            if pin and name in self.shebang:
+            if link and name in self.shebang:
+                python = layout.python if pin else 'cctbx.python'
+                script = os.path.abspath(src)
+                lines = ['#!/bin/sh\n',
+                         '# QRef: installed by install.py --link, runs the script '
+                         'in the QRef checkout\n',
+                         f'exec {shlex.quote(python)} {shlex.quote(script)} "$@"\n']
+                detail = [f'runs {python} {script}']
+                status = report.verb('would link', 'linked')
+            elif pin and name in self.shebang:
                 lines = read_lines(src)
                 had_shebang = lines and lines[0].startswith('#!')
                 old = lines[0].rstrip('\n') if had_shebang else '<none>'
@@ -687,12 +704,16 @@ class Extra(collections.namedtuple('Extra', 'option shebang plain')):
                 if name in self.shebang:
                     os.chmod(out, 0o755)    # whatever the checkout has
             written.append(out)
+        if link:
+            for name in self.support:
+                if os.path.exists(os.path.join(dest, name)):
+                    report.entry(name, 'not needed with --link, left alone')
         return written
 
 
 EXTRAS = (Extra('scripts', ('qref_prep.py', 'prep_geo_opt_qm_constrained.py',
-                            'sort_pdb.py', 'change_occ_pdb.py'), ('utils.py',)),
-          Extra('templates', (), ('junctfactor', 'qm_1.inp')))
+                            'sort_pdb.py', 'change_occ_pdb.py'), (), ('utils.py',)),
+          Extra('templates', (), ('junctfactor', 'qm_1.inp'), ()))
 
 
 # --- the manifest ----------------------------------------------------------
@@ -815,8 +836,10 @@ def parse_args(argv):
                         help='Also copy templates/ here.')
     parser.add_argument('--link', action='store_true',
                         help='Point a .pth at the checkout instead of copying '
-                             'the QRef package, so that several installations '
-                             'share one source.')
+                             'the QRef package, and install --scripts as '
+                             'wrappers that run the scripts in the checkout, so '
+                             'that several installations share one source and '
+                             'pulling the checkout updates them.')
     parser.add_argument('--source', default=HERE,
                         help='QRef checkout (default: the one this script is in).')
     parser.add_argument('--dry-run', action='store_true',
@@ -897,7 +920,7 @@ class Installer(object):
                 continue
             report.heading(f'{extra.option.capitalize()} -> {dest}')
             files += extra.install(report, args.source, dest,
-                                   pin=args.pin_shebang)
+                                   pin=args.pin_shebang, link=args.link)
             directories.append(os.path.abspath(dest))
         write_manifest(report, files, directories)
 
