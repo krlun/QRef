@@ -144,9 +144,9 @@ def parse_args():
     parser.add_argument('-c', '--cif', nargs='+', type=str, metavar='CIF', help='CIF files with restraints for residues and ligands')
     parser.add_argument('-s', '--syst1', nargs='+', default=['syst1'], type=str, metavar='SYST1', help='files defining the QM regions, one per region (default: syst1)')
     parser.add_argument('-u', '--skip_h', action='store_true', help='only write mm_i_c.pdb')
-    parser.add_argument('-j', '--junctfactor', nargs=1, default=['junctfactor'], type=str, metavar='FILE', help='file with the ideal C-H distances for the link atoms (default: junctfactor)')
-    parser.add_argument('-l', '--ltype', nargs=1, default=[12], type=int, metavar='LTYPE', help='level of theory for the C-H distances in the junctfactor file (default: 12, TPSS(RI)/def2-SV(P))')
-    parser.add_argument('-w', '--w_qm', nargs=1, default=[7.5], type=float, metavar='W_QM', help='weight of the QM energy and gradients, in mol/kcal (default: 7.5)')
+    parser.add_argument('-j', '--junctfactor', default='junctfactor', type=str, metavar='FILE', help='file with the ideal C-H distances for the link atoms (default: junctfactor)')
+    parser.add_argument('-l', '--ltype', default=12, type=int, metavar='LTYPE', help='level of theory for the C-H distances in the junctfactor file (default: 12, TPSS(RI)/def2-SV(P))')
+    parser.add_argument('-w', '--w_qm', default=7.5, type=float, metavar='W_QM', help='weight of the QM energy and gradients, in mol/kcal (default: 7.5)')
     parser.add_argument('-r', '--restart', nargs='?', const='restart.pdb', type=str, metavar='FILE', help='write a restart file (default name: restart.pdb)')
     parser.add_argument('-rd', '--restraint_distance', nargs=5, action='append', type=str, metavar=('I', 'ATOM1', 'ATOM2', 'DISTANCE', 'k'), help='harmonic distance restraint in QM region I between atoms ATOM1 and ATOM2 (serial numbers), with the ideal DISTANCE in Å and force constant k; can be repeated')
     parser.add_argument('-ra', '--restraint_angle', nargs=6, action='append', type=str, metavar=('I', 'ATOM1', 'ATOM2', 'ATOM3', 'ANGLE', 'k'), help='harmonic angle restraint in QM region I on the angle ATOM1-ATOM2-ATOM3 (serial numbers), with the ideal ANGLE in degrees and force constant k; can be repeated')
@@ -161,8 +161,8 @@ def main():
     print()
     model_file = args.pdb
     syst1_files = args.syst1
-    junc_factor_file = args.junctfactor[0]
-    ltype = args.ltype[0]
+    junc_factor_file = args.junctfactor
+    ltype = args.ltype
     if not args.skip_h:
         junc_factors = read_junc_factors(junc_factor_file=junc_factor_file)
         check_overlap(syst1_files)
@@ -226,7 +226,7 @@ def main():
     if not args.skip_h:
         dat['n_atoms'] = model_mm.get_number_of_atoms()
         dat['restart'] = args.restart
-        dat['w_qm'] = args.w_qm[0]
+        dat['w_qm'] = args.w_qm
         dat['cif'] = args.cif
         dat['orca_binary'] = locate_binary('orca')
         dat['ltype'] = ltype

@@ -267,7 +267,7 @@ class Region(object):
 def run(sites_cart, mm_gradients, mm_residual_sum):
     dat = read_dat('qref.dat')
 
-    if not len(sites_cart) == dat['n_atoms']:
+    if len(sites_cart) != dat['n_atoms']:
         return mm_gradients, mm_residual_sum
 
     with open('qm.lock', 'w'):
