@@ -41,11 +41,11 @@ def read_energy_and_gradient_from_orca(infile):
         for i in range(n_atoms):
             g = (float(file.readline()), float(file.readline()), float(file.readline()))
             gradients.append(g)
-    return energy, gradients
+    return energy, np.array(gradients)
 
 
 def rescale_qm_gradients(qm_gradients, w):
-    return [tuple([w*component for component in gradient]) for gradient in qm_gradients]
+    return w*qm_gradients
 
 
 def update_file_coordinates(infile, sites_cart):
@@ -107,11 +107,12 @@ class Region(object):
         """Fold this region's QM and MM1 gradients into the whole model's."""
         for atom in self.qm_atoms:
             gradient[atom-1] -= np.array(mm1_gradients[self.serial_to_index[atom]])
+            qm = qm_gradients[self.serial_to_index[atom]]
             if atom not in self.link_pairs:
-                gradient[atom-1] += np.array(qm_gradients[self.serial_to_index[atom]])
+                gradient[atom-1] += qm
             else:
-                gradient[self.link_pairs[atom]-1] += (1-self.g[atom])*np.array(qm_gradients[self.serial_to_index[atom]])
-                gradient[atom-1] += self.g[atom]*np.array(qm_gradients[self.serial_to_index[atom]])
+                gradient[self.link_pairs[atom]-1] += (1-self.g[atom])*qm
+                gradient[atom-1] += self.g[atom]*qm
         return gradient
 
     def _rotate_back(self, gradients):
