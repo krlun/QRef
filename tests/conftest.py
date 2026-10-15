@@ -20,6 +20,9 @@ CIFS = ('HXG.cif', 'PLC.cif')
 STUB = os.path.join(HERE, 'stub_orca.py')
 REFERENCE = os.path.join(HERE, 'reference.json')
 
+# install.py runs under Python 3 only, so its tests cannot be collected under Python 2
+collect_ignore = [] if sys.version_info[0] >= 3 else ['test_install.py']
+
 # the second occurrence of a serial makes it a link atom
 ONE = """4555 ! ASN C 227
 4558-4565 ! ASN C 227
@@ -115,9 +118,9 @@ def prepared(request, tmp_path, monkeypatch):
     for index, region in enumerate(regions, 1):
         with open(os.path.join(work, region), 'w') as handle:
             handle.write(case['syst1'][region])
-        with open(os.path.join(work, f'qm_{index}.inp'), 'w') as handle:
+        with open(os.path.join(work, 'qm_%d.inp' % index), 'w') as handle:
             handle.write('! TPSS D4 DEF2-SV(P)\n! ENGRAD\n'
-                         f'*pdbfile 0 1 qm_{index}_h.pdb\n')
+                         '*pdbfile 0 1 qm_%d_h.pdb\n' % index)
     monkeypatch.chdir(work)
 
     import qref_prep

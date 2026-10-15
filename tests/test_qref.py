@@ -42,8 +42,8 @@ def test_unchanged(prepared, installation, recording):
     gradients, target = contribution(model)
     # 17 significant digits round-trip a double, so comparing the strings compares
     # the values exactly
-    result = {'target': f'{float(target):.17g}',
-              'gradients': dict((str(i), [f'{c:.17g}' for c in g])
+    result = {'target': format(float(target), '.17g'),
+              'gradients': dict((str(i), [format(c, '.17g') for c in g])
                                 for i, g in enumerate(gradients)
                                 if g != (0.0, 0.0, 0.0))}
 
@@ -56,17 +56,17 @@ def test_unchanged(prepared, installation, recording):
         reference.setdefault(installation, {})[name] = result
         with open(REFERENCE, 'w') as handle:
             json.dump(reference, handle, indent=2, sort_keys=True)
-        pytest.skip(f'recorded {name} for {installation}')
+        pytest.skip('recorded %s for %s' % (name, installation))
 
     expected = reference.get(installation, {}).get(name)
     if expected is None:
-        pytest.skip(f'no reference for {name} under {installation}; '
-                    f'run with --record')
+        pytest.skip('no reference for %s under %s; run with --record'
+                    % (name, installation))
     assert result['target'] == expected['target']
     assert sorted(result['gradients']) == sorted(expected['gradients'])
     for index in sorted(expected['gradients'], key=int):
         assert result['gradients'][index] == expected['gradients'][index], \
-            f'serial {int(index) + 1}'
+            'serial %d' % (int(index) + 1)
 
 
 @pytest.mark.parametrize('serial, axis', [(4555, 0), (4555, 1), (4558, 2),
@@ -85,8 +85,8 @@ def test_gradient_matches_finite_difference(prepared, serial, axis):
     numeric = (plus - minus) / (2.0 * STEP)
 
     assert analytic == pytest.approx(numeric, rel=TOLERANCE), (
-        f'atom {serial} axis {axis}: gradient {analytic:.8f}, '
-        f'finite difference {numeric:.8f}')
+        'atom %d axis %d: gradient %.8f, finite difference %.8f'
+        % (serial, axis, analytic, numeric))
 
 
 def test_restart_file_follows_the_coordinates(prepared):
@@ -95,7 +95,7 @@ def test_restart_file_follows_the_coordinates(prepared):
     with open('qref.dat') as handle:
         restart = json.load(handle)['restart']
     if restart is None:
-        pytest.skip(f'{name} has no restart file')
+        pytest.skip('%s has no restart file' % name)
 
     serial, axis = 4555, 0
     sites_cart = moved(serial, axis, model.get_sites_cart(), +0.5)
@@ -109,7 +109,7 @@ def test_restart_file_follows_the_coordinates(prepared):
                            float(line[46:54])]
                 break
         else:
-            raise AssertionError(f'serial {serial} not in {restart}')
+            raise AssertionError('serial %d not in %s' % (serial, restart))
     assert written == pytest.approx(list(sites_cart[serial - 1]), abs=5e-4)
 
 
@@ -192,7 +192,7 @@ def test_regions_share_only_link_atoms(name, tmp_path, monkeypatch):
     shared."""
     texts, message = OVERLAPS[name]
     monkeypatch.chdir(tmp_path)
-    files = [f'syst1{index}' for index in range(1, len(texts) + 1)]
+    files = ['syst1%d' % index for index in range(1, len(texts) + 1)]
     for syst1, text in zip(files, texts):
         with open(syst1, 'w') as handle:
             handle.write(text)
