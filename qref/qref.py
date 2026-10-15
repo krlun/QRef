@@ -146,8 +146,8 @@ class Region(object):
             alpha = np.degrees(np.arccos(cos_alpha))
             delta_alpha = alpha - restraint[3]
             d_U_d_alpha = 2*restraint[4]*delta_alpha
-            d_alpha_d_r_i = (1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_ij) * (cos_alpha * (r_ij/norm_r_ij) - (r_kj/norm_r_kj))
-            d_alpha_d_r_k = (1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_kj) * (cos_alpha * (r_kj/norm_r_kj) - (r_ij/norm_r_ij))
+            d_alpha_d_r_i = np.degrees((1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_ij) * (cos_alpha * (r_ij/norm_r_ij) - (r_kj/norm_r_kj)))
+            d_alpha_d_r_k = np.degrees((1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_kj) * (cos_alpha * (r_kj/norm_r_kj) - (r_ij/norm_r_ij)))
             d_alpha_d_r_j = - d_alpha_d_r_i - d_alpha_d_r_k
             gradients[restraint[0]-1] += d_U_d_alpha*d_alpha_d_r_i
             gradients[restraint[1]-1] += d_U_d_alpha*d_alpha_d_r_j

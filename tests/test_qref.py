@@ -64,14 +64,17 @@ def test_unchanged(prepared, installation, recording):
                     f'run with --record')
     assert result['target'] == expected['target']
     assert sorted(result['gradients']) == sorted(expected['gradients'])
-    for serial in sorted(expected['gradients'], key=int):
-        assert result['gradients'][serial] == expected['gradients'][serial], serial
+    for index in sorted(expected['gradients'], key=int):
+        assert result['gradients'][index] == expected['gradients'][index], \
+            f'serial {int(index) + 1}'
 
 
-@pytest.mark.parametrize('serial, axis', [(4555, 0), (4555, 1), (4558, 2)])
+@pytest.mark.parametrize('serial, axis', [(4555, 0), (4555, 1), (4558, 2),
+                                          (4600, 0), (4602, 1), (20943, 2)])
 def test_gradient_matches_finite_difference(prepared, serial, axis):
     """4555 is a link atom and 4558 its bonded partner, so the QM gradient there is
-    split by g instead of passed straight through."""
+    split by g instead of passed straight through.  With two regions, 4600 and
+    4602 carry the angle restraint and 20943 the distance restraint."""
     name, model = prepared
     sites_cart = model.get_sites_cart()
     gradients, _ = contribution(model, sites_cart)
