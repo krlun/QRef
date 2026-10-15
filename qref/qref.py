@@ -240,8 +240,8 @@ class QMRegion(Region):
         self._rotate_back(qm_gradients)
         return qm_energy, qm_gradients, succeeded
 
-    def contribute(self, sites_cart, gradient, target, mm_residual_sum):
-        """Add this region to gradient, in place, and return target with it added;
+    def contribute(self, sites_cart, target, gradient, mm_residual_sum):
+        """Return target with this region added, and add it to gradient in place;
         log what it added."""
         model_mm1, mm1 = self.mm1_energies(sites_cart)
         qm_energy, qm_gradients, succeeded = self.qm_energy_and_gradient(model_mm1)
@@ -255,11 +255,11 @@ class QMRegion(Region):
         return target
 
 
-def run(sites_cart, mm_gradients, mm_residual_sum):
+def run(sites_cart, mm_residual_sum, mm_gradients):
     settings = Settings.read()
 
     if len(sites_cart) != settings.n_atoms:
-        return mm_gradients, mm_residual_sum
+        return mm_residual_sum, mm_gradients
 
     with open('qm.lock', 'w'):
         pass
@@ -273,8 +273,8 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
 
         # loop over all the definitions of syst1 and process (order matters)
         for region in settings.regions(QMRegion):
-            target = region.contribute(sites_cart, mm_gradients, target, mm_residual_sum)
+            target = region.contribute(sites_cart, target, mm_gradients, mm_residual_sum)
     finally:
         os.remove('qm.lock')
 
-    return mm_gradients, target
+    return target, mm_gradients

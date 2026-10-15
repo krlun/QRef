@@ -21,10 +21,10 @@ def contribution(model, sites_cart=None):
     """QRef's contribution alone, with the MM part going in as zero.  run()
     adds into the gradient array in place, so each call needs a fresh one."""
     sites = model.get_sites_cart() if sites_cart is None else sites_cart
-    gradients, target = qref.run(sites_cart=sites,
-                                 mm_gradients=model.get_sites_cart() * 0.0,
-                                 mm_residual_sum=0.0)
-    return gradients, target
+    target, gradients = qref.run(sites_cart=sites,
+                                 mm_residual_sum=0.0,
+                                 mm_gradients=model.get_sites_cart() * 0.0)
+    return target, gradients
 
 
 def moved(serial, axis, sites_cart, step):
@@ -39,7 +39,7 @@ def test_unchanged(prepared, installation, recording):
     """Target and gradients against tests/reference.json, to the last digit;
     --record writes the entry for the installation in use."""
     name, model = prepared
-    gradients, target = contribution(model)
+    target, gradients = contribution(model)
     # 17 significant digits round-trip a double, so comparing the strings compares
     # the values exactly
     result = {'target': format(float(target), '.17g'),
@@ -77,11 +77,11 @@ def test_gradient_matches_finite_difference(prepared, serial, axis):
     4602 carry the angle restraint and 20943 the distance restraint."""
     name, model = prepared
     sites_cart = model.get_sites_cart()
-    gradients, _ = contribution(model, sites_cart)
+    _, gradients = contribution(model, sites_cart)
     analytic = gradients[serial - 1][axis]
 
-    _, plus = contribution(model, moved(serial, axis, sites_cart, +STEP))
-    _, minus = contribution(model, moved(serial, axis, sites_cart, -STEP))
+    plus, _ = contribution(model, moved(serial, axis, sites_cart, +STEP))
+    minus, _ = contribution(model, moved(serial, axis, sites_cart, -STEP))
     numeric = (plus - minus) / (2.0 * STEP)
 
     assert analytic == pytest.approx(numeric, rel=TOLERANCE), (
@@ -138,10 +138,10 @@ def test_failed_orca_falls_back_on_the_previous_gradient(prepared, monkeypatch,
     """Logged as Failed and refined on with the gradient Orca left last time, so
     an unconverged step does not end the refinement."""
     name, model = prepared
-    expected, _ = contribution(model)
+    _, expected = contribution(model)
 
     monkeypatch.setenv('STUB_ORCA_FAIL', failure)
-    gradients, _ = contribution(model)
+    _, gradients = contribution(model)
 
     assert list(gradients) == list(expected)
     with open('qref_1.log') as handle:

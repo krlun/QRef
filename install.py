@@ -229,8 +229,8 @@ def qref_hook(guard):
         '  # ' + idle,
         '  ' + active,
         '    from qref import qref',
-        '    self.gradients, self.residual_sum = qref.run(sites_cart=sites_cart, '
-        'mm_gradients=self.gradients, mm_residual_sum=self.residual_sum)',
+        '    self.residual_sum, self.gradients = qref.run(sites_cart=sites_cart, '
+        'mm_residual_sum=self.residual_sum, mm_gradients=self.gradients)',
         END,
     ]
 
