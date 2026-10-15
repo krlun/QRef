@@ -7,12 +7,12 @@ import os
 import re
 import sys
 import argparse
-import json
 import subprocess
 
 from iotbx.data_manager import DataManager
 
 from utils import Region
+from utils import Settings
 from utils import read_region
 
 
@@ -127,11 +127,6 @@ def check_altlocs(model, link_atoms):
         print('Altloc:  \"and altloc ' + altlocs[0] + '\"')
 
 
-def write_settings(settings):
-    with open('qref.dat', 'w') as handle:
-        json.dump(settings, handle, indent=4, sort_keys=True)
-
-
 def prepare_restart(infile, outfile):
     records = {'ATOM', 'HETATM', 'ANISOU', 'CRYST1', 'ORIGX1', 'ORIGX2', 'ORIGX3', 'SCALE1', 'SCALE2', 'SCALE3', 'TER', 'END'}
     with open(infile, 'r') as handle, open(outfile, 'w') as out:
@@ -170,92 +165,92 @@ def parse_args():
     return parser.parse_args()
 
 
+def add_options(region, args):
+    # the restraints and transforms given for this region on the command line
+    for restraint in args.restraint_distance or []:
+        if int(restraint[0]) == region.number:
+            region.restraints_distance.append([int(restraint[1]), int(restraint[2]), float(restraint[3]), float(restraint[4])])
+    for restraint in args.restraint_angle or []:
+        if int(restraint[0]) == region.number:
+            region.restraints_angle.append([int(restraint[1]), int(restraint[2]), int(restraint[3]), float(restraint[4]), float(restraint[5])])
+    for transform in args.transform or []:
+        if int(transform[0]) == region.number:
+            region.transforms.append({'atoms': transform[1],
+                                      'R': [[float(x) for x in transform[3*i+2:3*i+5]] for i in range(3)],
+                                      't': [float(x) for x in transform[11:14]]})
+
+
+def prepare_region(number, syst1, model_mm, args, junctfactor):
+    """Write mm_i_c.pdb for one region and, unless -u, qm_i_h.pdb, and return the region."""
+    print('----------')
+    print(syst1.center(10))
+    print('----------')
+    print()
+    region = Region(number, syst1)
+    model_mm1 = region.select(model_mm)
+    model_mm1.process(pdb_interpretation_params=model_mm1.get_current_pdb_interpretation_params(), make_restraints=True)
+    region.restore_serials(model_mm1)
+    print('Writing file:  ' + region.mm1_file)
+    model_mm1.get_hierarchy().write_pdb_file(file_name=region.mm1_file, crystal_symmetry=model_mm.crystal_symmetry(), anisou=False)
+
+    if not args.skip_h:
+        region.link_partners = find_link_partners(model_mm1, region)
+        region.g_bond = junction_factors(model_mm1, region, junctfactor, args.ltype)
+        add_options(region, args)
+        region.apply_transforms(model_mm1)
+        print('Writing file:  ' + region.qm_file)
+        region.write_qm_model(model_mm1)
+
+    suggest_selection_string(model_mm1)
+    check_altlocs(model_mm1, region.link_atoms)
+    print('----------')
+    return region
+
+
 def main():
     args = parse_args()
     print('*** This is qref_prep.py ***')
     print()
-    model_file = args.pdb
-    syst1_files = args.syst1
-    junc_factor_file = args.junctfactor
-    ltype = args.ltype
+    junctfactor = None
     if not args.skip_h:
-        junctfactor = read_junctfactor(junc_factor_file=junc_factor_file)
-        check_overlap(syst1_files)
+        junctfactor = read_junctfactor(args.junctfactor)
+        check_overlap(args.syst1)
     dm = DataManager()
     if args.cif is not None:
         for cif in args.cif:
             dm.process_restraint_file(cif)
-    dm.process_model_file(model_file)
-    model_mm = dm.get_model(filename=model_file)
+    dm.process_model_file(args.pdb)
+    model_mm = dm.get_model(filename=args.pdb)
     model_mm.add_crystal_symmetry_if_necessary()
 
-    settings = dict()
-
-    for number, syst1 in enumerate(syst1_files, 1):
-        print('----------')
-        print(syst1.center(10))
-        print('----------')
-        print()
-        region = Region(number, syst1)
-        model_mm1 = region.select(model_mm)
-        model_mm1.process(pdb_interpretation_params=model_mm1.get_current_pdb_interpretation_params(), make_restraints=True)
-        region.restore_serials(model_mm1)
-        print('Writing file:  ' + region.mm1_file)
-        model_mm1.get_hierarchy().write_pdb_file(file_name=region.mm1_file, crystal_symmetry=model_mm.crystal_symmetry(), anisou=False)
-
-        if not args.skip_h:
-            region.link_partners = find_link_partners(model_mm1, region)
-            region.g_bond = junction_factors(model_mm1, region, junctfactor, ltype)
-            if args.restraint_distance is not None:
-                for restraint in args.restraint_distance:
-                    if int(restraint[0]) == number:
-                        region.restraints_distance.append([int(restraint[1]), int(restraint[2]), float(restraint[3]), float(restraint[4])])
-            if args.restraint_angle is not None:
-                for restraint in args.restraint_angle:
-                    if int(restraint[0]) == number:
-                        region.restraints_angle.append([int(restraint[1]), int(restraint[2]), int(restraint[3]), float(restraint[4]), float(restraint[5])])
-            if args.transform is not None:
-                for transform in args.transform:
-                    if int(transform[0]) == number:
-                        region.transforms.append({'atoms': transform[1],
-                                                  'R': [[float(x) for x in transform[3*i+2:3*i+5]] for i in range(3)],
-                                                  't': [float(x) for x in transform[11:14]]})
-            region.apply_transforms(model_mm1)
-            print('Writing file:  ' + region.qm_file)
-            region.write_qm_model(model_mm1)
-            settings[syst1] = region.settings_entry()
-
-        suggest_selection_string(model_mm1)
-        check_altlocs(model_mm1, region.link_atoms)
-        print('----------')
+    regions = [prepare_region(number, syst1, model_mm, args, junctfactor)
+               for number, syst1 in enumerate(args.syst1, 1)]
 
     if not args.skip_h:
-        settings['n_atoms'] = model_mm.get_number_of_atoms()
-        settings['restart'] = args.restart
-        settings['w_qm'] = args.w_qm
-        settings['cif'] = args.cif
-        settings['orca_binary'] = locate_binary('orca')
-        settings['ltype'] = ltype
-        settings['syst1_files'] = args.syst1
+        settings = Settings(args.syst1, n_atoms=model_mm.get_number_of_atoms(), restart=args.restart,
+                            w_qm=args.w_qm, cif=args.cif, orca_binary=locate_binary('orca'),
+                            ltype=args.ltype)
+        for region in regions:
+            settings.add(region)
         print('----------')
         print()
         print('Writing file:  qref.dat')
         print()
         print('----------')
-        write_settings(settings)
+        settings.write()
 
     if args.restart is not None:
         print()
         print('Writing file:  ' + args.restart)
         print()
         print('----------')
-        prepare_restart(model_file, args.restart)
+        prepare_restart(args.pdb, args.restart)
 
     # cleanup
     temp_files = ['settings.pickle']
-    for handle in temp_files:
-        if os.path.exists(handle):
-            os.remove(handle)
+    for path in temp_files:
+        if os.path.exists(path):
+            os.remove(path)
 
 
 if (__name__ == "__main__"):

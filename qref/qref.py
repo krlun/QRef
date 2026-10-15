@@ -8,8 +8,8 @@ import numpy as np
 from iotbx.data_manager import DataManager
 
 from qref.common import Region
+from qref.common import Settings
 from qref.common import parse_serials
-from qref.common import read_settings
 
 KCAL_PER_HARTREE = 627.509474063112
 KJ_PER_HARTREE = 2625.499639479950
@@ -124,9 +124,9 @@ class QMRegion(Region):
         super(QMRegion, self).__init__(number, syst1, settings)
         self.restraints = ([DistanceRestraint(*restraint) for restraint in self.restraints_distance]
                            + [AngleRestraint(*restraint) for restraint in self.restraints_angle])
-        self.cif = settings['cif']
-        self.orca_binary = settings['orca_binary']
-        self.w_qm = settings['w_qm']
+        self.cif = settings.cif
+        self.orca_binary = settings.orca_binary
+        self.w_qm = settings.w_qm
 
     def _add_qm_mm(self, gradient, qm_gradients, mm1_gradients):
         """Fold this region's QM and MM1 gradients into the whole model's."""
@@ -257,9 +257,9 @@ class QMRegion(Region):
 
 
 def run(sites_cart, mm_gradients, mm_residual_sum):
-    settings = read_settings('qref.dat')
+    settings = Settings.read()
 
-    if len(sites_cart) != settings['n_atoms']:
+    if len(sites_cart) != settings.n_atoms:
         return mm_gradients, mm_residual_sum
 
     with open('qm.lock', 'w'):
@@ -267,15 +267,14 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
 
     try:
         # if specified, update coordinates of restart file
-        if settings['restart'] is not None:
-            write_coordinates(infile=settings['restart'], sites_cart=sites_cart)
+        if settings.restart is not None:
+            write_coordinates(infile=settings.restart, sites_cart=sites_cart)
 
         target = mm_residual_sum
         total_gradient = mm_gradients
 
         # loop over all the definitions of syst1 and process (order matters)
-        for number, syst1 in enumerate(settings['syst1_files'], 1):
-            region = QMRegion(number, syst1, settings)
+        for region in settings.regions(QMRegion):
             total_gradient, target = region.contribute(sites_cart, total_gradient,
                 target, mm_residual_sum)
     finally:

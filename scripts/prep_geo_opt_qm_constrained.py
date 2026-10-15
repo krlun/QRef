@@ -8,8 +8,7 @@ import shutil
 
 from iotbx.data_manager import DataManager
 
-from utils import Region
-from utils import read_settings
+from utils import Settings
 
 
 def modify_qm_input(path, region):
@@ -59,17 +58,16 @@ def main():
         raise SystemExit('\'qref.dat\' missing, exiting...')
     args = parse_args()
     model_file = args.pdb
-    settings = read_settings('qref.dat')
+    settings = Settings.read()
     dm = DataManager()
     dm.process_model_file(model_file)
     model_mm = dm.get_model(filename=model_file)
     model_mm.add_crystal_symmetry_if_necessary()
     print('----------')
     print()
-    for number, syst1 in enumerate(settings['syst1_files'], 1):
-        region = Region(number, syst1, settings)
+    for region in settings.regions():
         model_mm1 = region.select(model_mm)
-        geo_opt_dir = 'geo_opt_qm_constrained_' + str(number)
+        geo_opt_dir = 'geo_opt_qm_constrained_' + str(region.number)
         print('Generating: ' + geo_opt_dir)
         if not os.path.isdir(geo_opt_dir):
             os.mkdir(geo_opt_dir)

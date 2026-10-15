@@ -34,12 +34,6 @@ def read_region(infile):
     return serials, link_atoms
 
 
-def read_settings(infile):
-    with open(infile, 'r') as handle:
-        settings = json.load(handle, object_hook=lambda d: {int(key) if key.isdigit() else key: value for key, value in d.items()})
-    return settings
-
-
 class Region(object):
     """One syst1 file: its atoms, how its link atoms are capped, its restraints,
     and the files named after it.  Without settings, the rest is left for
@@ -56,12 +50,13 @@ class Region(object):
         self.restraints_distance = list()
         self.restraints_angle = list()
         if settings is not None:
-            self.link_partners = settings[syst1]['link_pairs']
-            self.g_bond = settings[syst1]['g']
+            entry = settings.entries[syst1]
+            self.link_partners = entry['link_pairs']
+            self.g_bond = entry['g']
             # qref.dat files from before symmetry transforms have none
-            self.transforms = settings[syst1].get('transforms', [])
-            self.restraints_distance = settings[syst1]['restraints_distance']
-            self.restraints_angle = settings[syst1]['restraints_angle']
+            self.transforms = entry.get('transforms', [])
+            self.restraints_distance = entry['restraints_distance']
+            self.restraints_angle = entry['restraints_angle']
 
     def position(self, serial):
         """Where the atom is in this region's files: mm_i_c.pdb, qm_i_h.pdb and qm_i.engrad."""
@@ -141,3 +136,46 @@ class Region(object):
                 'transforms': self.transforms,
                 'restraints_distance': self.restraints_distance,
                 'restraints_angle': self.restraints_angle}
+
+
+class Settings(object):
+    """qref.dat: what qref_prep.py writes, and QRef and the scripts read back.
+    entries holds each region's entry, keyed by its syst1 file."""
+
+    def __init__(self, syst1_files, n_atoms=None, restart=None, w_qm=None, cif=None,
+                 orca_binary=None, ltype=None):
+        self.syst1_files = syst1_files
+        self.n_atoms = n_atoms
+        self.restart = restart
+        self.w_qm = w_qm
+        self.cif = cif
+        self.orca_binary = orca_binary
+        self.ltype = ltype
+        self.entries = dict()
+
+    @classmethod
+    def read(cls, path='qref.dat'):
+        # link_pairs and g are keyed by serial, which JSON stores as a string
+        with open(path, 'r') as handle:
+            data = json.load(handle, object_hook=lambda d: {int(key) if key.isdigit() else key: value for key, value in d.items()})
+        settings = cls(data['syst1_files'], n_atoms=data['n_atoms'], restart=data['restart'],
+                       w_qm=data['w_qm'], cif=data['cif'], orca_binary=data['orca_binary'],
+                       ltype=data['ltype'])
+        for syst1 in settings.syst1_files:
+            settings.entries[syst1] = data[syst1]
+        return settings
+
+    def write(self, path='qref.dat'):
+        data = dict(self.entries)
+        data.update({'syst1_files': self.syst1_files, 'n_atoms': self.n_atoms,
+                     'restart': self.restart, 'w_qm': self.w_qm, 'cif': self.cif,
+                     'orca_binary': self.orca_binary, 'ltype': self.ltype})
+        with open(path, 'w') as handle:
+            json.dump(data, handle, indent=4, sort_keys=True)
+
+    def add(self, region):
+        self.entries[region.syst1] = region.settings_entry()
+
+    def regions(self, region_class=Region):
+        """The regions, in the order of syst1_files, which is the order QRef adds them in."""
+        return [region_class(number, syst1, self) for number, syst1 in enumerate(self.syst1_files, 1)]

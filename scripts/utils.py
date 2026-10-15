@@ -21,5 +21,5 @@ except ImportError:
     sys.path.insert(0, root)
 
 from qref.common import Region
-from qref.common import read_settings
+from qref.common import Settings
 from qref.common import read_region
