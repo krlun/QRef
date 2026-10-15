@@ -33,30 +33,21 @@ from qref.common import write_pdb_h
 
 
 def read_junc_factors(junc_factor_file):
-    delimiters = '[#!]'
+    # a line 'residue atom1 atom2 type' starts a bond, followed by lines
+    # 'ltype distance' up to a blank line; distances are written as Fortran
+    # doubles, e.g. 1.1070d0
     junc_factors = dict()
+    distances = None
     with open(junc_factor_file, 'r') as file:
-        line = file.readline()
-        while line:
-            line = re.split(delimiters, line)[0].strip()
-            if len(line) > 0:
-                line = line.split()
-                if len(line) == 4:
-                    res = line[0]
-                    if res not in junc_factors:
-                        junc_factors[res] = dict()
-                    # bond = '-'.join(sorted(line[1:3]))
-                    bond = '-'.join(line[1:3])
-                    if bond not in junc_factors[res]:
-                        junc_factors[res][bond] = dict()
-                    line = file.readline()
-                    while line != '\n' and line:
-                        line = re.split(delimiters, line)[0].strip().split()
-                        ltype = int(line[0])
-                        distance = float(line[1].split('d')[0])
-                        junc_factors[res][bond][ltype] = distance
-                        line = file.readline()
-            line = file.readline()
+        for line in file:
+            fields = re.split('[#!]', line)[0].split()
+            if not line.strip():
+                distances = None
+            elif len(fields) == 4:
+                res, bond = fields[0], '-'.join(fields[1:3])
+                distances = junc_factors.setdefault(res, dict()).setdefault(bond, dict())
+            elif distances is not None and fields:
+                distances[int(fields[0])] = float(fields[1].split('d')[0])
     return junc_factors
 
 
