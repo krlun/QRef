@@ -66,6 +66,7 @@ def main():
     dm = DataManager()
     dm.process_model_file(model_file)
     model_mm = dm.get_model(filename=model_file)
+    model_mm.add_crystal_symmetry_if_necessary()
     print('----------')
     print()
     for index, syst1 in enumerate(settings['syst1_files'], 1):
