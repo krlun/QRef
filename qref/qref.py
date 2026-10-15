@@ -63,6 +63,63 @@ def write_coordinates(infile, sites_cart):
             handle.write(line)
 
 
+class DistanceRestraint(object):
+    """Harmonic restraint force_constant*(r - distance)**2 on the distance r between
+    atom1 and atom2, in Angstrom."""
+
+    def __init__(self, atom1, atom2, distance, force_constant):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.distance = distance
+        self.force_constant = force_constant
+
+    def add_to(self, sites_cart, gradients):
+        """Add the gradient of the restraint to gradients, and return its energy."""
+        r_ij = np.array(sites_cart[self.atom1-1]) - np.array(sites_cart[self.atom2-1])
+        r = np.linalg.norm(r_ij)
+        delta_r = r - self.distance
+        d_U_ij_d_r = 2*self.force_constant*delta_r
+        d_r_d_r_ij = r_ij/r
+        gradients[self.atom1-1] += d_U_ij_d_r*d_r_d_r_ij
+        gradients[self.atom2-1] += -d_U_ij_d_r*d_r_d_r_ij
+        return self.force_constant*delta_r**2
+
+
+class AngleRestraint(object):
+    """Harmonic restraint force_constant*(alpha - angle)**2 on the angle alpha
+    atom1-atom2-atom3, in degrees, with atom2 at the tip."""
+
+    def __init__(self, atom1, atom2, atom3, angle, force_constant):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.atom3 = atom3
+        self.angle = angle
+        self.force_constant = force_constant
+
+    def add_to(self, sites_cart, gradients):
+        """Add the gradient of the restraint to gradients, and return its energy.
+        i, j and k are atom1, atom2 and atom3."""
+        site2 = np.array(sites_cart[self.atom2-1])
+        r_ij = np.array(sites_cart[self.atom1-1]) - site2
+        r_kj = np.array(sites_cart[self.atom3-1]) - site2
+        norm_r_ij = np.linalg.norm(r_ij)
+        norm_r_kj = np.linalg.norm(r_kj)
+        u_ij = r_ij/norm_r_ij
+        u_kj = r_kj/norm_r_kj
+        cos_alpha = np.dot(r_ij, r_kj)/(norm_r_ij * norm_r_kj)
+        alpha = np.degrees(np.arccos(cos_alpha))
+        delta_alpha = alpha - self.angle
+        d_U_d_alpha = 2*self.force_constant*delta_alpha
+        inv_sin_alpha = 1.0/np.sqrt(1 - cos_alpha**2)
+        d_alpha_d_r_i = np.degrees(inv_sin_alpha * (1.0/norm_r_ij) * (cos_alpha * u_ij - u_kj))
+        d_alpha_d_r_k = np.degrees(inv_sin_alpha * (1.0/norm_r_kj) * (cos_alpha * u_kj - u_ij))
+        d_alpha_d_r_j = - d_alpha_d_r_i - d_alpha_d_r_k
+        gradients[self.atom1-1] += d_U_d_alpha*d_alpha_d_r_i
+        gradients[self.atom2-1] += d_U_d_alpha*d_alpha_d_r_j
+        gradients[self.atom3-1] += d_U_d_alpha*d_alpha_d_r_k
+        return self.force_constant*delta_alpha**2
+
+
 class Region(object):
     """One syst1 definition: its atoms, its junctions and the files named after it."""
 
@@ -73,8 +130,8 @@ class Region(object):
         self.link_partners = settings[syst1]['link_pairs']
         self.g_bond = settings[syst1]['g']
         self.transforms = settings[syst1]['transforms']
-        self.restraints_distance = settings[syst1]['restraints_distance']
-        self.restraints_angle = settings[syst1]['restraints_angle']
+        self.restraints = ([DistanceRestraint(*restraint) for restraint in settings[syst1]['restraints_distance']]
+                           + [AngleRestraint(*restraint) for restraint in settings[syst1]['restraints_angle']])
         self.cif = settings['cif']
         self.orca_binary = settings['orca_binary']
         self.w_qm = settings['w_qm']
@@ -122,39 +179,6 @@ class Region(object):
             for atom in parse_serials(transform['atoms']):
                 gradients[self.serial_to_index[atom]] = np.matmul(R_inv, gradients[self.serial_to_index[atom]])
         return gradients
-
-    def _apply_restraints_distance(self, sites_cart, gradients, target):
-        # restraint[0] = atom1_serial, restraint[1] = atom2_serial, restraint[2] = desired distance in Angstrom, restraint[3] = force constant
-        for restraint in self.restraints_distance:
-            r_ij = np.array(sites_cart[restraint[0]-1]) - np.array(sites_cart[restraint[1]-1])
-            r = np.sqrt(np.sum(r_ij**2))
-            delta_r = r - restraint[2]
-            d_U_ij_d_r = 2*restraint[3]*delta_r
-            d_r_d_r_ij = r_ij/r
-            gradients[restraint[0]-1] += d_U_ij_d_r*d_r_d_r_ij
-            gradients[restraint[1]-1] += -d_U_ij_d_r*d_r_d_r_ij
-            target += restraint[3]*delta_r**2
-        return gradients, target
-
-    def _apply_restraints_angle(self, sites_cart, gradients, target):
-        # restraint[0] = atom1_serial (i), restraint[1] = atom2_serial ("middle" atom) (j), restraint[2] = atom3_serial (k), restraint[3] = desired angle in degrees, restraint[4] = force constant
-        for restraint in self.restraints_angle:
-            r_ij = np.array(sites_cart[restraint[0]-1]) - np.array(sites_cart[restraint[1]-1])
-            r_kj = np.array(sites_cart[restraint[2]-1]) - np.array(sites_cart[restraint[1]-1])
-            norm_r_ij = np.linalg.norm(r_ij)
-            norm_r_kj = np.linalg.norm(r_kj)
-            cos_alpha = np.dot(r_ij, r_kj)/(norm_r_ij * norm_r_kj)
-            alpha = np.degrees(np.arccos(cos_alpha))
-            delta_alpha = alpha - restraint[3]
-            d_U_d_alpha = 2*restraint[4]*delta_alpha
-            d_alpha_d_r_i = np.degrees((1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_ij) * (cos_alpha * (r_ij/norm_r_ij) - (r_kj/norm_r_kj)))
-            d_alpha_d_r_k = np.degrees((1.0/np.sqrt(1 - cos_alpha**2)) * (1.0/norm_r_kj) * (cos_alpha * (r_kj/norm_r_kj) - (r_ij/norm_r_ij)))
-            d_alpha_d_r_j = - d_alpha_d_r_i - d_alpha_d_r_k
-            gradients[restraint[0]-1] += d_U_d_alpha*d_alpha_d_r_i
-            gradients[restraint[1]-1] += d_U_d_alpha*d_alpha_d_r_j
-            gradients[restraint[2]-1] += d_U_d_alpha*d_alpha_d_r_k
-            target += restraint[4]*delta_alpha**2
-        return gradients, target
 
     def _log(self, qm_energy, mm_energy, mm1_energy):
         """Append a row to this region's log; qm_energy is None for a failed run,
@@ -258,8 +282,8 @@ class Region(object):
 
         target = target - mm1.target + self.w_qm*KCAL_PER_HARTREE*qm_energy
         gradient = self._add_qm_mm(gradient, qm_gradients, mm1.gradients)
-        gradient, target = self._apply_restraints_distance(sites_cart, gradient, target)
-        gradient, target = self._apply_restraints_angle(sites_cart, gradient, target)
+        for restraint in self.restraints:
+            target += restraint.add_to(sites_cart, gradient)
 
         self._log(qm_energy if succeeded else None, mm_residual_sum, mm1.target)
         return gradient, target
