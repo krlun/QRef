@@ -138,7 +138,6 @@ class QMRegion(Region):
             else:
                 gradient[self.link_partners[atom]-1] += (1-self.g_bond[atom])*qm
                 gradient[atom-1] += self.g_bond[atom]*qm
-        return gradient
 
     def _rotate_back(self, gradients):
         """Undo the transforms, so the gradients match the untransformed model."""
@@ -146,7 +145,6 @@ class QMRegion(Region):
             R_inv = np.linalg.inv(np.array(transform['R']))
             for atom in parse_serials(transform['atoms']):
                 gradients[self.position(atom)] = np.matmul(R_inv, gradients[self.position(atom)])
-        return gradients
 
     def _log(self, qm_energy, mm_energy, mm1_energy):
         """Append a row to this region's log; qm_energy is None for a failed run,
@@ -239,21 +237,22 @@ class QMRegion(Region):
                              % (self.orca_binary, self.output_file))
         qm_energy, qm_gradients = read_engrad(self.engrad_file)
         qm_gradients = rescale_qm_gradients(qm_gradients, self.w_qm*KCAL_PER_HARTREE/ANGSTROM_PER_BOHR)
-        qm_gradients = self._rotate_back(qm_gradients)
+        self._rotate_back(qm_gradients)
         return qm_energy, qm_gradients, succeeded
 
     def contribute(self, sites_cart, gradient, target, mm_residual_sum):
-        """Add this region to the gradient and target, and log what it added."""
+        """Add this region to gradient, in place, and return target with it added;
+        log what it added."""
         model_mm1, mm1 = self.mm1_energies(sites_cart)
         qm_energy, qm_gradients, succeeded = self.qm_energy_and_gradient(model_mm1)
 
         target = target - mm1.target + self.w_qm*KCAL_PER_HARTREE*qm_energy
-        gradient = self._add_qm_mm(gradient, qm_gradients, mm1.gradients)
+        self._add_qm_mm(gradient, qm_gradients, mm1.gradients)
         for restraint in self.restraints:
             target += restraint.add_to(sites_cart, gradient)
 
         self._log(qm_energy if succeeded else None, mm_residual_sum, mm1.target)
-        return gradient, target
+        return target
 
 
 def run(sites_cart, mm_gradients, mm_residual_sum):
@@ -271,13 +270,11 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
             write_coordinates(infile=settings.restart, sites_cart=sites_cart)
 
         target = mm_residual_sum
-        total_gradient = mm_gradients
 
         # loop over all the definitions of syst1 and process (order matters)
         for region in settings.regions(QMRegion):
-            total_gradient, target = region.contribute(sites_cart, total_gradient,
-                target, mm_residual_sum)
+            target = region.contribute(sites_cart, mm_gradients, target, mm_residual_sum)
     finally:
         os.remove('qm.lock')
 
-    return total_gradient, target
+    return mm_gradients, target
