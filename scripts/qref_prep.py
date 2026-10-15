@@ -4,6 +4,7 @@
 from __future__ import absolute_import, division, print_function
 
 import os
+import re
 import sys
 import argparse
 import json
@@ -13,7 +14,25 @@ from iotbx.data_manager import DataManager
 
 from utils import Region
 from utils import read_region
-from utils import read_junctfactor
+
+
+def read_junctfactor(junc_factor_file):
+    # a line 'residue atom1 atom2 type' starts a bond, followed by lines
+    # 'ltype distance' up to a blank line; distances are written as Fortran
+    # doubles, e.g. 1.1070d0
+    junctfactor = dict()
+    distances = None
+    with open(junc_factor_file, 'r') as handle:
+        for line in handle:
+            fields = re.split('[#!]', line)[0].split()
+            if not line.strip():
+                distances = None
+            elif len(fields) == 4:
+                resname, bond = fields[0], '-'.join(fields[1:3])
+                distances = junctfactor.setdefault(resname, dict()).setdefault(bond, dict())
+            elif distances is not None and fields:
+                distances[int(fields[0])] = float(fields[1].split('d')[0])
+    return junctfactor
 
 
 def find_link_partners(model, region):
