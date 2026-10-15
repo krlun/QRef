@@ -43,11 +43,11 @@ def read_junc_factors(junc_factor_file):
                 line = line.split()
                 if len(line) == 4:
                     res = line[0]
-                    if res not in junc_factors.keys():
+                    if res not in junc_factors:
                         junc_factors[res] = dict()
                     # bond = '-'.join(sorted(line[1:3]))
                     bond = '-'.join(line[1:3])
-                    if bond not in junc_factors[res].keys():
+                    if bond not in junc_factors[res]:
                         junc_factors[res][bond] = dict()
                     line = file.readline()
                     while line != '\n' and line:

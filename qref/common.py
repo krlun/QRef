@@ -45,9 +45,9 @@ def write_pdb_h(outfile, model, link_pairs, g, serial_to_index):
     atoms = hierarchy.atoms()
     for atom in atoms:
         atom_serial = int(atom.serial.strip())
-        if atom.element_is_hydrogen() or atom_serial in link_pairs.keys():
+        if atom.element_is_hydrogen() or atom_serial in link_pairs:
             atom.element = ' H'
-        if atom_serial in link_pairs.keys():
+        if atom_serial in link_pairs:
             c_qm = atoms[serial_to_index[link_pairs[atom_serial]]]
             atom.xyz = (c_qm.xyz[0] + g[atom_serial]*(atom.xyz[0] - c_qm.xyz[0]), 
                 c_qm.xyz[1] + g[atom_serial]*(atom.xyz[1] - c_qm.xyz[1]),

@@ -67,11 +67,11 @@ def calculate_g_factor(model, link_pairs, junc_factors, ltype, serial_to_index):
         link_atom = atoms[serial_to_index[key]]
         resname = link_atom.parent().resname.strip()
         bond = '-'.join([c_qm.name.strip(), link_atom.name.strip()])
-        if resname not in junc_factors.keys():
+        if resname not in junc_factors:
             raise SystemExit(resname + ' missing in junction factor file. Exiting...')
-        if bond not in junc_factors[resname].keys():
+        if bond not in junc_factors[resname]:
             raise SystemExit(bond + ' (between atoms ' + str(value) + ' and ' + str(key) + ') missing for ' + resname + ' in junction factor file. Exiting...')
-        if ltype not in junc_factors[resname][bond].keys():
+        if ltype not in junc_factors[resname][bond]:
             raise SystemExit('Missing ltype ' + str(ltype) + ' for bond ' + bond + ' in residue ' + resname + ' in junction factor file. Exiting...')
         c_h_ideal = junc_factors[resname][bond][ltype] # eg. print(junc_factors['PHE']['CB-CG'][12])
         g[key] = c_h_ideal/model.restraints_manager.geometry.bond_params_table.lookup(serial_to_index[key], serial_to_index[value]).distance_ideal
@@ -163,7 +163,7 @@ def main():
     syst1_files = args.syst1
     junc_factor_file = args.junctfactor[0]
     ltype = args.ltype[0]
-    if args.skip_h is not True:
+    if not args.skip_h:
         junc_factors = read_junc_factors(junc_factor_file=junc_factor_file)
         check_overlap(syst1_files)
     dm = DataManager()
@@ -190,7 +190,7 @@ def main():
         print('Writing file:  ' + mm1_file)
         model_mm1.get_hierarchy().write_pdb_file(file_name=mm1_file, crystal_symmetry=model_mm.crystal_symmetry(), anisou=False)
 
-        if args.skip_h is not True:
+        if not args.skip_h:
             dat[syst1] = dict()
             link_pairs = identify_link_pairs(model_mm1, link_atoms, serial_to_index)
             g = calculate_g_factor(model_mm1, link_pairs=link_pairs, junc_factors=junc_factors, ltype=ltype, serial_to_index=serial_to_index)
@@ -223,7 +223,7 @@ def main():
         check_altlocs(model_mm1, link_atoms)
         print('----------')
 
-    if args.skip_h is not True:
+    if not args.skip_h:
         dat['n_atoms'] = model_mm.get_number_of_atoms()
         dat['restart'] = args.restart
         dat['w_qm'] = args.w_qm[0]

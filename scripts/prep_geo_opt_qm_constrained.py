@@ -78,7 +78,7 @@ def main():
         qm_inp_file = 'qm_' + str(index) + '.inp'
         if not os.path.isdir(geo_opt_dir):
             os.mkdir(geo_opt_dir)
-        if 'transforms' in dat[syst1].keys(): # backwards compatability
+        if 'transforms' in dat[syst1]: # backwards compatibility
             apply_transforms(model_mm1, dat[syst1]['transforms'], serial_to_index)
         write_pdb_h(geo_opt_dir + '/' + qm_pdb_file, model_mm1, dat[syst1]['link_pairs'], dat[syst1]['g'], serial_to_index)
         shutil.copy(qm_inp_file, geo_opt_dir)

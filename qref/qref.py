@@ -107,7 +107,7 @@ class Region(object):
         """Fold this region's QM and MM1 gradients into the whole model's."""
         for atom in self.qm_atoms:
             gradient[atom-1] -= np.array(mm1_gradients[self.serial_to_index[atom]])
-            if atom not in self.link_pairs.keys():
+            if atom not in self.link_pairs:
                 gradient[atom-1] += np.array(qm_gradients[self.serial_to_index[atom]])
             else:
                 gradient[self.link_pairs[atom]-1] += (1-self.g[atom])*np.array(qm_gradients[self.serial_to_index[atom]])
