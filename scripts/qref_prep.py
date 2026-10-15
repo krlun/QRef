@@ -11,27 +11,23 @@ import subprocess
 
 from iotbx.data_manager import DataManager
 
-from utils import apply_transforms
-from utils import convert_serial_to_index
+from utils import Region
 from utils import read_region
 from utils import read_junctfactor
-from utils import restore_serials
-from utils import select_region
-from utils import write_qm_model
 
 
-def find_link_partners(model, link_atoms, serial_to_index):
+def find_link_partners(model, region):
     link_partners = dict()
     hierarchy = model.get_hierarchy()
     atoms = hierarchy.atoms()
     bond_params_table = model.restraints_manager.geometry.bond_params_table
-    for link in link_atoms:
+    for link in region.link_atoms:
         min_distance = float('inf')
         closest = None
-        link_atom = atoms[serial_to_index[link]]
+        link_atom = atoms[region.position(link)]
         for atom in atoms:
             serial = int(atom.serial.strip())
-            if serial != link and bond_params_table.lookup(serial_to_index[link], serial_to_index[serial]) is not None:
+            if serial != link and bond_params_table.lookup(region.position(link), region.position(serial)) is not None:
                 distance = atom.distance(link_atom)
                 if distance < min_distance:
                     closest = serial
@@ -59,12 +55,12 @@ def check_overlap(syst1_files):
         qm_atoms |= serials - link_atoms
 
 
-def junction_factors(model, link_partners, junctfactor, ltype, serial_to_index):
+def junction_factors(model, region, junctfactor, ltype):
     g_bond = dict()
     atoms = model.get_hierarchy().atoms()
-    for key, value in link_partners.items():
-        c_qm = atoms[serial_to_index[value]]
-        link_atom = atoms[serial_to_index[key]]
+    for key, value in region.link_partners.items():
+        c_qm = atoms[region.position(value)]
+        link_atom = atoms[region.position(key)]
         resname = link_atom.parent().resname.strip()
         bond = '-'.join([c_qm.name.strip(), link_atom.name.strip()])
         if resname not in junctfactor:
@@ -74,7 +70,7 @@ def junction_factors(model, link_partners, junctfactor, ltype, serial_to_index):
         if ltype not in junctfactor[resname][bond]:
             raise SystemExit('Missing ltype ' + str(ltype) + ' for bond ' + bond + ' in residue ' + resname + ' in junction factor file. Exiting...')
         c_h_ideal = junctfactor[resname][bond][ltype] # eg. print(junctfactor['PHE']['CB-CG'][12])
-        g_bond[key] = c_h_ideal/model.restraints_manager.geometry.bond_params_table.lookup(serial_to_index[key], serial_to_index[value]).distance_ideal
+        g_bond[key] = c_h_ideal/model.restraints_manager.geometry.bond_params_table.lookup(region.position(key), region.position(value)).distance_ideal
     return g_bond
 
 
@@ -176,51 +172,42 @@ def main():
 
     settings = dict()
 
-    for index, syst1 in enumerate(syst1_files, 1):
+    for number, syst1 in enumerate(syst1_files, 1):
         print('----------')
         print(syst1.center(10))
         print('----------')
         print()
-        serials, link_atoms = read_region(syst1)
-        serial_to_index = convert_serial_to_index(serials)
-        model_mm1 = select_region(model=model_mm, serials=serials)
+        region = Region(number, syst1)
+        model_mm1 = region.select(model_mm)
         model_mm1.process(pdb_interpretation_params=model_mm1.get_current_pdb_interpretation_params(), make_restraints=True)
-        restore_serials(model_mm1, serial_to_index=serial_to_index)
-        mm1_file = 'mm_' + str(index) + '_c.pdb'
-        print('Writing file:  ' + mm1_file)
-        model_mm1.get_hierarchy().write_pdb_file(file_name=mm1_file, crystal_symmetry=model_mm.crystal_symmetry(), anisou=False)
+        region.restore_serials(model_mm1)
+        print('Writing file:  ' + region.mm1_file)
+        model_mm1.get_hierarchy().write_pdb_file(file_name=region.mm1_file, crystal_symmetry=model_mm.crystal_symmetry(), anisou=False)
 
         if not args.skip_h:
-            settings[syst1] = dict()
-            link_partners = find_link_partners(model_mm1, link_atoms, serial_to_index)
-            g_bond = junction_factors(model_mm1, link_partners=link_partners, junctfactor=junctfactor, ltype=ltype, serial_to_index=serial_to_index)
-            settings[syst1]['link_pairs'] = link_partners
-            settings[syst1]['g'] = g_bond
-            settings[syst1]['restraints_distance'] = list()
-            settings[syst1]['restraints_angle'] = list()
-            settings[syst1]['transforms'] = list()
+            region.link_partners = find_link_partners(model_mm1, region)
+            region.g_bond = junction_factors(model_mm1, region, junctfactor, ltype)
             if args.restraint_distance is not None:
                 for restraint in args.restraint_distance:
-                    if int(restraint[0]) == index:
-                        settings[syst1]['restraints_distance'].append([int(restraint[1]), int(restraint[2]), float(restraint[3]), float(restraint[4])])
+                    if int(restraint[0]) == number:
+                        region.restraints_distance.append([int(restraint[1]), int(restraint[2]), float(restraint[3]), float(restraint[4])])
             if args.restraint_angle is not None:
                 for restraint in args.restraint_angle:
-                    if int(restraint[0]) == index:
-                        settings[syst1]['restraints_angle'].append([int(restraint[1]), int(restraint[2]), int(restraint[3]), float(restraint[4]), float(restraint[5])])
+                    if int(restraint[0]) == number:
+                        region.restraints_angle.append([int(restraint[1]), int(restraint[2]), int(restraint[3]), float(restraint[4]), float(restraint[5])])
             if args.transform is not None:
                 for transform in args.transform:
-                    if int(transform[0]) == index:
-                        settings[syst1]['transforms'].append(dict())
-                        settings[syst1]['transforms'][-1]['atoms'] = transform[1]
-                        settings[syst1]['transforms'][-1]['R'] = [[float(x) for x in transform[3*i+2:3*i+5]] for i in range(3)]
-                        settings[syst1]['transforms'][-1]['t'] = [float(x) for x in transform[11:14]]
-                apply_transforms(model_mm1, settings[syst1]['transforms'], serial_to_index)
-            qm_file = 'qm_' + str(index) + '_h.pdb'
-            print('Writing file:  ' + qm_file)
-            write_qm_model(qm_file, model_mm1, link_partners, g_bond, serial_to_index)
+                    if int(transform[0]) == number:
+                        region.transforms.append({'atoms': transform[1],
+                                                  'R': [[float(x) for x in transform[3*i+2:3*i+5]] for i in range(3)],
+                                                  't': [float(x) for x in transform[11:14]]})
+            region.apply_transforms(model_mm1)
+            print('Writing file:  ' + region.qm_file)
+            region.write_qm_model(model_mm1)
+            settings[syst1] = region.settings_entry()
 
         suggest_selection_string(model_mm1)
-        check_altlocs(model_mm1, link_atoms)
+        check_altlocs(model_mm1, region.link_atoms)
         print('----------')
 
     if not args.skip_h:

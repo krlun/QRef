@@ -7,13 +7,9 @@ import numpy as np
 
 from iotbx.data_manager import DataManager
 
-from qref.common import apply_transforms
-from qref.common import convert_serial_to_index
+from qref.common import Region
 from qref.common import parse_serials
 from qref.common import read_settings
-from qref.common import read_region
-from qref.common import restore_serials
-from qref.common import write_qm_model
 
 KCAL_PER_HARTREE = 627.509474063112
 KJ_PER_HARTREE = 2625.499639479950
@@ -120,51 +116,23 @@ class AngleRestraint(object):
         return self.force_constant*delta_alpha**2
 
 
-class Region(object):
-    """One syst1 definition: its atoms, its junctions and the files named after it."""
+class QMRegion(Region):
+    """A Region during refinement: its restraints, the MM1 and QM energies and
+    gradients that replace each other, and its log."""
 
-    def __init__(self, index, syst1, settings):
-        self.index = index
-        self.serials = read_region(syst1)[0]
-        self.serial_to_index = convert_serial_to_index(self.serials)
-        self.link_partners = settings[syst1]['link_pairs']
-        self.g_bond = settings[syst1]['g']
-        self.transforms = settings[syst1]['transforms']
-        self.restraints = ([DistanceRestraint(*restraint) for restraint in settings[syst1]['restraints_distance']]
-                           + [AngleRestraint(*restraint) for restraint in settings[syst1]['restraints_angle']])
+    def __init__(self, number, syst1, settings):
+        super(QMRegion, self).__init__(number, syst1, settings)
+        self.restraints = ([DistanceRestraint(*restraint) for restraint in self.restraints_distance]
+                           + [AngleRestraint(*restraint) for restraint in self.restraints_angle])
         self.cif = settings['cif']
         self.orca_binary = settings['orca_binary']
         self.w_qm = settings['w_qm']
 
-    @property
-    def mm1_file(self):
-        return 'mm_%d_c.pdb' % self.index
-
-    @property
-    def qm_file(self):
-        return 'qm_%d_h.pdb' % self.index
-
-    @property
-    def input_file(self):
-        return 'qm_%d.inp' % self.index
-
-    @property
-    def output_file(self):
-        return 'qm_%d.out' % self.index
-
-    @property
-    def engrad_file(self):
-        return 'qm_%d.engrad' % self.index
-
-    @property
-    def log_file(self):
-        return 'qref_%d.log' % self.index
-
     def _add_qm_mm(self, gradient, qm_gradients, mm1_gradients):
         """Fold this region's QM and MM1 gradients into the whole model's."""
         for atom in self.serials:
-            gradient[atom-1] -= np.array(mm1_gradients[self.serial_to_index[atom]])
-            qm = qm_gradients[self.serial_to_index[atom]]
+            gradient[atom-1] -= np.array(mm1_gradients[self.position(atom)])
+            qm = qm_gradients[self.position(atom)]
             if atom not in self.link_partners:
                 gradient[atom-1] += qm
             else:
@@ -177,7 +145,7 @@ class Region(object):
         for transform in self.transforms:
             R_inv = np.linalg.inv(np.array(transform['R']))
             for atom in parse_serials(transform['atoms']):
-                gradients[self.serial_to_index[atom]] = np.matmul(R_inv, gradients[self.serial_to_index[atom]])
+                gradients[self.position(atom)] = np.matmul(R_inv, gradients[self.position(atom)])
         return gradients
 
     def _log(self, qm_energy, mm_energy, mm1_energy):
@@ -246,7 +214,7 @@ class Region(object):
         residuals.gradients = residuals.gradients*(1.0/residuals.normalization_factor)
 
         # this needs to come after model_mm1.process()
-        restore_serials(model_mm1, self.serial_to_index)
+        self.restore_serials(model_mm1)
         return model_mm1, residuals
 
     def _orca_succeeded(self, status):
@@ -260,9 +228,8 @@ class Region(object):
         """Run Orca on this region and return its energy, rescaled gradients, and
         whether Orca finished.  A failed run writes no gradient, so the one from
         the previous iteration is used instead."""
-        apply_transforms(model_mm1, self.transforms, self.serial_to_index)
-        write_qm_model(self.qm_file, model_mm1, link_partners=self.link_partners, g_bond=self.g_bond,
-            serial_to_index=self.serial_to_index)
+        self.apply_transforms(model_mm1)
+        self.write_qm_model(model_mm1)
         with open(self.output_file, 'w') as out:
             status = subprocess.call([self.orca_binary, self.input_file],
                 stdout=out, stderr=subprocess.STDOUT)
@@ -307,8 +274,8 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
         total_gradient = mm_gradients
 
         # loop over all the definitions of syst1 and process (order matters)
-        for index, syst1 in enumerate(settings['syst1_files'], 1):
-            region = Region(index, syst1, settings)
+        for number, syst1 in enumerate(settings['syst1_files'], 1):
+            region = QMRegion(number, syst1, settings)
             total_gradient, target = region.contribute(sites_cart, total_gradient,
                 target, mm_residual_sum)
     finally:

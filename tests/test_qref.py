@@ -5,7 +5,7 @@ import pytest
 
 from conftest import REFERENCE, ROOT
 from qref import qref
-from qref.common import convert_serial_to_index, restore_serials
+from qref.common import Region
 import qref_prep
 
 # at a link atom the step reaches Orca scaled by the junction factor g and
@@ -206,12 +206,15 @@ def test_regions_share_only_link_atoms(name, tmp_path, monkeypatch):
 
 def test_link_atoms_do_not_count_as_altlocs(tmp_path, capsys):
     """A region of altloc A cut at blank link atoms is one conformation."""
-    # MET A 102 in 5n6y: N and C blank, CA to CE altloc A
-    region = {793, 794} | set(range(796, 801))
+    # MET A 102 in 5n6y: CA to CE altloc A, cut at the blank N and C
+    syst1 = str(tmp_path / 'syst1')
+    with open(syst1, 'w') as handle:
+        handle.write('793 794 796-800\n793 794\n')
+    region = Region(1, syst1)
     with open(os.path.join(ROOT, 'examples', '5n6y_CO3', '5n6y_sorted.pdb')) as handle:
         lines = [line for line in handle if line.startswith('CRYST1')
                  or (line[0:6].strip() in ('ATOM', 'HETATM')
-                     and int(line[6:11]) in region)]
+                     and int(line[6:11]) in region.serials)]
     path = str(tmp_path / 'met102_a.pdb')
     with open(path, 'w') as handle:
         handle.writelines(lines)
@@ -221,9 +224,9 @@ def test_link_atoms_do_not_count_as_altlocs(tmp_path, capsys):
     manager.process_model_file(path)
     model = manager.get_model(filename=path)
     # as qref_prep.main() does before check_altlocs()
-    restore_serials(model, convert_serial_to_index(region))
+    region.restore_serials(model)
 
-    qref_prep.check_altlocs(model, link_atoms={793, 794})
+    qref_prep.check_altlocs(model, region.link_atoms)
     assert capsys.readouterr().out == 'Altloc:  "and altloc A"\n'
     qref_prep.check_altlocs(model, link_atoms=set())
     assert capsys.readouterr().out.startswith('Warning, multiple altlocs')

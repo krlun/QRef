@@ -11,8 +11,6 @@ import os
 import re
 import sys
 
-from cctbx.array_family import flex
-
 try:
     import qref
 except ImportError:
@@ -23,13 +21,9 @@ except ImportError:
                          'directory. Exiting...')
     sys.path.insert(0, root)
 
-from qref.common import apply_transforms
-from qref.common import convert_serial_to_index
-from qref.common import parse_serials
+from qref.common import Region
 from qref.common import read_settings
 from qref.common import read_region
-from qref.common import restore_serials
-from qref.common import write_qm_model
 
 
 def read_junctfactor(junc_factor_file):
@@ -49,11 +43,3 @@ def read_junctfactor(junc_factor_file):
             elif distances is not None and fields:
                 distances[int(fields[0])] = float(fields[1].split('d')[0])
     return junctfactor
-
-
-def select_region(model, serials):
-    hierarchy = model.get_hierarchy()
-    sel = flex.bool(hierarchy.atoms_size())
-    for atom in serials:
-        sel[atom-1] = True
-    return model.select(sel)
