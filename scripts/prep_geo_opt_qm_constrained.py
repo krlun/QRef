@@ -9,13 +9,13 @@ import shutil
 from iotbx.data_manager import DataManager
 
 from utils import apply_transforms
-from utils import read_dat
-from utils import read_syst1
-from utils import select_qm_model
-from utils import write_pdb_h
+from utils import read_settings
+from utils import read_region
+from utils import select_region
+from utils import write_qm_model
 
 
-def modify_qm_input(file, link_atoms, serial_to_index):
+def modify_qm_input(path, link_atoms, serial_to_index):
     # To be implemented
     # theory = {6: '! B3LYP 6-31G(d) D4 UKS Opt',
     #           7: '! BP ',
@@ -32,7 +32,7 @@ def modify_qm_input(file, link_atoms, serial_to_index):
     #12: TPSS(RI)/def2-SV(P) 
     #13: B97-D(RI)/def2-SV(P) 
 
-    with open(file, 'r') as f:
+    with open(path, 'r') as f:
         old = f.readlines()
     new = list()
     for line in old:
@@ -45,7 +45,7 @@ def modify_qm_input(file, link_atoms, serial_to_index):
         for link_atom in link_atoms:
             new.append('    {C ' + str(serial_to_index[link_atom]) + ' C}\n')
         new.append('  end\nend\n')
-    with open(file, 'w') as f:
+    with open(path, 'w') as f:
         f.writelines(new)
 
 
@@ -62,25 +62,25 @@ def main():
         raise SystemExit('\'qref.dat\' missing, exiting...')
     args = parse_args()
     model_file = args.pdb
-    dat = read_dat('qref.dat')
+    settings = read_settings('qref.dat')
     dm = DataManager()
     dm.process_model_file(model_file)
     model_mm = dm.get_model(filename=model_file)
     print('----------')
     print()
-    for index, syst1 in enumerate(dat['syst1_files'], 1):
-        qm_atoms, link_atoms = read_syst1(syst1)
-        serial_to_index = {value: key for key, value in dict(enumerate(sorted(qm_atoms))).items()}
-        model_mm1 = select_qm_model(model=model_mm, qm=qm_atoms)
+    for index, syst1 in enumerate(settings['syst1_files'], 1):
+        serials, link_atoms = read_region(syst1)
+        serial_to_index = {value: key for key, value in dict(enumerate(sorted(serials))).items()}
+        model_mm1 = select_region(model=model_mm, serials=serials)
         geo_opt_dir = 'geo_opt_qm_constrained_' + str(index)
         print('Generating: ' + geo_opt_dir)
         qm_pdb_file = 'qm_' + str(index) + '_h.pdb'
         qm_inp_file = 'qm_' + str(index) + '.inp'
         if not os.path.isdir(geo_opt_dir):
             os.mkdir(geo_opt_dir)
-        if 'transforms' in dat[syst1]: # backwards compatibility
-            apply_transforms(model_mm1, dat[syst1]['transforms'], serial_to_index)
-        write_pdb_h(geo_opt_dir + '/' + qm_pdb_file, model_mm1, dat[syst1]['link_pairs'], dat[syst1]['g'], serial_to_index)
+        if 'transforms' in settings[syst1]: # backwards compatibility
+            apply_transforms(model_mm1, settings[syst1]['transforms'], serial_to_index)
+        write_qm_model(geo_opt_dir + '/' + qm_pdb_file, model_mm1, settings[syst1]['link_pairs'], settings[syst1]['g'], serial_to_index)
         shutil.copy(qm_inp_file, geo_opt_dir)
         shutil.copy('qm_' + str(index) + '.gbw', geo_opt_dir + '/qm.gbw')
         modify_qm_input(geo_opt_dir + '/' + qm_inp_file, sorted(link_atoms), serial_to_index)

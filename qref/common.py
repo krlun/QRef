@@ -7,7 +7,7 @@ import re
 import numpy as np
 
 
-def parse_atoms_line(line):
+def parse_serials(line):
     comments = '[#!]'
     delimiters = '[^,\\s]+'
     atoms = set()
@@ -19,17 +19,17 @@ def parse_atoms_line(line):
     return atoms
 
 
-def read_syst1(infile):
-    qm_atoms = set()
+def read_region(infile):
+    serials = set()
     link_atoms = set()
-    with open(infile, 'r') as file:
-        line = file.readline()
+    with open(infile, 'r') as handle:
+        line = handle.readline()
         while line:
-            atoms = parse_atoms_line(line)
+            atoms = parse_serials(line)
             for atom in atoms:
-                link_atoms.add(atom) if atom in qm_atoms else qm_atoms.add(atom)
-            line = file.readline()
-    return qm_atoms, link_atoms
+                link_atoms.add(atom) if atom in serials else serials.add(atom)
+            line = handle.readline()
+    return serials, link_atoms
 
 
 def convert_serial_to_index(qm):
@@ -40,32 +40,32 @@ def convert_serial_to_index(qm):
     return indices
 
 
-def write_pdb_h(outfile, model, link_pairs, g, serial_to_index):
+def write_qm_model(outfile, model, link_partners, g_bond, serial_to_index):
     hierarchy = model.get_hierarchy()
     atoms = hierarchy.atoms()
     for atom in atoms:
         atom_serial = int(atom.serial.strip())
-        if atom.element_is_hydrogen() or atom_serial in link_pairs:
+        if atom.element_is_hydrogen() or atom_serial in link_partners:
             atom.element = ' H'
-        if atom_serial in link_pairs:
-            c_qm = atoms[serial_to_index[link_pairs[atom_serial]]]
-            atom.xyz = (c_qm.xyz[0] + g[atom_serial]*(atom.xyz[0] - c_qm.xyz[0]), 
-                c_qm.xyz[1] + g[atom_serial]*(atom.xyz[1] - c_qm.xyz[1]),
-                c_qm.xyz[2] + g[atom_serial]*(atom.xyz[2] - c_qm.xyz[2]))
+        if atom_serial in link_partners:
+            c_qm = atoms[serial_to_index[link_partners[atom_serial]]]
+            atom.xyz = (c_qm.xyz[0] + g_bond[atom_serial]*(atom.xyz[0] - c_qm.xyz[0]), 
+                c_qm.xyz[1] + g_bond[atom_serial]*(atom.xyz[1] - c_qm.xyz[1]),
+                c_qm.xyz[2] + g_bond[atom_serial]*(atom.xyz[2] - c_qm.xyz[2]))
     hierarchy.write_pdb_file(file_name=outfile, crystal_symmetry=model.crystal_symmetry(), anisou=False)
 
 
-def restore_serial_in_model(model, serial_to_index):
+def restore_serials(model, serial_to_index):
     index_to_serial = {value: key for key, value in serial_to_index.items()}
     atoms = model.get_hierarchy().atoms()
     width = 5
     for atom in atoms: atom.serial = str(index_to_serial[int(atom.serial) - 1]).rjust(width)
 
 
-def read_dat(infile):
-    with open(infile, 'r') as file:
-        dat = json.load(file, object_hook=lambda d: {int(key) if key.isdigit() else key: value for key, value in d.items()})
-    return dat
+def read_settings(infile):
+    with open(infile, 'r') as handle:
+        settings = json.load(handle, object_hook=lambda d: {int(key) if key.isdigit() else key: value for key, value in d.items()})
+    return settings
 
 
 def apply_transforms(model, transforms, serial_to_index):
@@ -73,5 +73,5 @@ def apply_transforms(model, transforms, serial_to_index):
         R = np.array(transform['R'])
         t = np.array(transform['t'])
         atoms_model = model.get_hierarchy().atoms()
-        for atom in parse_atoms_line(transform['atoms']):
+        for atom in parse_serials(transform['atoms']):
             atoms_model[serial_to_index[atom]].xyz = np.matmul(R, atoms_model[serial_to_index[atom]].xyz) + t

@@ -2,28 +2,28 @@
 
 import sys
 import argparse
-from utils import read_syst1
+from utils import read_region
 
 
 def parse_and_update(occupancy, infile, outfile, atoms=None, residues=None):
     records = {'ATOM', 'HETATM'}
-    with open(infile, 'r') as file:
+    with open(infile, 'r') as handle:
         with open(outfile, 'w') as out:
-            line = file.readline()
+            line = handle.readline()
             while line:
                 if line[0:6].strip() in records:
                     if (atoms is not None and int(line[6:11].strip()) in atoms) or (residues is not None and line[16:26] in residues):
                         line = line[0:54] + occupancy.rjust(6) + line[60:]
                 out.write(line)
-                line = file.readline()
+                line = handle.readline()
 
 def read_residues(infile):
     residues = set()
-    with open(infile, 'r') as file:
-        line = file.readline().rstrip()
+    with open(infile, 'r') as handle:
+        line = handle.readline().rstrip()
         while line:
             residues.add(line)
-            line = file.readline().rstrip()
+            line = handle.readline().rstrip()
     return residues
 
 
@@ -45,7 +45,7 @@ def main():
     atoms = None
     residues = None
     if args.syst1 is not None:
-        atoms, _ = read_syst1(args.syst1)
+        atoms, _ = read_region(args.syst1)
         outfile = args.pdb[:-4] + '_' + args.syst1 + '_' + occupancy + args.pdb[-4:]
     elif args.residues is not None:
         residues = read_residues(args.residues)

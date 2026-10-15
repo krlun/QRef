@@ -13,15 +13,15 @@ from iotbx.data_manager import DataManager
 
 from utils import apply_transforms
 from utils import convert_serial_to_index
-from utils import read_syst1
-from utils import read_junc_factors
-from utils import restore_serial_in_model
-from utils import select_qm_model
-from utils import write_pdb_h
+from utils import read_region
+from utils import read_junctfactor
+from utils import restore_serials
+from utils import select_region
+from utils import write_qm_model
 
 
-def identify_link_pairs(model, link_atoms, serial_to_index):
-    link_pairs = dict()
+def find_link_partners(model, link_atoms, serial_to_index):
+    link_partners = dict()
     hierarchy = model.get_hierarchy()
     atoms = hierarchy.atoms()
     bond_params_table = model.restraints_manager.geometry.bond_params_table
@@ -38,8 +38,8 @@ def identify_link_pairs(model, link_atoms, serial_to_index):
                     min_distance = distance
         if closest is None:
             raise SystemExit('No atom bonded to link atom ' + str(link) + ' in the QM system. Exiting...')
-        link_pairs[link] = closest
-    return link_pairs
+        link_partners[link] = closest
+    return link_partners
 
 
 def check_overlap(syst1_files):
@@ -47,35 +47,35 @@ def check_overlap(syst1_files):
     # each region subtracts them again in E_MM1. Link atoms may be shared: there
     # are no restraints among them, and Orca only sees the hydrogens replacing them.
     regions = dict()
-    qm_only = set()
+    qm_atoms = set()
     for syst1 in syst1_files:
-        qm_atoms, link_atoms = read_syst1(syst1)
-        shared = sorted(atom for atom in qm_atoms if atom in regions and (atom in qm_only or atom not in link_atoms))
+        serials, link_atoms = read_region(syst1)
+        shared = sorted(atom for atom in serials if atom in regions and (atom in qm_atoms or atom not in link_atoms))
         if shared:
             others = sorted(set(other for atom in shared for other in regions[atom]))
             raise SystemExit(syst1 + ' shares atoms ' + ', '.join(str(atom) for atom in shared) + ' with ' + ', '.join(others) + '. QM regions must not share atoms other than link atoms; duplicate the QM region into separate altlocs instead. Exiting...')
-        for atom in qm_atoms:
+        for atom in serials:
             regions.setdefault(atom, []).append(syst1)
-        qm_only |= qm_atoms - link_atoms
+        qm_atoms |= serials - link_atoms
 
 
-def calculate_g_factor(model, link_pairs, junc_factors, ltype, serial_to_index):
-    g = dict()
+def junction_factors(model, link_partners, junctfactor, ltype, serial_to_index):
+    g_bond = dict()
     atoms = model.get_hierarchy().atoms()
-    for key, value in link_pairs.items():
+    for key, value in link_partners.items():
         c_qm = atoms[serial_to_index[value]]
         link_atom = atoms[serial_to_index[key]]
         resname = link_atom.parent().resname.strip()
         bond = '-'.join([c_qm.name.strip(), link_atom.name.strip()])
-        if resname not in junc_factors:
+        if resname not in junctfactor:
             raise SystemExit(resname + ' missing in junction factor file. Exiting...')
-        if bond not in junc_factors[resname]:
+        if bond not in junctfactor[resname]:
             raise SystemExit(bond + ' (between atoms ' + str(value) + ' and ' + str(key) + ') missing for ' + resname + ' in junction factor file. Exiting...')
-        if ltype not in junc_factors[resname][bond]:
+        if ltype not in junctfactor[resname][bond]:
             raise SystemExit('Missing ltype ' + str(ltype) + ' for bond ' + bond + ' in residue ' + resname + ' in junction factor file. Exiting...')
-        c_h_ideal = junc_factors[resname][bond][ltype] # eg. print(junc_factors['PHE']['CB-CG'][12])
-        g[key] = c_h_ideal/model.restraints_manager.geometry.bond_params_table.lookup(serial_to_index[key], serial_to_index[value]).distance_ideal
-    return g
+        c_h_ideal = junctfactor[resname][bond][ltype] # eg. print(junctfactor['PHE']['CB-CG'][12])
+        g_bond[key] = c_h_ideal/model.restraints_manager.geometry.bond_params_table.lookup(serial_to_index[key], serial_to_index[value]).distance_ideal
+    return g_bond
 
 
 def suggest_selection_string(model):
@@ -112,19 +112,19 @@ def check_altlocs(model, link_atoms):
         print('Altloc:  \"and altloc ' + altlocs[0] + '\"')
 
 
-def write_dat(dat):
-    with open('qref.dat', 'w') as file:
-        json.dump(dat, file, indent=4, sort_keys=True)
+def write_settings(settings):
+    with open('qref.dat', 'w') as handle:
+        json.dump(settings, handle, indent=4, sort_keys=True)
 
 
 def prepare_restart(infile, outfile):
     records = {'ATOM', 'HETATM', 'ANISOU', 'CRYST1', 'ORIGX1', 'ORIGX2', 'ORIGX3', 'SCALE1', 'SCALE2', 'SCALE3', 'TER', 'END'}
-    with open(infile, 'r') as file, open(outfile, 'w') as out:
-        line = file.readline()
+    with open(infile, 'r') as handle, open(outfile, 'w') as out:
+        line = handle.readline()
         while line:
             if line[0:6].strip() in records:
                 out.write(line)
-            line = file.readline()
+            line = handle.readline()
 
 
 def locate_binary(binary):
@@ -164,7 +164,7 @@ def main():
     junc_factor_file = args.junctfactor
     ltype = args.ltype
     if not args.skip_h:
-        junc_factors = read_junc_factors(junc_factor_file=junc_factor_file)
+        junctfactor = read_junctfactor(junc_factor_file=junc_factor_file)
         check_overlap(syst1_files)
     dm = DataManager()
     if args.cif is not None:
@@ -174,69 +174,69 @@ def main():
     model_mm = dm.get_model(filename=model_file)
     model_mm.add_crystal_symmetry_if_necessary()
 
-    dat = dict()
+    settings = dict()
 
     for index, syst1 in enumerate(syst1_files, 1):
         print('----------')
         print(syst1.center(10))
         print('----------')
         print()
-        qm_atoms, link_atoms = read_syst1(syst1)
-        serial_to_index = convert_serial_to_index(qm_atoms)
-        model_mm1 = select_qm_model(model=model_mm, qm=qm_atoms)
+        serials, link_atoms = read_region(syst1)
+        serial_to_index = convert_serial_to_index(serials)
+        model_mm1 = select_region(model=model_mm, serials=serials)
         model_mm1.process(pdb_interpretation_params=model_mm1.get_current_pdb_interpretation_params(), make_restraints=True)
-        restore_serial_in_model(model_mm1, serial_to_index=serial_to_index)
+        restore_serials(model_mm1, serial_to_index=serial_to_index)
         mm1_file = 'mm_' + str(index) + '_c.pdb'
         print('Writing file:  ' + mm1_file)
         model_mm1.get_hierarchy().write_pdb_file(file_name=mm1_file, crystal_symmetry=model_mm.crystal_symmetry(), anisou=False)
 
         if not args.skip_h:
-            dat[syst1] = dict()
-            link_pairs = identify_link_pairs(model_mm1, link_atoms, serial_to_index)
-            g = calculate_g_factor(model_mm1, link_pairs=link_pairs, junc_factors=junc_factors, ltype=ltype, serial_to_index=serial_to_index)
-            dat[syst1]['link_pairs'] = link_pairs
-            dat[syst1]['g'] = g
-            dat[syst1]['restraints_distance'] = list()
-            dat[syst1]['restraints_angle'] = list()
-            dat[syst1]['transforms'] = list()
+            settings[syst1] = dict()
+            link_partners = find_link_partners(model_mm1, link_atoms, serial_to_index)
+            g_bond = junction_factors(model_mm1, link_partners=link_partners, junctfactor=junctfactor, ltype=ltype, serial_to_index=serial_to_index)
+            settings[syst1]['link_pairs'] = link_partners
+            settings[syst1]['g'] = g_bond
+            settings[syst1]['restraints_distance'] = list()
+            settings[syst1]['restraints_angle'] = list()
+            settings[syst1]['transforms'] = list()
             if args.restraint_distance is not None:
                 for restraint in args.restraint_distance:
                     if int(restraint[0]) == index:
-                        dat[syst1]['restraints_distance'].append([int(restraint[1]), int(restraint[2]), float(restraint[3]), float(restraint[4])])
+                        settings[syst1]['restraints_distance'].append([int(restraint[1]), int(restraint[2]), float(restraint[3]), float(restraint[4])])
             if args.restraint_angle is not None:
                 for restraint in args.restraint_angle:
                     if int(restraint[0]) == index:
-                        dat[syst1]['restraints_angle'].append([int(restraint[1]), int(restraint[2]), int(restraint[3]), float(restraint[4]), float(restraint[5])])
+                        settings[syst1]['restraints_angle'].append([int(restraint[1]), int(restraint[2]), int(restraint[3]), float(restraint[4]), float(restraint[5])])
             if args.transform is not None:
                 for transform in args.transform:
                     if int(transform[0]) == index:
-                        dat[syst1]['transforms'].append(dict())
-                        dat[syst1]['transforms'][-1]['atoms'] = transform[1]
-                        dat[syst1]['transforms'][-1]['R'] = [[float(x) for x in transform[3*i+2:3*i+5]] for i in range(3)]
-                        dat[syst1]['transforms'][-1]['t'] = [float(x) for x in transform[11:14]]
-                apply_transforms(model_mm1, dat[syst1]['transforms'], serial_to_index)
+                        settings[syst1]['transforms'].append(dict())
+                        settings[syst1]['transforms'][-1]['atoms'] = transform[1]
+                        settings[syst1]['transforms'][-1]['R'] = [[float(x) for x in transform[3*i+2:3*i+5]] for i in range(3)]
+                        settings[syst1]['transforms'][-1]['t'] = [float(x) for x in transform[11:14]]
+                apply_transforms(model_mm1, settings[syst1]['transforms'], serial_to_index)
             qm_file = 'qm_' + str(index) + '_h.pdb'
             print('Writing file:  ' + qm_file)
-            write_pdb_h(qm_file, model_mm1, link_pairs, g, serial_to_index)
+            write_qm_model(qm_file, model_mm1, link_partners, g_bond, serial_to_index)
 
         suggest_selection_string(model_mm1)
         check_altlocs(model_mm1, link_atoms)
         print('----------')
 
     if not args.skip_h:
-        dat['n_atoms'] = model_mm.get_number_of_atoms()
-        dat['restart'] = args.restart
-        dat['w_qm'] = args.w_qm
-        dat['cif'] = args.cif
-        dat['orca_binary'] = locate_binary('orca')
-        dat['ltype'] = ltype
-        dat['syst1_files'] = args.syst1
+        settings['n_atoms'] = model_mm.get_number_of_atoms()
+        settings['restart'] = args.restart
+        settings['w_qm'] = args.w_qm
+        settings['cif'] = args.cif
+        settings['orca_binary'] = locate_binary('orca')
+        settings['ltype'] = ltype
+        settings['syst1_files'] = args.syst1
         print('----------')
         print()
         print('Writing file:  qref.dat')
         print()
         print('----------')
-        write_dat(dat)
+        write_settings(settings)
 
     if args.restart is not None:
         print()
@@ -247,9 +247,9 @@ def main():
 
     # cleanup
     temp_files = ['settings.pickle']
-    for file in temp_files:
-        if os.path.exists(file):
-            os.remove(file)
+    for handle in temp_files:
+        if os.path.exists(handle):
+            os.remove(handle)
 
 
 if (__name__ == "__main__"):

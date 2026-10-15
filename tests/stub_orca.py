@@ -38,7 +38,7 @@ def gradient(sites):
 
 
 def write_engrad(path, sites):
-    # read_energy_and_gradient_from_orca() matches these header lines whole, so
+    # read_engrad() matches these header lines whole, so
     # they have to read exactly as Orca writes them
     with open(path, 'w') as out:
         out.write(f'#\n# Number of atoms\n#\n {len(sites)}\n')

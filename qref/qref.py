@@ -9,38 +9,38 @@ from iotbx.data_manager import DataManager
 
 from qref.common import apply_transforms
 from qref.common import convert_serial_to_index
-from qref.common import parse_atoms_line
-from qref.common import read_dat
-from qref.common import read_syst1
-from qref.common import restore_serial_in_model
-from qref.common import write_pdb_h
+from qref.common import parse_serials
+from qref.common import read_settings
+from qref.common import read_region
+from qref.common import restore_serials
+from qref.common import write_qm_model
 
-harkcal = 627.509474063112
-harkJ = 2625.499639479950
-bohrang = 0.529177249
+KCAL_PER_HARTREE = 627.509474063112
+KJ_PER_HARTREE = 2625.499639479950
+ANGSTROM_PER_BOHR = 0.529177249
 
 
 class OrcaFailed(Exception):
     """Orca failed with no earlier gradient to carry on with."""
 
 
-def read_energy_and_gradient_from_orca(infile):
+def read_engrad(infile):
     gradients = list()
-    with open(infile, 'r') as file:
-        line = file.readline()
+    with open(infile, 'r') as handle:
+        line = handle.readline()
         while line:
             if line == '# Number of atoms\n':
-                file.readline()
-                n_atoms = int(file.readline().strip())
+                handle.readline()
+                n_atoms = int(handle.readline().strip())
             if line == '# The current total energy in Eh\n':
-                file.readline()
-                energy = float(file.readline().strip())
+                handle.readline()
+                energy = float(handle.readline().strip())
                 break
-            line = file.readline()
-        for i in range(3): file.readline()
+            line = handle.readline()
+        for i in range(3): handle.readline()
         for i in range(n_atoms):
-            g = (float(file.readline()), float(file.readline()), float(file.readline()))
-            gradients.append(g)
+            gradient = (float(handle.readline()), float(handle.readline()), float(handle.readline()))
+            gradients.append(gradient)
     return energy, np.array(gradients)
 
 
@@ -48,36 +48,36 @@ def rescale_qm_gradients(qm_gradients, w):
     return w*qm_gradients
 
 
-def update_file_coordinates(infile, sites_cart):
-    with open(infile, 'r') as file:
-        model = file.readlines()
+def write_coordinates(infile, sites_cart):
+    with open(infile, 'r') as handle:
+        model = handle.readlines()
     records = {'ATOM', 'HETATM'}
     width = 8
-    with open(infile, 'w') as file:
+    with open(infile, 'w') as handle:
         for line in model:
             if line[0:6].strip() in records:
                 serial = int(line[6:11].strip())
                 coords = ''
                 for i in range(3): coords += '{:.3f}'.format(round(sites_cart[serial-1][i], 3)).rjust(width)
                 line = line[0:30] + coords + line[54:]
-            file.write(line)
+            handle.write(line)
 
 
 class Region(object):
     """One syst1 definition: its atoms, its junctions and the files named after it."""
 
-    def __init__(self, index, syst1, dat):
+    def __init__(self, index, syst1, settings):
         self.index = index
-        self.qm_atoms = read_syst1(syst1)[0]
-        self.serial_to_index = convert_serial_to_index(self.qm_atoms)
-        self.link_pairs = dat[syst1]['link_pairs']
-        self.g = dat[syst1]['g']
-        self.transforms = dat[syst1]['transforms']
-        self.restraints_distance = dat[syst1]['restraints_distance']
-        self.restraints_angle = dat[syst1]['restraints_angle']
-        self.cif = dat['cif']
-        self.orca_binary = dat['orca_binary']
-        self.w_qm = dat['w_qm']
+        self.serials = read_region(syst1)[0]
+        self.serial_to_index = convert_serial_to_index(self.serials)
+        self.link_partners = settings[syst1]['link_pairs']
+        self.g_bond = settings[syst1]['g']
+        self.transforms = settings[syst1]['transforms']
+        self.restraints_distance = settings[syst1]['restraints_distance']
+        self.restraints_angle = settings[syst1]['restraints_angle']
+        self.cif = settings['cif']
+        self.orca_binary = settings['orca_binary']
+        self.w_qm = settings['w_qm']
 
     @property
     def mm1_file(self):
@@ -105,21 +105,21 @@ class Region(object):
 
     def _add_qm_mm(self, gradient, qm_gradients, mm1_gradients):
         """Fold this region's QM and MM1 gradients into the whole model's."""
-        for atom in self.qm_atoms:
+        for atom in self.serials:
             gradient[atom-1] -= np.array(mm1_gradients[self.serial_to_index[atom]])
             qm = qm_gradients[self.serial_to_index[atom]]
-            if atom not in self.link_pairs:
+            if atom not in self.link_partners:
                 gradient[atom-1] += qm
             else:
-                gradient[self.link_pairs[atom]-1] += (1-self.g[atom])*qm
-                gradient[atom-1] += self.g[atom]*qm
+                gradient[self.link_partners[atom]-1] += (1-self.g_bond[atom])*qm
+                gradient[atom-1] += self.g_bond[atom]*qm
         return gradient
 
     def _rotate_back(self, gradients):
         """Undo the transforms, so the gradients match the untransformed model."""
         for transform in self.transforms:
             R_inv = np.linalg.inv(np.array(transform['R']))
-            for atom in parse_atoms_line(transform['atoms']):
+            for atom in parse_serials(transform['atoms']):
                 gradients[self.serial_to_index[atom]] = np.matmul(R_inv, gradients[self.serial_to_index[atom]])
         return gradients
 
@@ -174,39 +174,39 @@ class Region(object):
             header += 'MM1 energy ("kJ/mol")'.rjust(width)
             header += 'QM/MM energy ("kJ/mol")'.rjust(width)
             header += '\n'
-            with open(logfile, 'w') as file:
-                file.write(header)
+            with open(logfile, 'w') as handle:
+                handle.write(header)
         # The iteration counter continues from the last row written.
-        with open(logfile, 'r') as file:
-            log = file.readlines()
+        with open(logfile, 'r') as handle:
+            log = handle.readlines()
         line = ''
         # line += str(macro_cycle).rjust(macro_cycle_width)
         # if len(log) == 1 or int(log[-1].split()[0].strip()) != macro_cycle:
         #     iter = '1'.rjust(iter_width)
         # else:
         if len(log) == 1:
-            iter = '1'
+            iteration = '1'
         else:
-            iter = str(int(log[-1].split()[0]) + 1)
-        line += iter.rjust(iter_width)
+            iteration = str(int(log[-1].split()[0]) + 1)
+        line += iteration.rjust(iter_width)
         if qm_energy is None:
             line += 'Failed'.rjust(width)
         else:
-            scale = self.w_qm*harkcal
+            scale = self.w_qm*KCAL_PER_HARTREE
             # line += '{:.12f}'.format(round(qm_energy, 12)).rjust(width)
             # line += '{:.12f}'.format(round(qm_energy*harkcal, 12)).rjust(width)
-            line += '{:.10f}'.format(round(qm_energy*harkJ, 10)).rjust(width)
-            line += '{:.10f}'.format(round((mm_energy/scale)*harkJ, 10)).rjust(width)
-            line += '{:.10f}'.format(round((mm1_energy/scale)*harkJ, 10)).rjust(width)
-            line += '{:.10f}'.format(round((qm_energy + mm_energy/scale - mm1_energy/scale)*harkJ, 10)).rjust(width)
+            line += '{:.10f}'.format(round(qm_energy*KJ_PER_HARTREE, 10)).rjust(width)
+            line += '{:.10f}'.format(round((mm_energy/scale)*KJ_PER_HARTREE, 10)).rjust(width)
+            line += '{:.10f}'.format(round((mm1_energy/scale)*KJ_PER_HARTREE, 10)).rjust(width)
+            line += '{:.10f}'.format(round((qm_energy + mm_energy/scale - mm1_energy/scale)*KJ_PER_HARTREE, 10)).rjust(width)
         line += '\n'
-        with open(logfile, 'a') as file:
-            file.write(line)
+        with open(logfile, 'a') as handle:
+            handle.write(line)
 
     def mm1_energies(self, sites_cart):
         """The model for this region, and its MM energy and gradients unscaled."""
         # at this point we need a model object for syst1 :( but we have sites_cart for model_real
-        update_file_coordinates(infile=self.mm1_file, sites_cart=sites_cart)
+        write_coordinates(infile=self.mm1_file, sites_cart=sites_cart)
         dm = DataManager()
         if self.cif is not None:
             for cif in self.cif:
@@ -214,30 +214,30 @@ class Region(object):
         dm.process_model_file(self.mm1_file)
         model_mm1 = dm.get_model(filename=self.mm1_file)
 
-        with open('settings.pickle', 'rb') as file:
-            params = pickle.load(file)
+        with open('settings.pickle', 'rb') as handle:
+            params = pickle.load(handle)
         model_mm1.process(pdb_interpretation_params=params, make_restraints=True)
         residuals = model_mm1.restraints_manager_energies_sites(compute_gradients=True)
         residuals.target = residuals.target*(1.0/residuals.normalization_factor)
         residuals.gradients = residuals.gradients*(1.0/residuals.normalization_factor)
 
         # this needs to come after model_mm1.process()
-        restore_serial_in_model(model_mm1, self.serial_to_index)
+        restore_serials(model_mm1, self.serial_to_index)
         return model_mm1, residuals
 
     def _orca_succeeded(self, status):
         """Whether Orca exited cleanly and ran to completion."""
         if status != 0 or not os.path.exists(self.engrad_file):
             return False
-        with open(self.output_file, 'r') as file:
-            return any('ORCA TERMINATED NORMALLY' in line for line in file)
+        with open(self.output_file, 'r') as handle:
+            return any('ORCA TERMINATED NORMALLY' in line for line in handle)
 
     def qm_energy_and_gradient(self, model_mm1):
         """Run Orca on this region and return its energy, rescaled gradients, and
         whether Orca finished.  A failed run writes no gradient, so the one from
         the previous iteration is used instead."""
         apply_transforms(model_mm1, self.transforms, self.serial_to_index)
-        write_pdb_h(self.qm_file, model_mm1, link_pairs=self.link_pairs, g=self.g,
+        write_qm_model(self.qm_file, model_mm1, link_partners=self.link_partners, g_bond=self.g_bond,
             serial_to_index=self.serial_to_index)
         with open(self.output_file, 'w') as out:
             status = subprocess.call([self.orca_binary, self.input_file],
@@ -246,8 +246,8 @@ class Region(object):
         if not succeeded and not os.path.exists(self.engrad_file):
             raise OrcaFailed('%s did not finish, see %s'
                              % (self.orca_binary, self.output_file))
-        qm_energy, qm_gradients = read_energy_and_gradient_from_orca(self.engrad_file)
-        qm_gradients = rescale_qm_gradients(qm_gradients, self.w_qm*harkcal/bohrang)
+        qm_energy, qm_gradients = read_engrad(self.engrad_file)
+        qm_gradients = rescale_qm_gradients(qm_gradients, self.w_qm*KCAL_PER_HARTREE/ANGSTROM_PER_BOHR)
         qm_gradients = self._rotate_back(qm_gradients)
         return qm_energy, qm_gradients, succeeded
 
@@ -256,7 +256,7 @@ class Region(object):
         model_mm1, mm1 = self.mm1_energies(sites_cart)
         qm_energy, qm_gradients, succeeded = self.qm_energy_and_gradient(model_mm1)
 
-        target = target - mm1.target + self.w_qm*harkcal*qm_energy
+        target = target - mm1.target + self.w_qm*KCAL_PER_HARTREE*qm_energy
         gradient = self._add_qm_mm(gradient, qm_gradients, mm1.gradients)
         gradient, target = self._apply_restraints_distance(sites_cart, gradient, target)
         gradient, target = self._apply_restraints_angle(sites_cart, gradient, target)
@@ -266,9 +266,9 @@ class Region(object):
 
 
 def run(sites_cart, mm_gradients, mm_residual_sum):
-    dat = read_dat('qref.dat')
+    settings = read_settings('qref.dat')
 
-    if len(sites_cart) != dat['n_atoms']:
+    if len(sites_cart) != settings['n_atoms']:
         return mm_gradients, mm_residual_sum
 
     with open('qm.lock', 'w'):
@@ -276,15 +276,15 @@ def run(sites_cart, mm_gradients, mm_residual_sum):
 
     try:
         # if specified, update coordinates of restart file
-        if dat['restart'] is not None:
-            update_file_coordinates(infile=dat['restart'], sites_cart=sites_cart)
+        if settings['restart'] is not None:
+            write_coordinates(infile=settings['restart'], sites_cart=sites_cart)
 
         target = mm_residual_sum
         total_gradient = mm_gradients
 
         # loop over all the definitions of syst1 and process (order matters)
-        for index, syst1 in enumerate(dat['syst1_files'], 1):
-            region = Region(index, syst1, dat)
+        for index, syst1 in enumerate(settings['syst1_files'], 1):
+            region = Region(index, syst1, settings)
             total_gradient, target = region.contribute(sites_cart, total_gradient,
                 target, mm_residual_sum)
     finally:

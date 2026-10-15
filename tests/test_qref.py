@@ -5,7 +5,7 @@ import pytest
 
 from conftest import REFERENCE, ROOT
 from qref import qref
-from qref.common import convert_serial_to_index, restore_serial_in_model
+from qref.common import convert_serial_to_index, restore_serials
 import qref_prep
 
 # at a link atom the step reaches Orca scaled by the junction factor g and
@@ -221,7 +221,7 @@ def test_link_atoms_do_not_count_as_altlocs(tmp_path, capsys):
     manager.process_model_file(path)
     model = manager.get_model(filename=path)
     # as qref_prep.main() does before check_altlocs()
-    restore_serial_in_model(model, convert_serial_to_index(region))
+    restore_serials(model, convert_serial_to_index(region))
 
     qref_prep.check_altlocs(model, link_atoms={793, 794})
     assert capsys.readouterr().out == 'Altloc:  "and altloc A"\n'
