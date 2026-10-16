@@ -58,9 +58,6 @@ def find_link_partners(model, region):
 
 
 def check_overlap(syst1_files):
-    # E_MM counts the restraints among atoms that two QM regions share once, but
-    # each region subtracts them again in E_MM1. Link atoms may be shared: there
-    # are no restraints among them, and Orca only sees the hydrogens replacing them.
     regions = dict()
     qm_atoms = set()
     for syst1 in syst1_files:

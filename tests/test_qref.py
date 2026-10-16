@@ -187,9 +187,7 @@ OVERLAPS = {
 
 @pytest.mark.parametrize('name', sorted(OVERLAPS))
 def test_regions_share_only_link_atoms(name, tmp_path, monkeypatch):
-    """E_MM counts the restraints among atoms that QM regions share once, but each
-    region subtracts them, so only link atoms, which have none among them, may be
-    shared."""
+    """Only link atoms may be shared between QM regions."""
     texts, message = OVERLAPS[name]
     monkeypatch.chdir(tmp_path)
     files = ['syst1%d' % index for index in range(1, len(texts) + 1)]

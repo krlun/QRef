@@ -652,13 +652,10 @@ class Extra(collections.namedtuple('Extra', 'option shebang plain support')):
         cctbx.python` and follow whichever Phenix is sourced when they run.
 
         With `link`, each file in `shebang` is instead a wrapper that runs it
-        from the checkout, so that pulling the checkout updates it.  The wrapper
-        itself never changes, so its digest in the manifest stays valid, which
-        a symlink into the checkout would not.
+        from the checkout, and the `support` files are left out.
 
-        utils.py travels with copied scripts: they all import it, and python
-        only puts a script's own directory on sys.path.  Linked scripts find it
-        in the checkout.
+        utils.py travels with the scripts: they all import it, and python only
+        puts a script's own directory on sys.path.
         """
         layout = report.layout
         source = os.path.join(checkout, self.option)

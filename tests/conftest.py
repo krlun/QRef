@@ -20,7 +20,7 @@ CIFS = ('HXG.cif', 'PLC.cif')
 STUB = os.path.join(HERE, 'stub_orca.py')
 REFERENCE = os.path.join(HERE, 'reference.json')
 
-# install.py runs under Python 3 only, so its tests cannot be collected under Python 2
+# install.py is Python 3 only
 collect_ignore = [] if sys.version_info[0] >= 3 else ['test_install.py']
 
 # the second occurrence of a serial makes it a link atom
