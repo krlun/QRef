@@ -19,9 +19,6 @@ END = '# QRef END'
 BACKUP_SUFFIX = '.qref-orig'
 MANIFEST = '.qref-install.json'
 
-BSD = 'cctbx, BSD 3-clause'
-PROPRIETARY = 'Phenix, non-commercial source licence'
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -116,12 +113,6 @@ elif query == 'stmt_call':
     emit(hits, 1 if attr else 0, 'call statements in %s.%s%s'
          % (cls, func, ' to ' + attr if attr else ''))
 
-elif query == 'stmt_assign':
-    cls, func, name = rest
-    hits = [span(s) for s in body(cls, func) if isinstance(s, ast.Assign)
-            and any(isinstance(t, ast.Name) and t.id == name for t in s.targets)]
-    emit(hits, 0, 'assignments to %s in %s.%s' % (name, cls, func))
-
 elif query == 'importfrom':
     part, name = rest
     hits = [span(n) for n in ast.walk(tree)
@@ -173,12 +164,6 @@ def ensure_import(module):
     return (('import', module), [f'import {module} # QRef'], None)
 
 
-def lock(name):
-    """Create a lock file around the wrapped statement; no finally, so an exception leaves it."""
-    return ([BEGIN, f"with open('{name}', 'w'):", '  pass'],
-            [f"os.remove('{name}')", END])
-
-
 # a planned insertion: the 1-based line it goes before, its rendered source, and
 # whether it opens a statement rather than closing the one before it
 Block = collections.namedtuple('Block', 'at lines opening')
@@ -217,30 +202,12 @@ def splice(lines, blocks):
 
 # --- what to insert --------------------------------------------------------
 
-def qref_hook(guard):
-    """The call to QRef; the unused guard is emitted commented out."""
-    lock_test = ("if not os.path.exists('qm.lock') and "
-                 "(os.path.exists('xyz_reciprocal.lock') or os.path.exists('xyz.lock')):")
-    plain_test = "if not os.path.exists('qm.lock'):"
-    active, idle = (lock_test, plain_test) if guard == 'locks' else (plain_test, lock_test)
-    return [
-        BEGIN,
-        "if compute_gradients is True and os.path.exists('qref.dat'):",
-        '  # ' + idle,
-        '  ' + active,
-        '    from qref import qref',
-        '    self.residual_sum, self.gradients = qref.run(sites_cart=sites_cart, '
-        'mm_residual_sum=self.residual_sum, mm_gradients=self.gradients)',
-        END,
-    ]
-
-
-# dumps the pdb_interpretation_params argument; QRef reads settings.pickle back
-SETTINGS_PICKLE = [
+# gives the whole model QRef's geometry restraints manager when qref.dat is present
+QREF_MANAGER = [
     BEGIN,
-    "if not os.path.exists('settings.pickle'):",
-    "  with open('settings.pickle', 'wb') as file:",
-    '    pickle.dump(pdb_interpretation_params, file)',
+    "if os.path.exists('qref.dat'):",
+    '  from qref import manager as qref_manager',
+    '  geometry = qref_manager.digester(self, geometry, pdb_interpretation_params)',
     END,
 ]
 
@@ -262,32 +229,8 @@ SHIFT_HINT = [
     END,
 ]
 
-class Target(collections.namedtuple('Target', 'root rel edits licence')):
-    """One file QRef edits: where it lives, what goes into it, whose it is."""
-
-    @property
-    def proprietary(self):
-        return self.licence is PROPRIETARY
-
-    def mode_for(self, args):
-        """What to do with this file: skip, report, diff or apply."""
-        if self.proprietary and args.phenix_edits != 'apply':
-            return args.phenix_edits            # 'skip' or 'report'
-        return 'diff' if args.dry_run else 'apply'
-
-    def report(self, report):
-        """Print where the edits go, for someone applying them by hand."""
-        path = report.layout.path(self)
-        lines = read_lines(path)
-        if any(BEGIN in line for line in lines):
-            report.entry(self.rel, 'already patched, nothing to do')
-            return
-        detail = ['file ' + path]
-        for block in sorted(plan(report.layout, path, lines, self.edits),
-                            key=lambda b: -b.at):
-            detail.append(f'insert before line {block.at}:')
-            detail += ['    ' + line.rstrip('\n') for line in block.lines]
-        report.entry(self.rel, 'edits below, apply by hand', detail)
+class Target(collections.namedtuple('Target', 'root rel edits')):
+    """One file QRef edits: where it lives and what goes into it."""
 
     def patch(self, report, force):
         """Insert QRef's blocks.  True if the file would be written."""
@@ -319,16 +262,9 @@ class Target(collections.namedtuple('Target', 'root rel edits licence')):
                   + plural(len(blocks), 'insertion'))
 
         if report.dry_run:
-            # for the two Phenix/refinement files, diff without context: only
-            # what QRef adds
-            detail = []
-            if self.proprietary:
-                detail.append(f'diff shown without context: {self.licence}')
             diff = difflib.unified_diff(original, lines, 'a/' + self.rel,
-                                        'b/' + self.rel,
-                                        n=0 if self.proprietary else 2)
-            detail += [line.rstrip('\n') for line in diff]
-            report.entry(self.rel, status, detail)
+                                        'b/' + self.rel, n=2)
+            report.entry(self.rel, status, [line.rstrip('\n') for line in diff])
             return True
 
         commit(layout, path, lines, backup)
@@ -352,39 +288,16 @@ class Target(collections.namedtuple('Target', 'root rel edits licence')):
         return True
 
 
-def patches(guard, shift_hint=False):
+def patches(shift_hint=False):
     """The files QRef edits, keyed by the name used in the output."""
-    model_edits = [ensure_import('os'), ensure_import('pickle'),
+    model_edits = [ensure_import('os'),
                    (('importfrom', 'geometry_restraints', 'quantum_interface'),
-                    SETTINGS_PICKLE, None)]
+                    QREF_MANAGER, None)]
     if shift_hint:
         model_edits.append((('stmt_call', 'manager', 'shift_model_back',
                              'shift_model_and_set_crystal_symmetry'),
                             SHIFT_HINT, None))
-    spec = {
-        'energies.py': Target('cctbx', 'cctbx/geometry_restraints/energies.py', [
-            ensure_import('os'),
-            (('stmt_call', 'energies', '__init__',
-              'finalize_target_and_gradients'), qref_hook(guard), None),
-        ], BSD),
-        'model.py': Target('cctbx', 'mmtbx/model/model.py', model_edits, BSD),
-    }
-    if guard != 'locks':
-        return spec
-    before, after = lock('xyz_reciprocal.lock')
-    # minimized is assigned in two branches; each gets its own lock
-    spec['xyz_reciprocal_space.py'] = Target(
-        'phenix', 'phenix/refinement/xyz_reciprocal_space.py', [
-            ensure_import('os'),
-            (('stmt_assign', 'run_all', 'run_lbfgs', 'minimized'), before, after),
-        ], PROPRIETARY)
-    before, after = lock('xyz.lock')
-    spec['macro_cycle_real_space.py'] = Target(
-        'phenix', 'phenix/refinement/macro_cycle_real_space.py', [
-            ensure_import('os'),
-            (('stmt_call', 'run', 'refine_xyz'), before, after),
-        ], PROPRIETARY)
-    return spec
+    return {'model.py': Target('cctbx', 'mmtbx/model/model.py', model_edits)}
 
 
 # --- the installation being written to -------------------------------------
@@ -652,13 +565,10 @@ class Extra(collections.namedtuple('Extra', 'option shebang plain support')):
         cctbx.python` and follow whichever Phenix is sourced when they run.
 
         With `link`, each file in `shebang` is instead a wrapper that runs it
-        from the checkout, so that pulling the checkout updates it.  The wrapper
-        itself never changes, so its digest in the manifest stays valid, which
-        a symlink into the checkout would not.
+        from the checkout, and the `support` files are left out.
 
-        utils.py travels with copied scripts: they all import it, and python
-        only puts a script's own directory on sys.path.  Linked scripts find it
-        in the checkout.
+        utils.py travels with the scripts: they all import it, and python only
+        puts a script's own directory on sys.path.
         """
         layout = report.layout
         source = os.path.join(checkout, self.option)
@@ -808,15 +718,6 @@ def parse_args(argv):
         description='Install QRef into a Phenix installation.')
     parser.add_argument('--phenix', default=os.environ.get('PHENIX'),
                         help='Phenix prefix (default: $PHENIX)')
-    parser.add_argument('--guard', choices=['locks', 'always'], default='locks',
-                        help='"locks" (default) runs QRef only while '
-                             'coordinates are refined; "always" runs it '
-                             'whenever qref.dat is present and qm.lock is not')
-    parser.add_argument('--phenix-edits', choices=['apply', 'report', 'skip'],
-                        default='apply',
-                        help='what to do with the two Phenix/refinement files: '
-                             'edit in place (default), print the located edits '
-                             'so you can apply them yourself, or leave alone')
     parser.add_argument('--shift-hint', action='store_true',
                         help='also print the translation needed to correct the '
                              'output of phenix.real_space_refine, which does not '
@@ -871,26 +772,14 @@ class Installer(object):
                      else '<not found>')
         if not args.uninstall:
             report.field('source', args.source)
-            report.field('guard', args.guard)
         report.line()
-
-    def guard_note(self):
-        self.report.line('note: --guard locks relies on the lock files that only '
-                         'the two Phenix/refinement')
-        self.report.line('      edits create, so QRef stays inactive until those '
-                         'edits are in place.')
-        self.report.line()
 
     def targets(self):
         """The files to work through, in the order the listing shows them."""
-        spec = patches(self.args.guard, self.args.shift_hint)
-        return sorted(spec.values(), key=lambda t: t.rel)
+        return sorted(patches(self.args.shift_hint).values(), key=lambda t: t.rel)
 
     def install(self):
         report, args = self.report, self.args
-        if args.guard == 'locks' and args.phenix_edits != 'apply':
-            self.guard_note()
-
         report.line('Module')
         added = [install_package(report, args.source, args.link)]
 
@@ -898,16 +787,10 @@ class Installer(object):
         if not report.dry_run:
             heading += f' (originals kept as <file>{BACKUP_SUFFIX})'
         report.heading(heading)
-        by_hand = 0
         for target in self.targets():
-            mode = target.mode_for(args)
-            if mode == 'skip':
-                report.entry(target.rel, f'left alone ({target.licence})')
-            elif mode == 'report':
-                target.report(report)
-                by_hand += 1
-            elif target.patch(report, args.force):
+            if target.patch(report, args.force):
                 self.patched.append(target.rel)
+
 
         files, directories = [], []
         for extra in EXTRAS:
@@ -924,8 +807,6 @@ class Installer(object):
         would = 'would be ' if report.dry_run else ''
         parts = [f"{plural(len(self.patched), 'file')} {would}patched",
                  f'{len(added) + len(files)} {would}installed']
-        if by_hand:
-            parts.append(f"{plural(by_hand, 'file')} left for you")
         report.line(f"{report.outcome()}: {', '.join(parts)}")
 
     def uninstall(self):
@@ -933,8 +814,7 @@ class Installer(object):
         report = self.report
         restored = 0
         report.line('Patches')
-        # always the full set, whatever --guard and --phenix-edits chose at install
-        for target in sorted(patches('locks', shift_hint=True).values(),
+        for target in sorted(patches(shift_hint=True).values(),
                              key=lambda t: t.rel):
             if target.restore(report):
                 restored += 1

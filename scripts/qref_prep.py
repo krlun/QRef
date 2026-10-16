@@ -3,7 +3,6 @@
 
 from __future__ import absolute_import, division, print_function
 
-import os
 import re
 import sys
 import argparse
@@ -58,9 +57,6 @@ def find_link_partners(model, region):
 
 
 def check_overlap(syst1_files):
-    # E_MM counts the restraints among atoms that two QM regions share once, but
-    # each region subtracts them again in E_MM1. Link atoms may be shared: there
-    # are no restraints among them, and Orca only sees the hydrogens replacing them.
     regions = dict()
     qm_atoms = set()
     for syst1 in syst1_files:
@@ -245,12 +241,6 @@ def main():
         print()
         print('----------')
         prepare_restart(args.pdb, args.restart)
-
-    # cleanup
-    temp_files = ['settings.pickle']
-    for path in temp_files:
-        if os.path.exists(path):
-            os.remove(path)
 
 
 if (__name__ == "__main__"):

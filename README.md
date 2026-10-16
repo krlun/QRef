@@ -42,7 +42,7 @@ where $J(\mathbf{R_{syst1,i}}; \mathbf{R})$ is the Jacobian between $\mathbf{R_{
     source /path/to/phenix/phenix_env.sh
     ./install.py
 
-The `qref` module is copied into that installation, and `energies.py` in `cctbx` and `model.py` in `mmtbx` are modified so that `QRef` is called during refinement. Each modified file is backed up as `<file>.qref-orig`.
+The `qref` module is copied into that installation, and `model.py` in `mmtbx` is modified so that `QRef` is called while coordinates are refined. The modified file is backed up as `model.py.qref-orig`.
 
 `--dry-run` lists the changes without making them.
 
@@ -59,14 +59,6 @@ A file that is already patched is left alone, so running `install.py` again repo
 `--force` patches an already patched file again, starting over from the `.qref-orig` backup.
 
 `QRef` has been verified to work with `Phenix` versions 1.20.1-4487, 1.21-5207, 1.21.1-5286, 1.21.2-5419, 2.0-5936, 2.1-6084 and 2.2.1-6174.
-
-### Guard clause
-`QRef` is only needed while coordinates are being refined. To restrict it to that, `install.py` also modifies<br>
-
-    $PHENIX/.../phenix/refinement/xyz_reciprocal_space.py
-    $PHENIX/.../phenix/refinement/macro_cycle_real_space.py
-
-so that a lock file exists while coordinates are refined, and `QRef` runs only when it does. Use `--phenix-edits report` to print these modifications and make them by hand instead, or `--guard always` to leave the two files untouched, at the cost of running QM calculations outside coordinate refinement as well.
 
 ### Scripts
 
@@ -145,7 +137,7 @@ The general procedure to set up a quantum refinement job consists of
     - To read coordinates from a PDB file (`qm_i_h.pdb`) use `*pdbfile <charge> <multiplicity> qm_i_h.pdb`, where again `i` refers to the i:th QM region.
     - Custom settings can also be supplied (see the `examples` folder).
 
-7. At this point it is possible to start a quantum refinement. It is however recommended to first create an empty file named `qm.lock` (this disables QRef - additionally, if `qref.dat` is not present in the folder QRef will not run, i.e. this step can be run before starting to set up the QR job) through for example the `touch` command, then start a refinement so that an `.eff` file is obtained (this file contains all the `Phenix` refinement settings for the current experimental data and model). A good idea is to rename this file to `phenix.params` or similar, then edit this file and make sure the following options are set:
+7. At this point it is possible to start a quantum refinement. It is however recommended to first start a refinement in a folder without `qref.dat` (QRef does not run without it, i.e. this step can be run before starting to set up the QR job), so that an `.eff` file is obtained (this file contains all the `Phenix` refinement settings for the current experimental data and model). A good idea is to rename this file to `phenix.params` or similar, then edit this file and make sure the following options are set:
     - For reciprocal space refinement (`phenix.refine`):
         - `refinement.pdb_interpretation.restraints_library.cdl = False`
         - `refinement.pdb_interpretation.restraints_library.mcl = False`
@@ -182,7 +174,7 @@ The general procedure to set up a quantum refinement job consists of
         - `pdb_interpretation.ramachandran_plot_restraints.enabled = False`
     - Other options can be set as needed.
 
-8. To run the quantum refinement job, make sure that the `qm.lock` file has been deleted, then execute either `phenix.refine phenix.params` or `phenix.real_space_refine phenix.params`. If there is a need to restart the job with different settings for `Phenix`, make sure to delete the file `settings.pickle`.
+8. To run the quantum refinement job, execute either `phenix.refine phenix.params` or `phenix.real_space_refine phenix.params` in the folder with `qref.dat`.
 
 ## Notes
 ### For COSMOS@LUNARC users
@@ -197,7 +189,7 @@ When using ORCA/6.0.0 either manually run (before you submit your job) or add to
 - ~~Add support for distance restraints.~~ Done.
 - ~~Add support for angle restraints.~~ Done.
 - Refactor code to be OOP.
-- Turn QRef into a proper restraint_manager class.
+- ~~Turn QRef into a proper restraint_manager class.~~ Done.
 
 ## Citation
 Lundgren, K. J. M., Caldararu, O., Oksanen, E., & Ryde, U. (2024). "Quantum refinement in real and reciprocal space using the *Phenix* and *ORCA* software", IUCrJ, **11**(6), 921-937.  

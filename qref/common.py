@@ -53,7 +53,7 @@ class Region(object):
             entry = settings.entries[syst1]
             self.link_partners = entry['link_pairs']
             self.g_bond = entry['g']
-            # qref.dat files from before symmetry transforms have none
+            # missing from older qref.dat files
             self.transforms = entry.get('transforms', [])
             self.restraints_distance = entry['restraints_distance']
             self.restraints_angle = entry['restraints_angle']
@@ -140,7 +140,8 @@ class Region(object):
 
 class Settings(object):
     """qref.dat: what qref_prep.py writes, and QRef and the scripts read back.
-    entries holds each region's entry, keyed by its syst1 file."""
+    entries holds each region's entry, keyed by its syst1 file.
+    run() sets pdb_interpretation_params, which qref.dat does not hold."""
 
     def __init__(self, syst1_files, n_atoms=None, restart=None, w_qm=None, cif=None,
                  orca_binary=None, ltype=None):
@@ -152,10 +153,11 @@ class Settings(object):
         self.orca_binary = orca_binary
         self.ltype = ltype
         self.entries = dict()
+        self.pdb_interpretation_params = None
 
     @classmethod
     def read(cls, path='qref.dat'):
-        # link_pairs and g are keyed by serial, which JSON stores as a string
+        # the serial keys of link_pairs and g back to int
         with open(path, 'r') as handle:
             data = json.load(handle, object_hook=lambda d: {int(key) if key.isdigit() else key: value for key, value in d.items()})
         settings = cls(data['syst1_files'], n_atoms=data['n_atoms'], restart=data['restart'],
@@ -177,5 +179,5 @@ class Settings(object):
         self.entries[region.syst1] = region.settings_entry()
 
     def regions(self, region_class=Region):
-        """The regions, in the order of syst1_files, which is the order QRef adds them in."""
+        """The regions, in the order of syst1_files."""
         return [region_class(number, syst1, self) for number, syst1 in enumerate(self.syst1_files, 1)]

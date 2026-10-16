@@ -11,7 +11,7 @@ EXTRAS = dict((extra.option, extra) for extra in install.EXTRAS)
 
 def report(tmp_path):
     """A Report for an installation whose cctbx.python is the one running the
-    tests, so that pinned scripts can be run."""
+    tests."""
     prefix = str(tmp_path)
     layout = SimpleNamespace(prefix=prefix, python=sys.executable,
                              roots={'cctbx': prefix, 'phenix': prefix})
@@ -20,8 +20,7 @@ def report(tmp_path):
 
 def test_linked_scripts_run_from_the_checkout(tmp_path):
     """With --link, the scripts are wrappers that run the scripts in the
-    checkout, so that pulling the checkout updates them; utils.py is left out,
-    as they find it beside them in the checkout."""
+    checkout, and utils.py is not installed."""
     scripts = EXTRAS['scripts']
     dest = str(tmp_path / 'bin')
     scripts.install(report(tmp_path), install.HERE, dest, pin=True, link=True)
@@ -37,8 +36,7 @@ def test_linked_scripts_run_from_the_checkout(tmp_path):
 
 
 def test_uninstall_removes_linked_scripts(tmp_path):
-    """The manifest records the wrappers, so --uninstall removes them along with
-    the templates, which --link still copies."""
+    """--uninstall removes the linked scripts and the copied templates."""
     out = report(tmp_path)
     dest = str(tmp_path / 'bin')
     files = []

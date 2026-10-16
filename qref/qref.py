@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division
+import copy
 import os
 import subprocess
-import pickle
 
 import numpy as np
 
@@ -127,6 +127,7 @@ class QMRegion(Region):
         self.cif = settings.cif
         self.orca_binary = settings.orca_binary
         self.w_qm = settings.w_qm
+        self.pdb_interpretation_params = settings.pdb_interpretation_params
 
     def _add_qm_mm(self, gradient, qm_gradients, mm1_gradients):
         """Fold this region's QM and MM1 gradients into the whole model's."""
@@ -146,16 +147,18 @@ class QMRegion(Region):
             for atom in parse_serials(transform['atoms']):
                 gradients[self.position(atom)] = np.matmul(R_inv, gradients[self.position(atom)])
 
-    def _log(self, qm_energy, mm_energy, mm1_energy):
+    def _log(self, qm_energy, mm_energy, mm1_energy, macro_cycle):
         """Append a row to this region's log; qm_energy is None for a failed run,
-        whose energies belong to the previous iteration and are left out."""
+        whose energies belong to the previous iteration and are left out, and
+        macro_cycle is None when it is not known."""
         logfile = self.log_file
-        # macro_cycle_width = 12
+        macro_cycle_width = 12
+        macro_cycle_shift = 5
         iter_width = 5
         width = 25
         if not os.path.exists(logfile):
             header = ''
-            # header += 'macro cycle'.rjust(macro_cycle_width)
+            header += 'macro-cycle'.rjust(macro_cycle_width)
             header += 'iter'.rjust(iter_width)
             # header += 'QM energy (Ha)'.rjust(width)
             # header += 'QM energy (kcal/mol)'.rjust(width)
@@ -166,18 +169,23 @@ class QMRegion(Region):
             header += '\n'
             with open(logfile, 'w') as handle:
                 handle.write(header)
-        # The iteration counter continues from the last row written.
+        # The iteration counter continues from the last row written, and starts
+        # again at 1 in a new macro-cycle.
         with open(logfile, 'r') as handle:
-            log = handle.readlines()
+            rows = handle.readlines()[1:]
+        current = None
+        for row in reversed(rows):
+            if row[:macro_cycle_width].strip():
+                current = row[:macro_cycle_width].strip()
+                break
+        cycle = '-' if macro_cycle is None else str(macro_cycle)
         line = ''
-        # line += str(macro_cycle).rjust(macro_cycle_width)
-        # if len(log) == 1 or int(log[-1].split()[0].strip()) != macro_cycle:
-        #     iter = '1'.rjust(iter_width)
-        # else:
-        if len(log) == 1:
-            iteration = '1'
+        if cycle == current:
+            line += ' '*macro_cycle_width
+            iteration = str(int(rows[-1][macro_cycle_width:macro_cycle_width + iter_width]) + 1)
         else:
-            iteration = str(int(log[-1].split()[0]) + 1)
+            line += cycle.rjust(macro_cycle_width - macro_cycle_shift) + ' '*macro_cycle_shift
+            iteration = '1'
         line += iteration.rjust(iter_width)
         if qm_energy is None:
             line += 'Failed'.rjust(width)
@@ -204,9 +212,7 @@ class QMRegion(Region):
         dm.process_model_file(self.mm1_file)
         model_mm1 = dm.get_model(filename=self.mm1_file)
 
-        with open('settings.pickle', 'rb') as handle:
-            params = pickle.load(handle)
-        model_mm1.process(pdb_interpretation_params=params, make_restraints=True)
+        model_mm1.process(pdb_interpretation_params=copy.deepcopy(self.pdb_interpretation_params), make_restraints=True)
         residuals = model_mm1.restraints_manager_energies_sites(compute_gradients=True)
         residuals.target = residuals.target*(1.0/residuals.normalization_factor)
         residuals.gradients = residuals.gradients*(1.0/residuals.normalization_factor)
@@ -240,7 +246,7 @@ class QMRegion(Region):
         self._rotate_back(qm_gradients)
         return qm_energy, qm_gradients, succeeded
 
-    def contribute(self, sites_cart, target, gradient, mm_residual_sum):
+    def contribute(self, sites_cart, target, gradient, mm_residual_sum, macro_cycle):
         """Return target with this region added, and add it to gradient in place;
         log what it added."""
         model_mm1, mm1 = self.mm1_energies(sites_cart)
@@ -251,30 +257,26 @@ class QMRegion(Region):
         for restraint in self.restraints:
             target += restraint.add_to(sites_cart, gradient)
 
-        self._log(qm_energy if succeeded else None, mm_residual_sum, mm1.target)
+        self._log(qm_energy if succeeded else None, mm_residual_sum, mm1.target, macro_cycle)
         return target
 
 
-def run(sites_cart, mm_residual_sum, mm_gradients):
+def run(sites_cart, mm_residual_sum, mm_gradients, pdb_interpretation_params, macro_cycle=None):
     settings = Settings.read()
 
     if len(sites_cart) != settings.n_atoms:
         return mm_residual_sum, mm_gradients
 
-    with open('qm.lock', 'w'):
-        pass
+    settings.pdb_interpretation_params = pdb_interpretation_params
 
-    try:
-        # if specified, update coordinates of restart file
-        if settings.restart is not None:
-            write_coordinates(infile=settings.restart, sites_cart=sites_cart)
+    # if specified, update coordinates of restart file
+    if settings.restart is not None:
+        write_coordinates(infile=settings.restart, sites_cart=sites_cart)
 
-        target = mm_residual_sum
+    target = mm_residual_sum
 
-        # loop over all the definitions of syst1 and process (order matters)
-        for region in settings.regions(QMRegion):
-            target = region.contribute(sites_cart, target, mm_gradients, mm_residual_sum)
-    finally:
-        os.remove('qm.lock')
+    # loop over all the definitions of syst1 and process (order matters)
+    for region in settings.regions(QMRegion):
+        target = region.contribute(sites_cart, target, mm_gradients, mm_residual_sum, macro_cycle)
 
     return target, mm_gradients

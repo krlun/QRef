@@ -16,14 +16,20 @@ STEP = 0.05
 # passes only because g*STEP lands on the grid, so recheck if g or STEP changes
 TOLERANCE = 0.01
 
+# the macro-cycle and iteration columns of qref_i.log
+CYCLE = slice(0, 12)
+ITERATION = slice(12, 17)
 
-def contribution(model, sites_cart=None):
+
+def contribution(model, sites_cart=None, macro_cycle=None):
     """QRef's contribution alone, with the MM part going in as zero.  run()
     adds into the gradient array in place, so each call needs a fresh one."""
     sites = model.get_sites_cart() if sites_cart is None else sites_cart
     target, gradients = qref.run(sites_cart=sites,
                                  mm_residual_sum=0.0,
-                                 mm_gradients=model.get_sites_cart() * 0.0)
+                                 mm_gradients=model.get_sites_cart() * 0.0,
+                                 pdb_interpretation_params=model.get_default_pdb_interpretation_params(),
+                                 macro_cycle=macro_cycle)
     return target, gradients
 
 
@@ -114,22 +120,35 @@ def test_restart_file_follows_the_coordinates(prepared):
 
 
 def test_log_gains_a_row_per_call(prepared):
-    """run() appends one row per call to qref_i.log, numbered from 1."""
+    """run() appends one row per call to qref_i.log, numbered from 1, with - as
+    the macro-cycle when it is not known."""
     name, model = prepared
     contribution(model)
     contribution(model)
 
     with open('qref_1.log') as handle:
         header, first, second = handle.read().splitlines()
-    assert header.split() == ['iter', 'QM', 'energy', '(kJ/mol)', 'MM', 'energy',
-                              '("kJ/mol")', 'MM1', 'energy', '("kJ/mol")',
+    assert header.split() == ['macro-cycle', 'iter', 'QM', 'energy', '(kJ/mol)', 'MM',
+                              'energy', '("kJ/mol")', 'MM1', 'energy', '("kJ/mol")',
                               'QM/MM', 'energy', '("kJ/mol")']
-    for row, iteration in ((first, '1'), (second, '2')):
-        fields = row.split()
-        assert fields[0] == iteration
-        assert len(fields) == 5
-        for energy in fields[1:]:
+    for row, cycle, iteration in ((first, '-', '1'), (second, '', '2')):
+        assert row[CYCLE].strip() == cycle
+        assert row[ITERATION].strip() == iteration
+        energies = row[ITERATION.stop:].split()
+        assert len(energies) == 4
+        for energy in energies:
             float(energy)
+
+
+def test_log_numbers_the_iterations_of_each_macro_cycle(prepared):
+    name, model = prepared
+    for macro_cycle in (1, 1, 2):
+        contribution(model, macro_cycle=macro_cycle)
+
+    with open('qref_1.log') as handle:
+        rows = handle.read().splitlines()[1:]
+    assert ([(row[CYCLE].strip(), row[ITERATION].strip()) for row in rows]
+            == [('1', '1'), ('', '2'), ('2', '1')])
 
 
 @pytest.mark.parametrize('failure', ['exit', 'noscf'])
@@ -157,20 +176,6 @@ def test_failed_orca_raises_with_no_gradient_to_fall_back_on(prepared,
         contribution(model)
 
 
-def test_lock_is_released(prepared, monkeypatch):
-    """A lock left behind silently disables QRef on the next refinement started
-    in the same directory."""
-    name, model = prepared
-    monkeypatch.setenv('STUB_ORCA_FAIL', 'exit')
-    with pytest.raises(qref.OrcaFailed):
-        contribution(model)
-    assert not os.path.exists('qm.lock')
-
-    monkeypatch.delenv('STUB_ORCA_FAIL')
-    contribution(model)
-    assert not os.path.exists('qm.lock')
-
-
 # syst1 files in order, and how qref_prep.py exits on them (None: it carries on);
 # the second occurrence of a serial makes it a link atom
 OVERLAPS = {
@@ -187,9 +192,7 @@ OVERLAPS = {
 
 @pytest.mark.parametrize('name', sorted(OVERLAPS))
 def test_regions_share_only_link_atoms(name, tmp_path, monkeypatch):
-    """E_MM counts the restraints among atoms that QM regions share once, but each
-    region subtracts them, so only link atoms, which have none among them, may be
-    shared."""
+    """Only link atoms may be shared between QM regions."""
     texts, message = OVERLAPS[name]
     monkeypatch.chdir(tmp_path)
     files = ['syst1%d' % index for index in range(1, len(texts) + 1)]
