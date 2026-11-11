@@ -63,6 +63,14 @@ TRANSFORM = ['2', '4725-4733',
              '0', '0', '1',
              '10.0', '0.0', '0.0']
 
+# applied after TRANSFORM to the same atoms: a quarter turn about x and 5 Angstrom
+# along y, which does not commute with TRANSFORM
+SECOND_TRANSFORM = ['2', '4725-4733',
+                    '1', '0', '0',
+                    '0', '0', '-1',
+                    '0', '1', '0',
+                    '0.0', '5.0', '0.0']
+
 CASES = {
     'one region': {
         'syst1': {'syst1': ONE},
@@ -75,7 +83,15 @@ CASES = {
                     + ['-ra', '2', '4598', '4600', '4602', '109.5', '10']
                     + ['-r']),
     },
+    'two transforms on the same atoms': {
+        'syst1': {'syst11': TWO_A, 'syst12': TWO_B},
+        'options': ['-t'] + TRANSFORM + ['-t'] + SECOND_TRANSFORM,
+    },
 }
+
+# the cases every test taking `prepared` runs on; a test asks for any other case
+# by name, with indirect parametrization
+DEFAULT_CASES = ('one region', 'two regions with a transform and restraints')
 
 
 def pytest_addoption(parser):
@@ -105,7 +121,7 @@ def installation():
     return 'unknown'
 
 
-@pytest.fixture(params=sorted(CASES), ids=sorted(CASES))
+@pytest.fixture(params=DEFAULT_CASES, ids=DEFAULT_CASES)
 def prepared(request, tmp_path, monkeypatch):
     """The example taken through qref_prep.py, once per region split.  Returns
     the case name and the full model."""

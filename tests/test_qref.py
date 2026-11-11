@@ -35,6 +35,20 @@ def moved(serial, axis, sites_cart, step):
     return sites
 
 
+def assert_gradient_matches_finite_difference(model, serial, axis):
+    sites_cart = model.get_sites_cart()
+    _, gradients = contribution(model, sites_cart)
+    analytic = gradients[serial - 1][axis]
+
+    plus, _ = contribution(model, moved(serial, axis, sites_cart, +STEP))
+    minus, _ = contribution(model, moved(serial, axis, sites_cart, -STEP))
+    numeric = (plus - minus) / (2.0 * STEP)
+
+    assert analytic == pytest.approx(numeric, rel=TOLERANCE), (
+        'atom %d axis %d: gradient %.8f, finite difference %.8f'
+        % (serial, axis, analytic, numeric))
+
+
 def test_unchanged(prepared, installation, recording):
     """Target and gradients against tests/reference.json, to the last digit;
     --record writes the entry for the installation in use."""
@@ -76,17 +90,19 @@ def test_gradient_matches_finite_difference(prepared, serial, axis):
     split by g instead of passed straight through.  With two regions, 4600 and
     4602 carry the angle restraint and 20943 the distance restraint."""
     name, model = prepared
-    sites_cart = model.get_sites_cart()
-    _, gradients = contribution(model, sites_cart)
-    analytic = gradients[serial - 1][axis]
+    assert_gradient_matches_finite_difference(model, serial, axis)
 
-    plus, _ = contribution(model, moved(serial, axis, sites_cart, +STEP))
-    minus, _ = contribution(model, moved(serial, axis, sites_cart, -STEP))
-    numeric = (plus - minus) / (2.0 * STEP)
 
-    assert analytic == pytest.approx(numeric, rel=TOLERANCE), (
-        'atom %d axis %d: gradient %.8f, finite difference %.8f'
-        % (serial, axis, analytic, numeric))
+@pytest.mark.parametrize('prepared', ['two transforms on the same atoms'],
+                         indirect=True)
+@pytest.mark.parametrize('serial, axis', [(4725, 1), (4726, 2), (4730, 0)])
+def test_gradient_matches_finite_difference_under_two_transforms(prepared,
+                                                                  serial, axis):
+    """4725-4733 are turned about z and then about x, which do not commute, so the
+    gradients are only right if the second turn is undone first.  4725 is a link
+    atom and 4726 its bonded partner."""
+    name, model = prepared
+    assert_gradient_matches_finite_difference(model, serial, axis)
 
 
 def test_restart_file_follows_the_coordinates(prepared):

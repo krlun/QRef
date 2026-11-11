@@ -140,8 +140,9 @@ class QMRegion(Region):
                 gradient[atom-1] += self.g_bond[atom]*qm
 
     def _rotate_back(self, gradients):
-        """Undo the transforms, so the gradients match the untransformed model."""
-        for transform in self.transforms:
+        """Undo the transforms, so the gradients match the untransformed model.
+        apply_transforms() applies them in order, so the last is undone first."""
+        for transform in reversed(self.transforms):
             R_inv = np.linalg.inv(np.array(transform['R']))
             for atom in parse_serials(transform['atoms']):
                 gradients[self.position(atom)] = np.matmul(R_inv, gradients[self.position(atom)])
