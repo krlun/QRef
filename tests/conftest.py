@@ -3,6 +3,7 @@ for qref.run()."""
 import json
 import os
 import pickle
+import re
 import shutil
 import sys
 
@@ -71,6 +72,54 @@ SECOND_TRANSFORM = ['2', '4725-4733',
                     '0', '1', '0',
                     '0.0', '5.0', '0.0']
 
+# atoms put ahead of the example, so that each of its serials goes past 99999 and
+# is written in hybrid-36
+PADDING = 100000
+
+
+def shifted(syst1, offset):
+    """syst1 with each serial raised by offset, and the comments dropped."""
+    return ''.join(re.sub(r'\d+', lambda match: str(int(match.group()) + offset),
+                          re.split('[#!]', line)[0]) + '\n'
+                   for line in syst1.splitlines())
+
+
+def write_padded(source, destination, count):
+    """source behind a chain of count water oxygens, well away from it, so that
+    each of its atoms is count further along.  The padded model is put in the box
+    source gets, which the padding lies outside of; a box of its own would change
+    the last digits of the MM1 energies."""
+    from iotbx.data_manager import DataManager
+    from iotbx.pdb import hierarchy
+    from iotbx.pdb.hybrid_36 import hy36encode
+    manager = DataManager()
+    manager.process_model_file(source)
+    original = manager.get_model(filename=source)
+    original.add_crystal_symmetry_if_necessary()
+    root = hierarchy.root()
+    model = hierarchy.model()
+    root.append_model(model)
+    chain = hierarchy.chain(id='ZZ')
+    model.append_chain(chain)
+    for i in range(count):
+        residue_group = hierarchy.residue_group(resseq=hy36encode(4, i + 1))
+        atom_group = hierarchy.atom_group(resname='HOH')
+        atom = hierarchy.atom()
+        atom.name = ' O  '
+        atom.element = ' O'
+        atom.xyz = (1000 + 3*(i % 50), 1000 + 3*(i//50 % 50), 1000 + 3*(i//2500))
+        atom.occ = 1.0
+        atom.b = 30.0
+        atom_group.append_atom(atom)
+        residue_group.append_atom_group(atom_group)
+        chain.append_residue_group(residue_group)
+    for original_chain in original.get_hierarchy().only_model().chains():
+        model.append_chain(original_chain.detached_copy())
+    root.atoms().reset_serial()
+    root.write_pdb_file(file_name=destination,
+                        crystal_symmetry=original.crystal_symmetry())
+
+
 CASES = {
     'one region': {
         'syst1': {'syst1': ONE},
@@ -86,6 +135,11 @@ CASES = {
     'two transforms on the same atoms': {
         'syst1': {'syst11': TWO_A, 'syst12': TWO_B},
         'options': ['-t'] + TRANSFORM + ['-t'] + SECOND_TRANSFORM,
+    },
+    'one region past 99999': {
+        'syst1': {'syst1': shifted(ONE, PADDING)},
+        'options': ['-r'],
+        'padding': PADDING,
     },
 }
 
@@ -130,6 +184,9 @@ def prepared(request, tmp_path, monkeypatch):
     work = str(tmp_path)
     for copied in (MODEL, 'junctfactor') + CIFS:
         shutil.copy(os.path.join(EXAMPLE, copied), work)
+    if 'padding' in case:
+        write_padded(os.path.join(EXAMPLE, MODEL), os.path.join(work, MODEL),
+                     case['padding'])
     regions = sorted(case['syst1'])
     for index, region in enumerate(regions, 1):
         with open(os.path.join(work, region), 'w') as handle:

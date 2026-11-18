@@ -3,7 +3,9 @@ import os
 
 import pytest
 
-from conftest import REFERENCE, ROOT
+from iotbx.pdb.hybrid_36 import hy36decode, hy36encode
+
+from conftest import CASES, DEFAULT_CASES, PADDING, REFERENCE, ROOT
 from qref import qref
 from qref.common import Region
 import qref_prep
@@ -49,22 +51,29 @@ def assert_gradient_matches_finite_difference(model, serial, axis):
         % (serial, axis, analytic, numeric))
 
 
+def summary(target, gradients, offset=0):
+    """The target and the nonzero gradients as strings, each gradient keyed by its
+    index less offset.  17 significant digits round-trip a double, so comparing
+    the strings compares the values exactly."""
+    return {'target': format(float(target), '.17g'),
+            'gradients': dict((str(i - offset), [format(c, '.17g') for c in g])
+                              for i, g in enumerate(gradients)
+                              if g != (0.0, 0.0, 0.0))}
+
+
+def read_reference():
+    if not os.path.exists(REFERENCE):
+        return {}
+    with open(REFERENCE) as handle:
+        return json.load(handle)
+
+
 def test_unchanged(prepared, installation, recording):
     """Target and gradients against tests/reference.json, to the last digit;
     --record writes the entry for the installation in use."""
     name, model = prepared
-    target, gradients = contribution(model)
-    # 17 significant digits round-trip a double, so comparing the strings compares
-    # the values exactly
-    result = {'target': format(float(target), '.17g'),
-              'gradients': dict((str(i), [format(c, '.17g') for c in g])
-                                for i, g in enumerate(gradients)
-                                if g != (0.0, 0.0, 0.0))}
-
-    reference = {}
-    if os.path.exists(REFERENCE):
-        with open(REFERENCE) as handle:
-            reference = json.load(handle)
+    result = summary(*contribution(model))
+    reference = read_reference()
 
     if recording:
         reference.setdefault(installation, {})[name] = result
@@ -81,6 +90,35 @@ def test_unchanged(prepared, installation, recording):
     for index in sorted(expected['gradients'], key=int):
         assert result['gradients'][index] == expected['gradients'][index], \
             'serial %d' % (int(index) + 1)
+
+
+@pytest.mark.parametrize('prepared', ['one region past 99999'], indirect=True)
+def test_serials_past_99999_change_nothing_else(prepared, installation):
+    """With PADDING atoms ahead of it, the example gives the target and gradients
+    of 'one region' to the last digit, PADDING atoms further along."""
+    name, model = prepared
+    expected = read_reference().get(installation, {}).get('one region')
+    if expected is None:
+        pytest.skip('no reference for one region under %s; run with --record'
+                    % installation)
+    assert summary(*contribution(model), offset=PADDING) == expected
+
+
+@pytest.mark.parametrize('prepared', ['one region past 99999'], indirect=True)
+def test_qm_model_past_99999_is_numbered_from_1(prepared):
+    """mm_1_c.pdb keeps the serials of the whole model, in hybrid-36, but Orca
+    cannot read those, so qm_1_h.pdb numbers its atoms from 1."""
+    name, model = prepared
+    contribution(model)
+
+    def serials(path):
+        with open(path) as handle:
+            return [line[6:11] for line in handle
+                    if line[0:6].strip() in ('ATOM', 'HETATM')]
+    whole = sorted(Region(1, 'syst1').serials)
+    assert serials('mm_1_c.pdb') == [hy36encode(5, serial) for serial in whole]
+    assert serials('qm_1_h.pdb') == [str(i).rjust(5)
+                                     for i in range(1, len(whole) + 1)]
 
 
 @pytest.mark.parametrize('serial, axis', [(4555, 0), (4555, 1), (4558, 2),
@@ -105,6 +143,8 @@ def test_gradient_matches_finite_difference_under_two_transforms(prepared,
     assert_gradient_matches_finite_difference(model, serial, axis)
 
 
+@pytest.mark.parametrize('prepared', DEFAULT_CASES + ('one region past 99999',),
+                         indirect=True)
 def test_restart_file_follows_the_coordinates(prepared):
     """run() rewrites the restart file from sites_cart, to three decimals."""
     name, model = prepared
@@ -113,14 +153,14 @@ def test_restart_file_follows_the_coordinates(prepared):
     if restart is None:
         pytest.skip('%s has no restart file' % name)
 
-    serial, axis = 4555, 0
+    serial, axis = 4555 + CASES[name].get('padding', 0), 0
     sites_cart = moved(serial, axis, model.get_sites_cart(), +0.5)
     contribution(model, sites_cart)
 
     with open(restart) as handle:
         for line in handle:
             if line[0:6].strip() in ('ATOM', 'HETATM') \
-                    and int(line[6:11]) == serial:
+                    and hy36decode(5, line[6:11]) == serial:
                 written = [float(line[30:38]), float(line[38:46]),
                            float(line[46:54])]
                 break

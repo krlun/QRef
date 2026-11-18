@@ -7,6 +7,7 @@ import re
 import numpy as np
 
 from cctbx.array_family import flex
+from iotbx.pdb.hybrid_36 import hy36encode
 
 
 def parse_serials(line):
@@ -99,11 +100,12 @@ class Region(object):
         return model.select(sel)
 
     def restore_serials(self, model):
-        """Give the atoms of a model of this region their serials in the whole model."""
+        """Give the atoms of a model of this region their serials in the whole model,
+        in hybrid-36 past 99999."""
         serials = sorted(self.serials)
         atoms = model.get_hierarchy().atoms()
         width = 5
-        for atom in atoms: atom.serial = str(serials[int(atom.serial) - 1]).rjust(width)
+        for atom in atoms: atom.serial = hy36encode(width, serials[int(atom.serial) - 1])
 
     def apply_transforms(self, model):
         for transform in self.transforms:
@@ -115,11 +117,12 @@ class Region(object):
 
     def write_qm_model(self, model, path=None):
         """Write the model with each link atom replaced by a hydrogen, to qm_file
-        unless another path is given."""
+        unless another path is given.  Orca cannot read hybrid-36 serials, so a
+        region with serials past 99999 is numbered from 1 instead."""
         hierarchy = model.get_hierarchy()
         atoms = hierarchy.atoms()
         for atom in atoms:
-            atom_serial = int(atom.serial.strip())
+            atom_serial = atom.serial_as_int()
             if atom.element_is_hydrogen() or atom_serial in self.link_partners:
                 atom.element = ' H'
             if atom_serial in self.link_partners:
@@ -127,6 +130,10 @@ class Region(object):
                 atom.xyz = (c_qm.xyz[0] + self.g_bond[atom_serial]*(atom.xyz[0] - c_qm.xyz[0]),
                     c_qm.xyz[1] + self.g_bond[atom_serial]*(atom.xyz[1] - c_qm.xyz[1]),
                     c_qm.xyz[2] + self.g_bond[atom_serial]*(atom.xyz[2] - c_qm.xyz[2]))
+        if max(self.serials) > 99999:
+            # a copy, since qref_prep.py reads the serials of the model afterwards
+            hierarchy = hierarchy.deep_copy()
+            hierarchy.atoms().reset_serial()
         hierarchy.write_pdb_file(file_name=path or self.qm_file, crystal_symmetry=model.crystal_symmetry(), anisou=False)
 
     def settings_entry(self):

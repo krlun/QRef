@@ -2,6 +2,7 @@
 
 import sys
 import argparse
+from iotbx.pdb.hybrid_36 import hy36decode
 from utils import read_region
 
 
@@ -12,7 +13,7 @@ def parse_and_update(occupancy, infile, outfile, atoms=None, residues=None):
             line = handle.readline()
             while line:
                 if line[0:6].strip() in records:
-                    if (atoms is not None and int(line[6:11].strip()) in atoms) or (residues is not None and line[16:26] in residues):
+                    if (atoms is not None and hy36decode(5, line[6:11]) in atoms) or (residues is not None and line[16:26] in residues):
                         line = line[0:54] + occupancy.rjust(6) + line[60:]
                 out.write(line)
                 line = handle.readline()

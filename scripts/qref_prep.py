@@ -45,7 +45,7 @@ def find_link_partners(model, region):
         closest = None
         link_atom = atoms[region.position(link)]
         for atom in atoms:
-            serial = int(atom.serial.strip())
+            serial = atom.serial_as_int()
             if serial != link and bond_params_table.lookup(region.position(link), region.position(serial)) is not None:
                 distance = atom.distance(link_atom)
                 if distance < min_distance:
@@ -115,7 +115,7 @@ def check_altlocs(model, link_atoms):
     hierarchy = model.get_hierarchy()
     altlocs = set()
     for atom in hierarchy.atoms():
-        if int(atom.serial) not in link_atoms: altlocs.add(atom.pdb_label_columns()[4])
+        if atom.serial_as_int() not in link_atoms: altlocs.add(atom.pdb_label_columns()[4])
     altlocs = sorted(list(altlocs))
     if len(altlocs) != 1:
         if altlocs[0] == ' ': altlocs[0] = '<blank>'

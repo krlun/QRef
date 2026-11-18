@@ -6,6 +6,7 @@ import pickle
 import numpy as np
 
 from iotbx.data_manager import DataManager
+from iotbx.pdb.hybrid_36 import hy36decode
 
 from qref.common import Region
 from qref.common import Settings
@@ -52,7 +53,7 @@ def write_coordinates(infile, sites_cart):
     with open(infile, 'w') as handle:
         for line in model:
             if line[0:6].strip() in records:
-                serial = int(line[6:11].strip())
+                serial = hy36decode(5, line[6:11])
                 coords = ''
                 for i in range(3): coords += '{:.3f}'.format(round(sites_cart[serial-1][i], 3)).rjust(width)
                 line = line[0:30] + coords + line[54:]
