@@ -105,7 +105,7 @@ class Region(object):
         serials = sorted(self.serials)
         atoms = model.get_hierarchy().atoms()
         width = 5
-        for atom in atoms: atom.serial = hy36encode(width, serials[int(atom.serial) - 1])
+        for i, atom in enumerate(atoms): atom.serial = hy36encode(width, serials[i])
 
     def apply_transforms(self, model):
         for transform in self.transforms:
