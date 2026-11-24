@@ -54,7 +54,7 @@ The `qref` module is copied into that installation, and `energies.py` in `cctbx`
 
 `--link` makes the installation import `qref` from the `QRef` directory rather than copying it, so that several installations can share one copy of `QRef`. It also installs the scripts (see below) as wrappers that run them from the `QRef` directory, so a `git pull` updates both.
 
-A file that is already patched is left alone, so running `install.py` again reports what it skipped and changes nothing.
+Running `install.py` again skips the files that are already patched, but copies the `qref` module again, which updates it.
 
 `--force` patches an already patched file again, starting over from the `.qref-orig` backup.
 
